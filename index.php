@@ -13,6 +13,8 @@
 define("FILE_DATA",    "mud.dat");
 define("FILE_NOLOGIN", "nologin");
 
+include("user.php");
+
 /*
  *	Check we are running on the correct host
  *	see the notes about the use of flock();
@@ -56,7 +58,7 @@ function loadData()
 	if(!file_exists(FILE_DATA)) return false;
 	//"<p>AberMUD has yet to ever start!!!</p>\n"
 
-	$f = file(FILEDATA);
+	$f = file(FILE_DATA);
 
 	return array(
 		'start' => $f[0],
@@ -247,9 +249,12 @@ if($nologin) $errors[] = $nologin;
 
 $mud_data = loadData();
 
-$timestart   = getShortTime($mud_data['start']);
-$timeelapsed = getFullTime( $mud_data['start']);
-$view_file   = "splash.html";    
+$data = array(
+	'view'   => "splash.html",
+	'time'   => getShortTime($mud_data['start']),
+	'text'   => getFullTime( $mud_data['start']),
+	'errors' => array(),
+);
 
 /**/
 $qnmrq  = 1;
@@ -286,5 +291,4 @@ if($page_data == "logout")
 }
 
 $view_file = $data['view'];
-$text      = $data['text'];
 include($view_file);
