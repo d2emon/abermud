@@ -25,7 +25,9 @@ long_line_column=72
 
 [files]
 current_page=0
-FILE_NAME_0=944;Python;0;EUTF-8;1;1;0;C%3A%5CUsers%5CМихалычЪ%5CDocuments%5CGitHub%5Cabermud%5CpyAber%5Cmain.py;0;4
+FILE_NAME_0=1806;Python;0;EUTF-8;1;1;0;C%3A%5CUsers%5CМихалычЪ%5CDocuments%5CGitHub%5Cabermud%5CpyAber%5Cmain.py;0;4
+FILE_NAME_1=850;C;0;EUTF-8;1;1;0;C%3A%5CUsers%5CМихалычЪ%5CDocuments%5CGitHub%5Cabermud%5Cmud%5Cgamego.c;0;4
+FILE_NAME_2=1560;Python;0;EUTF-8;1;1;0;C%3A%5CUsers%5CМихалычЪ%5CDocuments%5CGitHub%5Cabermud%5CpyAber%5Ctemp_aber.py;0;4
 
 [build-menu]
 EX_00_LB=_Выполнить
