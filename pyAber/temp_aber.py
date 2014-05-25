@@ -25,46 +25,67 @@
 globme = ""
 tty = 0
 in_fight = 0
+maxu = 0
+zapped = False
 
-def syslog(text):
-    """TODO : System log"""
-    print("syslog({0})".format(text))
+def dumpitems():
+    """TODO : Dump player items"""
+    print(">>>dumpitems()")
 
-def keysetup():
-    """TODO : Key setup"""
-    print("keysetup()")
+def saveme():
+    """TODO : Save player"""
+    print(">>>saveme()")
 
-def talker(globme):
-    """TODO : Main loop"""
-    print("talker({0})".format(globme))
-    try:
-        while True:
-            pass
-    except KeyboardInterrupt:
-        from main import sig_ctrlc
-        sig_ctrlc()
+def chksnp():
+    """TODO : Check snoop"""
+    print(">>>chksnp()")
+    
+def pvis(mynum):
+    """TODO : Player visibility"""
+    print(">>>pvis({0})".format(mynum))
+    return 0
 
-def cuserid():
-	"""TODO : User ID"""
-	print("cuserid()")
+def pname(mynum):
+    """TODO : Player name"""
+    print(">>>pname({0})".format(mynum))
+    return "Player"
 
-def loseme():
-    """TODO : Losing game"""
-    print("loseme()")
+def sendsys(player_from, player_to, code, txt, block):
+    """TODO : Send block"""
+    print(">>>sendsys({0}, {1}, {2}, {3}, {4})".format(player_from, player_to, code, txt, block))
 
-def crapup(text):
-    """TODO : Showing final message"""
-    print("crapup({0})".format(text))
-    exit()
+def pbfr():
+    """TODO : Show buffer"""
+    print(">>>pbfr()")
 
-def keysetback():
-    """TODO : Key return"""
-    print("keysetback()")
+def openworld():
+    """TODO : Open world"""
+    print(">>>openworld()")
+    
+def closeworld():
+    """TODO : Close world"""
+    print(">>>closeworld()")
+    
+def putmeon(name):
+    """TODO : Put player on"""
+    print(">>>putmeon({0})".format(name))
+    
+def rte(name):
+    """TODO : Read messages"""
+    print(">>>rte({0})".format(name))
+    
+def special(cmd, name):
+    """TODO : Run special command"""
+    print(">>>special({0}, {1})".format(cmd, name))
+    
+def sendmsg(name):
+    """TODO : Send messages"""
+    print(">>>sendmsg({0})".format(name))
 
 def main():
-	"""Temporary functions"""
-	return 0
+    """Temporary functions"""
+    return 0
 
 if __name__ == '__main__':
-	main()
+    main()
 

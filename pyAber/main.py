@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  без имени.py
+#  main.py
 #  
 #  Copyright 2014 МихалычЪ <МихалычЪ@PC>
 #  
@@ -22,66 +22,95 @@
 #  
 #  
 
+import blib
+
 #~ char **argv_p;
 
 def main(username):
-    from temp_aber import syslog, keysetup, talker, cuserid
+    from talker import talker
     from temp_aber import globme, tty
+    
+    import key
+    from support import syslog
 
     sig_init()
     if not username:
         raise Exception("Args!")
-    print("Entering Game ....\n");
+    print("Entering Game ...");
     tty=0;
     #~ if tty=4: initbbc(): initscr(): topscr()
 
     if username == "D2emon":
         globme = "The {0}".format(username)
     else:
-	    globme = username
+        globme = username
 
-    print("Hello {0}\n".format(globme))
-    syslog("GAME ENTRY: {name}[{user_id}]".format(name=globme, user_id=cuserid()))
-    keysetup()
+    user_id = blib.cuserid()
+
+    print("Hello {0}".format(globme))
+    syslog("GAME ENTRY: {name}[{user_id}]".format(name=globme, user_id=user_id))
+    key.setup()
     talker(globme)
-	
+    
     return 0
 
 #~ char privs[4];
 
 def crapup(str):
-	"""Quitting game with message"""
-    #~ extern long pr_due;
-    #~ static char *dashes =
-    #~ "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-";
-    #~ pbfr();
-    #~ pr_due=0;  /* So we dont get a prompt after the exit */ 
-    #~ keysetback();
-    #~ printf("\n%s\n\n%s\n\n%s\n", dashes, str, dashes);
-    exit(0)
+    """Quitting game with message"""
+    from temp_aber import pbfr
+    from bprintf import pr_due
+    import key
 
-#~ listfl(name)
-#~ char *getkbd(s,l)   /* Getstr() with length limit and filter ctrl */
+    dashes = "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    pbfr()
+    pr_due = 0  
+    #~ So we dont get a prompt after the exit
+    key.setback()
+    print("\n{0}\n\n{1}\n\n{0}\n".format(dashes, str))
+    exit(0)
+    
+def listfl(name):
+    """List file"""
+    print(">>>listfl({0})".format(name))
+
+def getkbd(s, l):
+    """Getstr() with length limit and filter ctrl"""
+    print(">>>getkbd({0}, {1})".format(s, l))
 
 #~ import signal
-
 import atexit
 
 sig_active=0;
 
-#~ sig_alon()
-#~ unblock_alarm()
-#~ block_alarm()
+def sig_alon():
+    """Set signals on"""
+    print(">>>sig_alon()")
+
+def unblock_alarm():
+    """Unblock alarm"""
+    print(">>>unblock_alarm()")
+
+def block_alarm():
+    """Block alarm"""
+    print(">>>block_alarm()")
 
 def sig_aloff():
     "Stopping all signals"
-    sig_active=0;	
+    sig_active=0;   
+
+    sigs = {'alrm':0}
+    print(sigs)
+
     #~ signal(SIGALRM,SIG_IGN);
     #~ alarm(2147487643);
-    print("sig_aloff")    
+    pass    
 
 #~ long interrupt=0;
-#~ sig_occur()
+
+def sig_occur():
+    """Signal occured"""
+    print(">>>sig_occur()")
 
 def sig_init():
     "Initialization if signals"
@@ -90,26 +119,28 @@ def sig_init():
 
     atexit.register(sig_oops)
     
-	#~ signal(SIGHUP,sig_oops);
-	#~ signal(SIGINT,sig_ctrlc);
-	#~ signal(SIGTERM,sig_ctrlc);
-	#~ signal(SIGTSTP,SIG_IGN);
-	#~ signal(SIGQUIT,SIG_IGN);
+    #~ signal(SIGHUP,sig_oops);
+    #~ signal(SIGINT,sig_ctrlc);
+    #~ signal(SIGTERM,sig_ctrlc);
+    #~ signal(SIGTSTP,SIG_IGN);
+    #~ signal(SIGQUIT,SIG_IGN);
     #~ signal(SIGCONT,sig_oops);
     pass
 
 def sig_oops(is_ctrlc = False):
     "Quitting"
-    from temp_aber import loseme, keysetback
+    from temp_aber import globme
+    from talker import loseme
+    import key
 
     sig_aloff();
-    loseme();
-    keysetback();
+    loseme(globme);
+    key.setback();
     print("Ooops")
 
 def sig_ctrlc():
     "Quitting on Ctrl+C"
-    from temp_aber import loseme, crapup
+    from talker import loseme
     from temp_aber import in_fight
 
     if in_fight:
@@ -119,8 +150,10 @@ def sig_ctrlc():
     loseme();
     atexit.unregister(sig_oops)
     crapup("Byeeeeeeeeee  ...........")
-	
-#~ set_progname(n,text)
+    
+def set_progname(n,text):
+    """Program name set"""
+    print(">>>set_progname({0}, {1})".format(n,text))
 
 if __name__ == '__main__':
     main("D2emon")
