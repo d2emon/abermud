@@ -25,8 +25,55 @@
 globme = ""
 tty = 0
 in_fight = 0
-maxu = 0
+maxu = 15
 zapped = False
+
+my_str = 0
+my_lev = 0
+my_sex = 0
+
+def trapch(ch):
+    """TODO : Go to room"""
+    print(">>>trapch({0})".format(ch))
+
+def randperc():
+    """TODO : Random percent"""
+    print(">>>randperc()")
+    return 25
+
+def cuserid():
+    """TODO : User ID"""
+    print(">>>cuserid()")
+
+def initme():
+    """TODO : Initialize player"""
+    print(">>>initme()")
+
+def sendsys(player_from, player_to, code, txt, block):
+    """TODO : Send block"""
+    print(">>>sendsys({0}, {1}, {2}, {3}, {4})".format(player_from, player_to, code, txt, block))
+
+def sendmsg(name):
+    """TODO : Send messages"""
+    print(">>>sendmsg({0})".format(name))
+
+def readmsg(unit, block, ct):
+    """TODO : Read messages"""
+    print(">>>readmsg({0}, {1}, {2})".format(unit, block, ct))
+	
+def mstoout(block, name):
+    """TODO : Show messages"""
+    print(">>>mstoout({0}, {1})".format(block, name))
+
+def findend(unit):
+    """TODO : Find end of messages"""
+    print(">>>findend({0})".format(unit))
+    return 10
+
+def fpbn(name):
+    """TODO : Find player by name"""
+    print(">>>fpbn({0})".format(name))
+    return -1
 
 def dumpitems():
     """TODO : Dump player items"""
@@ -48,40 +95,61 @@ def pvis(mynum):
 def pname(mynum):
     """TODO : Player name"""
     print(">>>pname({0})".format(mynum))
-    return "Player"
+    return ""
 
-def sendsys(player_from, player_to, code, txt, block):
-    """TODO : Send block"""
-    print(">>>sendsys({0}, {1}, {2}, {3}, {4})".format(player_from, player_to, code, txt, block))
+def setpname(ct, value):
+    """TODO : Set player name"""
+    print(">>>setpname({0}, {1})".format(ct, value))
 
-def pbfr():
-    """TODO : Show buffer"""
-    print(">>>pbfr()")
+def setploc(ct, value):
+    """TODO : Set player location"""
+    print(">>>setploc({0}, {1})".format(ct, value))
 
+def setppos(ct, value):
+    """TODO : Set player position"""
+    print(">>>setppos({0}, {1})".format(ct, value))
+
+def setplev(ct,value):
+    """TODO : Set player level"""
+    print(">>>setplev({0}, {1})".format(ct, value))
+
+def setpvis(ct,value):
+    """TODO : Set player visibility"""
+    print(">>>setpvis({0}, {1})".format(ct, value))
+
+def setpstr(ct,value):
+    """TODO : Set player strength"""
+    print(">>>setpstr({0}, {1})".format(ct, value))
+
+def setpwpn(ct,value):
+    """TODO : Set player weapon"""
+    print(">>>setpwpn({0}, {1})".format(ct, value))
+
+def setpsex(ct,value):
+    """TODO : Set player sex"""
+    print(">>>setpsex({0}, {1})".format(ct, value))
+
+def setpsexall(ct,value):
+    """TODO : Set player flags"""
+    print(">>>setpsexall({0}, {1})".format(ct, value))
+
+def setphelping(ct,value):
+    """TODO : Set player helping"""
+    print(">>>setphelping({0}, {1})".format(ct, value))
+    
 def openworld():
     """TODO : Open world"""
-    print(">>>openworld()")
+    print("<-<openworld()")
+    return True
     
 def closeworld():
     """TODO : Close world"""
-    print(">>>closeworld()")
-    
-def putmeon(name):
-    """TODO : Put player on"""
-    print(">>>putmeon({0})".format(name))
+    print(">->closeworld()")
     
 def rte(name):
     """TODO : Read messages"""
     print(">>>rte({0})".format(name))
     
-def special(cmd, name):
-    """TODO : Run special command"""
-    print(">>>special({0}, {1})".format(cmd, name))
-    
-def sendmsg(name):
-    """TODO : Send messages"""
-    print(">>>sendmsg({0})".format(name))
-
 def main():
     """Temporary functions"""
     return 0

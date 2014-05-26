@@ -110,10 +110,7 @@ def syslog(args):
             loseme()
             raise Exception("Log fault")
         x.write(log_str+"\n")
-        #~ fprintf(x,"%s:  ",z);
-        #~ fprintf(x,args,arg1,arg2);
-        #~ fprintf(x,"\n");
-    print("<-{0}".format(log_str) )
+    print("<--{0}".format(log_str) )
 
 
 #~ osetbit(ob,x)

@@ -34,7 +34,7 @@ def setup():
     #~ save_flag=ios.c_lflag;
     #~ ios.c_lflag&=~(ECHO|ICANON);
     #~ tcsetattr(fileno(stdin),TCSANOW,&ios);
-    print("->keysetup()")
+    print("-->keysetup()")
     pass
 
 def setback():
@@ -43,7 +43,7 @@ def setback():
     #~ tcgetattr(fileno(stdin),&ios);
     #~ ios.c_lflag=save_flag;
     #~ tcsetattr(fileno(stdin),TCSANOW,&ios);
-    print("->keysetback()")
+    print("-->keysetback()")
     pass
 
 #~ char key_buff[256];

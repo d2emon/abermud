@@ -32,7 +32,9 @@ pr_due = False
 
 #~ The main loop
 
-#~ void dcprnt(str,file)
+def dcprnt(str, file):
+    """Decode and print text"""
+    print(">>>dcprnt({0}, {1})".format(str, file))
 
 #~ int pfile(str,ct,file)
 
@@ -52,13 +54,15 @@ pr_due = False
 
 #~ int  ppnblind(str,ct,file)
 
-sysbuf=""
+sysbuf = ""
 
 def makebfr():
     """Make system buffer"""
+    global sysbuf
     sysbuf = ""
 
-#~ FILE * log_fl= 0; /* 0 = not logging */
+log_fl = False
+#~ 0 = not logging
 
 #~ void logcom()
 
@@ -66,53 +70,59 @@ pr_qcr = False
 
 def pbfr():
     """Put buffer on screen"""
-    from temp_aber import closeworld
-    from main import block_alarm, unblock_alarm
-    #~ FILE *fln;
-    #~ long mu;
+    global sysbuf
 
-    block_alarm()
+    from temp_aber import closeworld, pname
+
+    import signals
+
+    signals.block_alarm()
     closeworld()
     if sysbuf:
         pr_due = True
     if sysbuf and pr_qcr:
-        pass
-        #~ putchar('\n');
+        print("\n")
     pr_qcr = False
-    #~ if(log_fl!=NULL):
-        #~ iskb=0;
-        #~ dcprnt(sysbuf,log_fl);
-    #~ if(snoopd!=-1):
-        #~ fln=opensnoop(pname(snoopd),"a");
-        #~ if(fln>0):
-            #~ iskb = 0
-            #~ dcprnt(sysbuf,fln);
-            #~ fcloselock(fln);
-    iskb = 1
-    #~ dcprnt(sysbuf,stdout);
-    sysbuf = "" #~ clear buffer
-    #~ if(snoopt!=-1):
-        #~ viewsnoop();
-    unblock_alarm()
+    if log_fl:
+        iskb = False
+        dcprnt(sysbuf,log_fl)
+    if snoopd != -1:
+        fln=opensnoop(pname(snoopd),"a")
+        if fln:
+            iskb = False
+            dcprnt(sysbuf,fln)
+            #~ fcloselock(fln)
+    iskb = True
+    dcprnt(sysbuf, "stdout")
+    sysbuf = ""
+    #~ clear buffer
+    if snoopt != -1:
+        viewsnoop()
+    signals.unblock_alarm()
 
-iskb = 1
+iskb = True
 
 #~ void quprnt(x)
 
 #~ int pnotkb(str,ct,file)
 
-#~ long snoopd= -1;
+snoopd = -1
 
-#~ FILE *opensnoop(user,per)
+def opensnoop(user, per):
+    """Open snoop file"""
+    print(">>>opensnoop({0}, {1})".format(user, per))
+    return False
 
-#~ long snoopt= -1;
+snoopt = -1
 
 #~ char sntn[32];
 
 #~ void snoopcom()
 
-#~ void viewsnoop()
-
+def viewnoop():
+    """View snoop file"""
+    print(">>>viewsnoop()")
+    
 #~ void chksnp()
 
 #~ void setname(x)  /* Assign Him her etc according to who it is */
