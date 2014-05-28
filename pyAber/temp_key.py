@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  blib.py
+#  key.py
 #  
 #  Copyright 2014 МихалычЪ <d2emon@mikhalych-desktop>
 #  
@@ -23,46 +23,15 @@
 #  
 
 #~ #include <stdio.h>
-#~ #include <pwd.h>
+#~ #include <termios.h>
 
-#~ #include <ctype.h>
-#~ #include "System.h"
+#~ long save_flag= -1;
 
-#~ char *lowercase(str)
+#~ key_input(ppt,len_max)
 
-#~ char *uppercase(str)
-
-#~ char *trim(str)
-
-#~ int any(ch,str)
-
-#~ void gepass(str)
-
-#~ int scan(out,in,start,skips,stops)
-
-#~ char *getstr(file,st)
-
-#~ void addchar(str,ch)
-
-#~ long numarg(str)
-
-#~ sbar()
-
-#~ void f_listfl(name,file)
-
-#~ void sec_read(unit,block,pos,len)
-
-#~ void sec_write(unit,block,pos,len)
-
-def cuserid():
-    """Get user ID"""
-    user_id = "192.168.0.78"
-    return user_id
-    pass
-    
 def main():
-    """B functions and utilities"""
-    print("B functions and utilities")
+    """Working with keyboard"""
+    print("Key drivers")
     return 0
 
 if __name__ == '__main__':

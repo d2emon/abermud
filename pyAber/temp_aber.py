@@ -22,15 +22,35 @@
 #  
 #  
 
-globme = ""
 tty = 0
-in_fight = 0
 maxu = 15
 zapped = False
 
 my_str = 0
 my_lev = 0
 my_sex = 0
+
+debug_mode = True
+convflg    = 0
+
+in_fight = 0
+fighting = 0
+
+def gamecom(name):
+	"""TODO : Game commands"""
+	print(">>>gamecom({0})".format(name))
+
+def update(name):
+	"""TODO : Update data"""
+	print(">>>update({0})".format(name))
+
+def eorte():
+	"""TODO : End of rte"""
+	print(">>>eorte()")
+
+def on_timing():
+	"""TODO : On timing event"""
+	print(">>>on_timing()")
 
 def trapch(ch):
     """TODO : Go to room"""
@@ -53,10 +73,6 @@ def sendsys(player_from, player_to, code, txt, block):
     """TODO : Send block"""
     print(">>>sendsys({0}, {1}, {2}, {3}, {4})".format(player_from, player_to, code, txt, block))
 
-def sendmsg(name):
-    """TODO : Send messages"""
-    print(">>>sendmsg({0})".format(name))
-
 def readmsg(unit, block, ct):
     """TODO : Read messages"""
     print(">>>readmsg({0}, {1}, {2})".format(unit, block, ct))
@@ -64,11 +80,6 @@ def readmsg(unit, block, ct):
 def mstoout(block, name):
     """TODO : Show messages"""
     print(">>>mstoout({0}, {1})".format(block, name))
-
-def findend(unit):
-    """TODO : Find end of messages"""
-    print(">>>findend({0})".format(unit))
-    return 10
 
 def fpbn(name):
     """TODO : Find player by name"""
@@ -87,6 +98,11 @@ def chksnp():
     """TODO : Check snoop"""
     print(">>>chksnp()")
     
+def ploc(mynum):
+    """TODO : Player location"""
+    print(">>>ploc({0})".format(mynum))
+    return 0
+
 def pvis(mynum):
     """TODO : Player visibility"""
     print(">>>pvis({0})".format(mynum))
@@ -136,19 +152,6 @@ def setpsexall(ct,value):
 def setphelping(ct,value):
     """TODO : Set player helping"""
     print(">>>setphelping({0}, {1})".format(ct, value))
-    
-def openworld():
-    """TODO : Open world"""
-    print("<-<openworld()")
-    return True
-    
-def closeworld():
-    """TODO : Close world"""
-    print(">->closeworld()")
-    
-def rte(name):
-    """TODO : Read messages"""
-    print(">>>rte({0})".format(name))
     
 def main():
     """Temporary functions"""

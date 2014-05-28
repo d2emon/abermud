@@ -22,17 +22,17 @@
 #  
 #  
 
-import blib
+import gamesys
 
 #~ char **argv_p;
 
 def main(username):
-    from temp_aber import globme, tty
+    from temp_aber import tty
+    from temp_talker import globme
+    from temp_talker import talker
     
     import signals
     import key
-    from talker import talker
-    from support import syslog
 
     signals.init()
     if not username:
@@ -46,10 +46,10 @@ def main(username):
     else:
         globme = username
 
-    user_id = blib.cuserid()
+    user_id = gamesys.cuserid()
 
     print("Hello {0}".format(globme))
-    syslog("GAME ENTRY: {name}[{user_id}]".format(name=globme, user_id=user_id))
+    gamesys.syslog("GAME ENTRY: {name}[{user_id}]".format(name=globme, user_id=user_id))
     key.setup()
     talker(globme)
     
@@ -57,19 +57,6 @@ def main(username):
 
 #~ char privs[4];
 
-def crapup(str):
-    """Quitting game with message"""
-    import bprintf
-    import key
-
-    dashes = "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    bprintf.pbfr()
-    bprintf.pr_due = 0  
-    #~ So we dont get a prompt after the exit
-    key.setback()
-    print("\n{0}\n\n{1}\n\n{0}\n".format(dashes, str))
-    exit(0)
-    
 def listfl(name):
     """List file"""
     print(">>>listfl({0})".format(name))
@@ -77,8 +64,6 @@ def listfl(name):
 def getkbd(s, l):
     """Getstr() with length limit and filter ctrl"""
     print(">>>getkbd({0}, {1})".format(s, l))
-
-#~ long interrupt=0;
 
 def set_progname(n,text):
     """Program name set"""

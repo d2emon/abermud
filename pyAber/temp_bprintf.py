@@ -26,8 +26,6 @@
 #~ #include <stdio.h>
 #~ #include "System.h"
 
-pr_due = False
-
 #~ void bprintf(args,arg1,arg2,arg3,arg4,arg5,arg6,arg7)
 
 #~ The main loop
@@ -54,75 +52,19 @@ def dcprnt(str, file):
 
 #~ int  ppnblind(str,ct,file)
 
-sysbuf = ""
-
-def makebfr():
-    """Make system buffer"""
-    global sysbuf
-    sysbuf = ""
-
 log_fl = False
 #~ 0 = not logging
 
 #~ void logcom()
 
-pr_qcr = False
-
-def pbfr():
-    """Put buffer on screen"""
-    global sysbuf
-
-    from temp_aber import closeworld, pname
-
-    import signals
-
-    signals.block_alarm()
-    closeworld()
-    if sysbuf:
-        pr_due = True
-    if sysbuf and pr_qcr:
-        print("\n")
-    pr_qcr = False
-    if log_fl:
-        iskb = False
-        dcprnt(sysbuf,log_fl)
-    if snoopd != -1:
-        fln=opensnoop(pname(snoopd),"a")
-        if fln:
-            iskb = False
-            dcprnt(sysbuf,fln)
-            #~ fcloselock(fln)
-    iskb = True
-    dcprnt(sysbuf, "stdout")
-    sysbuf = ""
-    #~ clear buffer
-    if snoopt != -1:
-        viewsnoop()
-    signals.unblock_alarm()
-
-iskb = True
-
 #~ void quprnt(x)
 
 #~ int pnotkb(str,ct,file)
-
-snoopd = -1
-
-def opensnoop(user, per):
-    """Open snoop file"""
-    print(">>>opensnoop({0}, {1})".format(user, per))
-    return False
-
-snoopt = -1
 
 #~ char sntn[32];
 
 #~ void snoopcom()
 
-def viewnoop():
-    """View snoop file"""
-    print(">>>viewsnoop()")
-    
 #~ void chksnp()
 
 #~ void setname(x)  /* Assign Him her etc according to who it is */

@@ -24,7 +24,6 @@
 
 #~ #define UAF_RAND "/cygdrive/c/Programs/Adv/AberMUD2/mud/uaf.rand"
 #~ #define ROOMS "/cygdrive/c/Programs/Adv/AberMUD2/mud/TEXT/ROOMS/"
-LOG_FILE = "mud_syslog"
 #~ #define BAN_FILE "/cygdrive/c/Programs/Adv/AberMUD2/mud/banned_file"
 #~ #define NOLOGIN "/cygdrive/c/Programs/Adv/AberMUD2/mud/nologin"
 #~ #define RESET_T "/cygdrive/c/Programs/Adv/AberMUD2/mud/reset_t"

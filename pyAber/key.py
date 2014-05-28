@@ -3,7 +3,7 @@
 #
 #  key.py
 #  
-#  Copyright 2014 МихалычЪ <d2emon@mikhalych-desktop>
+#  Copyright 2014 МихалычЪ <МихалычЪ@PC>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,10 +22,9 @@
 #  
 #  
 
-#~ #include <stdio.h>
-#~ #include <termios.h>
-
-#~ long save_flag= -1;
+buff  = ""
+pr_bf = "PR"     # ""
+mode  = -1
 
 def setup():
     """Setting up keys"""
@@ -46,13 +45,85 @@ def setback():
     print("-->keysetback()")
     pass
 
-#~ char key_buff[256];
-#~ char pr_bf[32];
-#~ long key_mode= -1;
+def reprint():
+    """Reprint"""
+    import gamebuffer
 
-#~ key_input(ppt,len_max)
+    global mode, pr_bf, buff
 
-#~ key_reprint()
+    gamebuffer.pr_qcr = True
+    gamebuffer.pbfr()
+    if not mode and gamebuffer.pr_due:
+        print("\n{0}{1}", pr_bf, buff)
+    gamebuffer.pr_due = False
+	#~ fflush(stdout);
+
+def prmpt(vis, debug, wiz, convflg):
+    """Get prompt symbol"""
+    p = "\r"
+    if vis:
+        p += "("
+
+    if debug:
+        p += "#"
+    if wiz:
+        p += "----"
+
+    if convflg == 0:
+        p += ">"
+    elif convflg == 1:
+        p += "\""
+    elif convflg == 2:
+        p += "*"
+    else:
+        p += "?"
+
+    if vis:
+        p += ")"
+
+    return p
+
+def kinput(ppt,len_max):
+    """Input from keyboard"""
+    #~ extern long pr_due;
+
+    import gamebuffer
+
+    global mode, buff
+    
+    x       = ""
+    len_cur = 0
+    mode    = 0
+
+    pr_bf = ppt
+    print(ppt)
+    gamebuffer.pbfr()
+    gamebuffer.pr_due = 0
+
+    buff = ""
+    
+    while len_cur < len_max:
+        #~ x = getchar()
+        if x == "\n":
+            print("\n")
+            mode = 1
+            return 0
+        #~ if ((x == 8) or (x == 127)) and len_cur:
+            #~ putchar(8);
+            #~ putchar(' ');
+            #~ putchar(8);
+            #~ len_cur -= 1
+            #~ buff[len_cur] = 0
+            #~ continue
+        #~ if x<32:
+            #~ continue
+        #~ if x==127:
+            #~ continue
+        #~ putchar(x)
+        #~ buff[len_cur] = x
+        #~ len_cur += 1
+        #~ buff[len_cur] = 0
+    print(">>>input(\n{0}, {1})".format(n, t))
 
 def main():
     """Working with keyboard"""

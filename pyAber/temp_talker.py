@@ -45,11 +45,11 @@ i_setup = 0
 #~ extern long ppos();
 #~ extern char key_buff[];
 
-cms   = -1
-curch = 0
+cms     = -1
+curch   = 0
+globme  = ""
+curmode = 0
 
-#~ char globme[40];
-#~ long  curmode=0;
 #~ long  meall=0;
 
 #~ Data format for mud packets
@@ -74,8 +74,88 @@ curch = 0
 #~ long gurum=0;
 #~ long convflg=0;
 
-#~ sendmsg(name)
+def sendmsg(name):
+    """Sending game messages"""
+    from temp_aber import debug_mode, tty, convflg, my_lev, my_str, in_fight, fighting
+    from temp_aber import pvis, pname, ploc, gamecom
+    
+    import gamebuffer
+    import key
+    import signals
+    import world
 
+    global curch, mynum, curmode
+
+    #~ l:
+    gamebuffer.pbfr()
+
+    if tty == 4:
+        btmscr()
+
+    prmpt = key.prmpt(vis=pvis(mynum), debug=debug_mode, wiz=(my_lev > 9), convflg=convflg)
+    print("------------------------------------------------------------")
+    print(prmpt)
+    print("------------------------------------------------------------")
+
+    gamebuffer.pbfr()
+
+    if pvis(mynum) > 9999:
+        pass
+        #~ set_progname(0, "-csh")
+    else:
+        work = "   --}}----- ABERMUD -----{{--     Playing as {0}".format(name)
+
+    print("------------------------------------------------------------")
+    print(work)
+    print("------------------------------------------------------------")
+
+    signals.alon()
+    key.kinput(prmpt, 80)
+    signals.aloff()
+    work = key.buff
+    if tty == 4:
+        topscr()
+
+    gamebuffer.sysbuf += "\001l"
+    gamebuffer.sysbuf += work
+    gamebuffer.sysbuf += "\n\001"
+
+    world.openw()
+    rte(name)
+    world.closew()
+    if convflg and not work == "**":
+        convflg = 0
+       #~ goto l;
+    if not work:
+        pass
+        #goto nadj;
+    if work != "*" and work[0] != '*':
+        pass
+        #~ work[0]=32
+        #~ goto nadj;
+    if convflg:
+        w2 = work
+        if convflg == 1:
+            work = "say {0}".format(w2)
+        else:
+            work = "tss {0}".format(w2)
+    #~ nadj
+    if curmode == 1:
+        gamecom(work)
+    else:
+        if (work != ".Q" and work != ".q") and worker:
+            a = special(work, name)
+    if fighting > -1:
+        if not pname(fighting):
+            in_fight = False
+            fighting = -1
+        if ploc(fighting) != curch:
+            in_fight = False
+            fighting = -1
+    if in_fight:
+        in_fight -= 1
+    return (not (work == ".Q")) or (not (work == ".q"))
+    
 #~ send2(block)
 
 #~ readmsg(channel,block,num)
@@ -85,7 +165,9 @@ curch = 0
 
 def rte(name):
     """Read messages"""
-    from temp_aber import openworld, findend, readmsg, mstoout
+    from temp_aber import readmsg, mstoout, update, eorte
+    import world
+    
     #~ extern long cms;
     #~ extern long vdes,tdes,rdes;
     #~ extern FILE *fl_com;
@@ -93,13 +175,13 @@ def rte(name):
     #~ long too,ct,block[128];
     global cms
 
-    unit   = openworld()
+    unit   = world.openw()
     fl_com = unit
     if not unit:
         crapup("AberMUD: FILE_ACCESS : Access failed")
         raise Exception("AberMUD: FILE_ACCESS : Access failed")
 
-    too = findend(unit) + 1
+    too = world.findend(unit) + 1
     if cms == -1:
         cms = too
 
@@ -107,20 +189,16 @@ def rte(name):
     for ct in range(cms, too):
         readmsg(unit, block, ct)
         mstoout(block, name)
-    #~ update(name);
-    #~ eorte();
+    update(name)
+    eorte()
 
     rdes = 0
     tdes = 0
     vdes = 0
-    
-    print(">>>rte({0})".format(name))
 
 #~ FILE *openlock(file,perm)
 
 #~ long findstart(unit)
-
-#~ long findend(unit)
 
 rd_qd = True
 
@@ -128,9 +206,11 @@ rd_qd = True
 
 def special(string, name):
     """Special functions"""
-    from temp_aber import openworld, setpstr, setplev, setpvis, setpwpn, setpsexall, setphelping, initme, cuserid, sendsys, randperc, trapch
+    from temp_aber import setpstr, setplev, setpvis, setpwpn, setpsexall, setphelping, initme, cuserid, sendsys, randperc, trapch
     from temp_aber import my_str, my_lev, my_sex
 
+    import world
+    
     global mynum, curmode, curch
 
     #~ extern long curmode;
@@ -150,7 +230,7 @@ def special(string, name):
         curmode = 1
         curch   = -5
         initme()
-        ufl = openworld()
+        ufl = world.openw()
         setpstr(mynum, my_str)
         setplev(mynum, my_lev)
         if my_lev < 10000:
@@ -199,20 +279,21 @@ mynum = 0
 
 def putmeon(name):
     """TODO : Put player on"""
-    from temp_aber import openworld, setploc, setppos, setplev, setpvis, setpstr, setpwpn, setpsex, fpbn, pname, setpname
+    from temp_aber import setploc, setppos, setplev, setpvis, setpstr, setpwpn, setpsex, fpbn, pname, setpname
     from temp_aber import maxu
 
-    from main import crapup
+    import gamesys
+    import world
 
     global mynum, curch
     
     #~ extern long mynum,curch;
 
     iamon = False
-    unit  = openworld()
+    unit  = world.openw()
     
     if fpbn(name)!= -1:
-        crapup("You are already on the system - you may only be on once at a time")
+        gamesys.crapup("You are already on the system - you may only be on once at a time")
         raise Exception("You are already on the system - you may only be on once at a time")
 
     ct = 0
@@ -239,23 +320,24 @@ def putmeon(name):
     
 def loseme(name):
     """Loosing the game"""
-    from temp_aber import openworld, closeworld, dumpitems, pvis, pname, sendsys, saveme, chksnp, setpname
+    from temp_aber import dumpitems, pvis, pname, sendsys, saveme, chksnp, setpname
     from temp_aber import zapped
 
     import signals
+    import world
 
     signals.aloff() 
     #~ No interruptions while you are busy dying
     #~ ABOUT 2 MINUTES OR SO
     i_setup = 0
 
-    unit = openworld()
+    unit = world.openw()
     dumpitems()
     if pvis(mynum)<10000:
         bk = "{0} has departed from AberMUDII\n".format(name)
         sendsys(name, name, -10113, 0, bk)
     setpname(mynum, "")
-    closeworld()
+    world.closew()
     if not zapped:
         saveme()
     chksnp()
@@ -282,40 +364,40 @@ def talker(name=""):
     #~ FILE *fl;
     #~ char string[128];
 
-    from temp_aber import openworld, rte, closeworld, sendmsg
-    from temp_aber import globme, maxu
+    from temp_aber import maxu
 
-    from main import crapup
-    import bprintf
+    import gamesys
+    import gamebuffer
     import signals
+    import world
 
-    global cms, rd_qd, mynum
+    global globme, cms, rd_qd, mynum
  
-    bprintf.makebfr()
+    gamebuffer.makebfr()
     cms = -1
     putmeon(name)
-    if not openworld():
-        crapup("Sorry AberMUD is currently unavailable")
+    if not world.openw():
+        gamesys.crapup("Sorry AberMUD is currently unavailable")
         raise Exception("Sorry AberMUD is currently unavailable")
     if mynum >= maxu:
-        crapup("Sorry AberMUD is full at the moment")
+        gamesys.crapup("Sorry AberMUD is full at the moment")
         raise Exception("Sorry AberMUD is full at the moment")
     globme = name
     rte(name)
-    closeworld()
+    world.closew()
     cms= -1
     special(".g",name)
     i_setup = 1
     try:
         i = 0
         for i in range(0, 2):
-            bprintf.pbfr()
+            gamebuffer.pbfr()
             sendmsg(name)
             if rd_qd:
                 rte(name)
             rd_qd = False
-            closeworld()
-            bprintf.pbfr()
+            world.closew()
+            gamebuffer.pbfr()
 
             if signals.sigs['alrm']:
                 print("[SIGNAL BEGIN]")

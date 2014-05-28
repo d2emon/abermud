@@ -93,26 +93,6 @@
 
 #~ ocreate(ob)
 
-def syslog(args):
-    """Writing system log"""
-    from main import crapup
-    from talker import loseme
-    
-    import files
-    from datetime import datetime
-
-    z = datetime.now()
-    
-    log_str = "{time}: {str}".format(time=z.strftime("%y.%m.%d %H:%M:%S"), str=args)
-
-    with open(files.LOG_FILE, 'a') as x:
-        if not x:
-            loseme()
-            raise Exception("Log fault")
-        x.write(log_str+"\n")
-    print("<--{0}".format(log_str) )
-
-
 #~ osetbit(ob,x)
 
 #~ oclearbit(ob,x)

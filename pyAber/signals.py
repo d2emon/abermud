@@ -25,18 +25,23 @@
 #~ import signal
 import atexit
 
-active = False
-sigs   = {}
-alarm  = 0
+active    = False
+sigs      = {}
+alarm     = 0
+interrupt = False
 
 def block_alarm():
     """Block alarm"""
+    global sigs
+    
     #~ signal(SIGALRM,SIG_IGN);
     sigs['alrm'] = 0
     print(sigs)
 
 def unblock_alarm():
     """Unblock alarm"""
+    global sigs, active, alarm
+    
 	#~ signal(SIGALRM,sig_occur);
     sigs['alrm'] = 'sig_occur'
     print(sigs)
@@ -46,24 +51,32 @@ def unblock_alarm():
 
 def alon():
     """Set signals on"""
+    global sigs, active, alarm
+    
     active = True   
 	#~ signal(SIGALRM,sig_occur);
     sigs['alrm'] = 'sig_occur'
     print(sigs)
-    alarm = 2
+    print(active)
     #~ alarm(2)
+    alarm = 2
 
 def aloff():
     """Stopping signals"""
+    global sigs, active, alarm
+    
     active = False   
     #~ signal(SIGALRM,SIG_IGN);
     sigs['alrm'] = 0
     print(sigs)
-    alarm = 2147487643
+    print(active)
     #~ alarm(2147487643)
+    alarm = 2147487643
 
 def init():
     "Initialization if signals"
+    global sigs
+    
     atexit.register(oops)
     
     #~ signal(SIGHUP,sig_oops);
@@ -82,26 +95,45 @@ def init():
 
 def occur():
     """Signal occured"""
-    print(">>>sig_occur()")
+    from temp_aber import on_timing
+    from temp_talker import globme
+    from temp_talker import rte
+    
+    import world
+    import key
+
+    global active, interrupt
+
+    if not active:
+        return 0
+    aloff()
+    world.openw()
+    interrupt = True
+    rte(globme)
+    interrupt = False
+    on_timing()
+    world.closew()
+    key.reprint()
+    alon()
 
 def oops():
     "Quitting"
-    from temp_aber import globme
+    from temp_talker import globme
+    from temp_talker import loseme
 
     import key
-    from talker import loseme
 
-    aloff();
-    loseme(globme);
-    key.setback();
+    aloff()
+    loseme(globme)
+    key.setback()
     print("Ooops")
 
 def ctrlc():
     "Quitting on Ctrl+C"
     from temp_aber import in_fight
+    from temp_talker import loseme
 
-    from talker import loseme
-    from main import crapup
+    import gamesys
 
     if in_fight:
         return
@@ -109,7 +141,7 @@ def ctrlc():
     atexit.unregister(sig_oops)
     aloff()
     loseme()
-    crapup("Byeeeeeeeeee  ...........")
+    gamesys.crapup("Byeeeeeeeeee  ...........")
 
 def main():
     """Functions to work with signals"""
