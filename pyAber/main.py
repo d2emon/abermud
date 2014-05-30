@@ -25,36 +25,6 @@
 import gamesys
 
 #~ char **argv_p;
-
-def main(username):
-    from temp_aber import tty
-    from temp_talker import globme
-    from temp_talker import talker
-    
-    import signals
-    import key
-
-    signals.init()
-    if not username:
-        raise Exception("Args!")
-    print("Entering Game ...");
-    tty=0;
-    #~ if tty=4: initbbc(): initscr(): topscr()
-
-    if username == "D2emon":
-        globme = "The {0}".format(username)
-    else:
-        globme = username
-
-    user_id = gamesys.cuserid()
-
-    print("Hello {0}".format(globme))
-    gamesys.syslog("GAME ENTRY: {name}[{user_id}]".format(name=globme, user_id=user_id))
-    key.setup()
-    talker(globme)
-    
-    return 0
-
 #~ char privs[4];
 
 def listfl(name):
@@ -65,9 +35,78 @@ def getkbd(s, l):
     """Getstr() with length limit and filter ctrl"""
     print(">>>getkbd({0}, {1})".format(s, l))
 
-def set_progname(n,text):
-    """Program name set"""
-    print(">>>set_progname({0}, {1})".format(n,text))
+def before_loop(username):
+    """Setting up for main loop"""
+    from temp_aber import maxu
+    from temp_talker import cms, putmeon, mynum, rte, special
+	
+    import gamesys
+    import gamebuffer
+    import signals
+    import world
+    import user
+
+    signals.init()
+	user.ne
+    print("Entering Game ...");
+    tty=0;
+    #~ if tty=4: initbbc(): initscr(): topscr()
+
+    if username == "D2emon":
+        user.username = "The {0}".format(username)
+    else:
+        user.username = username
+
+    user_id = gamesys.cuserid()
+
+    print("Hello {0}".format(user.username))
+    gamesys.syslog("GAME ENTRY: {name}[{user_id}]".format(name=user.username, user_id=user_id))
+    key.setup()
+
+    gamebuffer.makebfr()
+    cms = -1
+    putmeon(username)
+    if not world.openw():
+        gamesys.crapup("Sorry AberMUD is currently unavailable")
+        raise Exception("Sorry AberMUD is currently unavailable")
+    if mynum >= maxu:
+        gamesys.crapup("Sorry AberMUD is full at the moment")
+        raise Exception("Sorry AberMUD is full at the moment")
+    user.username = username
+    rte(username)
+    world.closew()
+    cms= -1
+    special(".g", username)
+    i_setup = 1
+
+def main_loop(username):
+    """This file holds the basic communications routines"""
+    from temp_talker import sendmsg, rd_qd, rte
+
+    import gamebuffer
+    import world
+
+    gamebuffer.pbfr()
+    sendmsg(username)
+    if rd_qd:
+        rte(username)
+    rd_qd = False
+    world.closew()
+    gamebuffer.pbfr()
+
+def main(username):
+    import signals
+    import user
+
+    before_loop(username)
+    try:
+        while True:
+            main_loop(user.username)
+            signals.sloop()
+    except KeyboardInterrupt:
+        signals.ctrlc()
+    
+    return 0
 
 if __name__ == '__main__':
     main("D2emon")

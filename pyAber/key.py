@@ -23,7 +23,7 @@
 #  
 
 buff  = ""
-pr_bf = "PR"     # ""
+pr_bf = ""
 mode  = -1
 
 def setup():
@@ -85,46 +85,17 @@ def prmpt(vis, debug, wiz, convflg):
 
 def kinput(ppt,len_max):
     """Input from keyboard"""
-    #~ extern long pr_due;
-
     import gamebuffer
 
-    global mode, buff
+    global mode, buff, pr_bf
     
-    x       = ""
-    len_cur = 0
-    mode    = 0
+    mode = 0
 
     pr_bf = ppt
-    print(ppt)
+    buff  = input(ppt)
+
     gamebuffer.pbfr()
-    gamebuffer.pr_due = 0
-
-    buff = ""
-    
-    while len_cur < len_max:
-        #~ x = getchar()
-        if x == "\n":
-            print("\n")
-            mode = 1
-            return 0
-        #~ if ((x == 8) or (x == 127)) and len_cur:
-            #~ putchar(8);
-            #~ putchar(' ');
-            #~ putchar(8);
-            #~ len_cur -= 1
-            #~ buff[len_cur] = 0
-            #~ continue
-        #~ if x<32:
-            #~ continue
-        #~ if x==127:
-            #~ continue
-        #~ putchar(x)
-        #~ buff[len_cur] = x
-        #~ len_cur += 1
-        #~ buff[len_cur] = 0
-    print(">>>input(\n{0}, {1})".format(n, t))
-
+    gamebuffer.pr_due = False
 def main():
     """Working with keyboard"""
     print("Key drivers")

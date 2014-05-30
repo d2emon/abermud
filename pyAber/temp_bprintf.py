@@ -28,12 +28,6 @@
 
 #~ void bprintf(args,arg1,arg2,arg3,arg4,arg5,arg6,arg7)
 
-#~ The main loop
-
-def dcprnt(str, file):
-    """Decode and print text"""
-    print(">>>dcprnt({0}, {1})".format(str, file))
-
 #~ int pfile(str,ct,file)
 
 #~ int pndeaf(str,ct,file)
@@ -51,9 +45,6 @@ def dcprnt(str, file):
 #~ int ppndeaf(str,ct,file)
 
 #~ int  ppnblind(str,ct,file)
-
-log_fl = False
-#~ 0 = not logging
 
 #~ void logcom()
 

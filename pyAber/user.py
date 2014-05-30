@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  key.py
+#  user.py
 #  
-#  Copyright 2014 МихалычЪ <d2emon@mikhalych-desktop>
+#  Copyright 2014 МихалычЪ <МихалычЪ@PC>
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,16 +22,17 @@
 #  
 #  
 
-#~ #include <stdio.h>
-#~ #include <termios.h>
+username = ""
 
-#~ long save_flag= -1;
+def setName(newname):
+    """Set user name"""
+    if not newname:
+        raise Exception("Args!")
 
-#~ key_input(ppt,len_max)
 
 def main():
-    """Working with keyboard"""
-    print("Key drivers")
+    """User data"""
+    print("User data and functions")
     return 0
 
 if __name__ == '__main__':

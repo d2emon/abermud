@@ -30,8 +30,11 @@ pr_qcr = False
 #~ Need we put a linebreak?
 pr_due = False
 #~ Need we show keyboar buffer?
+
 sysbuf = ""
 #~ System buffer
+log_fl = False
+#~ 0 - no log
 
 def makebfr():
     """Make system buffer"""
@@ -41,12 +44,11 @@ def makebfr():
 def pbfr():
     """Put buffer on screen"""
     from temp_aber import pname
-    from temp_bprintf import log_fl, dcprnt
 
     import world
     import snoop
     
-    global sysbuf, pr_due, pr_qcr, iskb
+    global sysbuf, pr_due, pr_qcr, iskb, log_fl
 
     signals.block_alarm()
     world.closew()
@@ -71,6 +73,12 @@ def pbfr():
     if snoop.snoopt != -1:
         snoop.views()
     signals.unblock_alarm()
+
+#~ The main loop
+def dcprnt(s, f):
+    """Decode and print text"""
+    print(">>>dcprnt({0}, {1})".format(s, f))
+
 
 
 def main():

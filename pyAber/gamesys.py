@@ -22,17 +22,17 @@
 #  
 #  
 
-def crapup(str):
+def crapup(error_str):
     """Quitting game with message"""
-    import temp_bprintf
+    import gamebuffer
     import key
 
     dashes = "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    temp_bprintf.pbfr()
-    temp_bprintf.pr_due = 0  
+    gamebuffer.pbfr()
+    gamebuffer.pr_due = 0  
     #~ So we dont get a prompt after the exit
     key.setback()
-    print("\n{0}\n\n{1}\n\n{0}\n".format(dashes, str))
+    print("\n{0}\n\n{1}\n\n{0}\n".format(dashes, error_str))
     exit(0)
     
 def syslog(args):
@@ -51,7 +51,7 @@ def syslog(args):
             loseme()
             raise Exception("Log fault")
         x.write(log_str+"\n")
-    print("<--{0}".format(log_str) )
+        print("<--{0}".format(log_str) )
 
 def cuserid():
     """Get user ID"""

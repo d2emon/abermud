@@ -93,12 +93,21 @@ def init():
     sigs['cont'] = 'oops'
     print(sigs)
 
+def sloop():
+    """Signals loop"""
+    globals sigs
+    
+    if sigs['alrm']:
+        print("[SIGNAL BEGIN]")
+        occur()
+        print("[SIGNAL END]")
+
 def occur():
     """Signal occured"""
     from temp_aber import on_timing
-    from temp_talker import globme
     from temp_talker import rte
-    
+
+    import user
     import world
     import key
 
@@ -109,7 +118,7 @@ def occur():
     aloff()
     world.openw()
     interrupt = True
-    rte(globme)
+    rte(user.username)
     interrupt = False
     on_timing()
     world.closew()
@@ -118,13 +127,13 @@ def occur():
 
 def oops():
     "Quitting"
-    from temp_talker import globme
     from temp_talker import loseme
 
     import key
+    import user
 
     aloff()
-    loseme(globme)
+    loseme(user.username)
     key.setback()
     print("Ooops")
 
@@ -133,14 +142,15 @@ def ctrlc():
     from temp_aber import in_fight
     from temp_talker import loseme
 
+    import user
     import gamesys
 
     if in_fight:
         return
 
-    atexit.unregister(sig_oops)
+    atexit.unregister(oops)
     aloff()
-    loseme()
+    loseme(user.username)
     gamesys.crapup("Byeeeeeeeeee  ...........")
 
 def main():

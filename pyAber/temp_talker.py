@@ -93,21 +93,23 @@ def sendmsg(name):
         btmscr()
 
     prmpt = key.prmpt(vis=pvis(mynum), debug=debug_mode, wiz=(my_lev > 9), convflg=convflg)
-    print("------------------------------------------------------------")
-    print(prmpt)
-    print("------------------------------------------------------------")
 
     gamebuffer.pbfr()
 
     if pvis(mynum) > 9999:
         pass
         #~ set_progname(0, "-csh")
+        print("------------------------------------------------------------")
+        print("-csh")
+        print("------------------------------------------------------------")
     else:
         work = "   --}}----- ABERMUD -----{{--     Playing as {0}".format(name)
-
-    print("------------------------------------------------------------")
-    print(work)
-    print("------------------------------------------------------------")
+    if pvis(mynum) == 0:
+        pass
+        #~ set_progname(0, work)
+        print("------------------------------------------------------------")
+        print(work)
+        print("------------------------------------------------------------")
 
     signals.alon()
     key.kinput(prmpt, 80)
@@ -357,54 +359,6 @@ iamon = 0
 #~ userwrap()
 
 def talker(name=""):
-    """This file holds the basic communications routines"""
-    #~ extern long curch,cms;
-    #~ extern long maxu;
-    #~ extern long rd_qd;
-    #~ FILE *fl;
-    #~ char string[128];
-
-    from temp_aber import maxu
-
-    import gamesys
-    import gamebuffer
-    import signals
-    import world
-
-    global globme, cms, rd_qd, mynum
- 
-    gamebuffer.makebfr()
-    cms = -1
-    putmeon(name)
-    if not world.openw():
-        gamesys.crapup("Sorry AberMUD is currently unavailable")
-        raise Exception("Sorry AberMUD is currently unavailable")
-    if mynum >= maxu:
-        gamesys.crapup("Sorry AberMUD is full at the moment")
-        raise Exception("Sorry AberMUD is full at the moment")
-    globme = name
-    rte(name)
-    world.closew()
-    cms= -1
-    special(".g",name)
-    i_setup = 1
-    try:
-        i = 0
-        for i in range(0, 2):
-            gamebuffer.pbfr()
-            sendmsg(name)
-            if rd_qd:
-                rte(name)
-            rd_qd = False
-            world.closew()
-            gamebuffer.pbfr()
-
-            if signals.sigs['alrm']:
-                print("[SIGNAL BEGIN]")
-                signals.occur()
-                print("[SIGNAL END]")
-    except KeyboardInterrupt:
-        signals.ctrlc()
 
     return 0
 
