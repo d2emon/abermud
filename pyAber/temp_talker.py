@@ -79,10 +79,13 @@ def sendmsg(name):
     from temp_aber import debug_mode, tty, convflg, my_lev, my_str, in_fight, fighting
     from temp_aber import pvis, pname, ploc, gamecom
     
+    from main import guser
+    
     import gamebuffer
     import key
     import signals
     import world
+    import user
 
     global curch, mynum, curmode
 
@@ -123,7 +126,7 @@ def sendmsg(name):
     gamebuffer.sysbuf += "\n\001"
 
     world.openw()
-    rte(name)
+    guser.chkMsg()
     world.closew()
     if convflg and not work == "**":
         convflg = 0
@@ -145,8 +148,8 @@ def sendmsg(name):
     if curmode == 1:
         gamecom(work)
     else:
-        if (work != ".Q" and work != ".q") and worker:
-            a = special(work, name)
+        if (work != ".Q" and work != ".q") and work:
+            a = user.special(work, name)
     if fighting > -1:
         if not pname(fighting):
             in_fight = False
@@ -164,40 +167,6 @@ def sendmsg(name):
 
 #~ FILE *fl_com;
 
-
-def rte(name):
-    """Read messages"""
-    from temp_aber import readmsg, mstoout, update, eorte
-    import world
-    
-    #~ extern long cms;
-    #~ extern long vdes,tdes,rdes;
-    #~ extern FILE *fl_com;
-    #~ extern long debug_mode;
-    #~ long too,ct,block[128];
-    global cms
-
-    unit   = world.openw()
-    fl_com = unit
-    if not unit:
-        crapup("AberMUD: FILE_ACCESS : Access failed")
-        raise Exception("AberMUD: FILE_ACCESS : Access failed")
-
-    too = world.findend(unit) + 1
-    if cms == -1:
-        cms = too
-
-    ct  = cms
-    for ct in range(cms, too):
-        readmsg(unit, block, ct)
-        mstoout(block, name)
-    update(name)
-    eorte()
-
-    rdes = 0
-    tdes = 0
-    vdes = 0
-
 #~ FILE *openlock(file,perm)
 
 #~ long findstart(unit)
@@ -205,58 +174,6 @@ def rte(name):
 rd_qd = True
 
 #~ cleanup(inpbk)
-
-def special(string, name):
-    """Special functions"""
-    from temp_aber import setpstr, setplev, setpvis, setpwpn, setpsexall, setphelping, initme, cuserid, sendsys, randperc, trapch
-    from temp_aber import my_str, my_lev, my_sex
-
-    import world
-    
-    global mynum, curmode, curch
-
-    #~ extern long curmode;
-    #~ extern long curch,moni;
-    #~ extern long my_sco
-    #~ char xx[128];
-    #~ char xy[128];
-    #~ char us[32];
-
-    bk = string.lower()
-    ch = bk[0]
-    if ch != '.':
-        return False
-    ch = bk[1]
-
-    if ch == 'g':
-        curmode = 1
-        curch   = -5
-        initme()
-        ufl = world.openw()
-        setpstr(mynum, my_str)
-        setplev(mynum, my_lev)
-        if my_lev < 10000:
-            setpvis(mynum, 0)
-        else:
-            setpvis(mynum, 10000)
-        setpwpn(mynum,-1)
-        setpsexall(mynum,my_sex)
-        setphelping(mynum,-1)
-        cuserid()
-        xy = "\001s{0}\001{1}  has entered the game\n\001".format(name, name)
-        xx = "\001s{0}\001[ {1}  has entered the game ]\n\001".format(name, name)
-        sendsys(name, name, -10113, curch, xx)
-        rte(name)
-        if randperc() > 50:
-            trapch(-5)
-        else:
-            curch = -183
-            trapch(-183)
-        sendsys(name, name, -10000, curch, xy)
-    else:
-        print("Unknown . option")
-
-    return True
 
 #~ long dsdb=0;
 
@@ -279,47 +196,6 @@ def special(string, name):
 
 mynum = 0
 
-def putmeon(name):
-    """TODO : Put player on"""
-    from temp_aber import setploc, setppos, setplev, setpvis, setpstr, setpwpn, setpsex, fpbn, pname, setpname
-    from temp_aber import maxu
-
-    import gamesys
-    import world
-
-    global mynum, curch
-    
-    #~ extern long mynum,curch;
-
-    iamon = False
-    unit  = world.openw()
-    
-    if fpbn(name)!= -1:
-        gamesys.crapup("You are already on the system - you may only be on once at a time")
-        raise Exception("You are already on the system - you may only be on once at a time")
-
-    ct = 0
-    for ct in range(0, maxu+1):
-        if not pname(ct):
-            break
-
-    if ct == maxu:
-        mynum = maxu
-        return False
-
-    setpname(ct, name)
-    setploc(ct, curch)
-    setppos(ct, -1)
-    setplev(ct,  1)
-    setpvis(ct,  0)
-    setpstr(ct, -1)
-    setpwpn(ct, -1)
-    setpsex(ct,  0)
-    mynum = ct
-
-    iamon = True
-    return iamon    
-    
 def loseme(name):
     """Loosing the game"""
     from temp_aber import dumpitems, pvis, pname, sendsys, saveme, chksnp, setpname

@@ -23,6 +23,9 @@
 #  
 
 import gamesys
+from user import User
+
+guser = 0
 
 #~ char **argv_p;
 #~ char privs[4];
@@ -38,58 +41,62 @@ def getkbd(s, l):
 def before_loop(username):
     """Setting up for main loop"""
     from temp_aber import maxu
-    from temp_talker import cms, putmeon, mynum, rte, special
-	
+    
     import gamesys
     import gamebuffer
     import signals
     import world
     import user
+    import key
+
+    global guser
 
     signals.init()
-	user.ne
+    guser = User(username)
     print("Entering Game ...");
+    #~ WTF?
     tty=0;
     #~ if tty=4: initbbc(): initscr(): topscr()
+    #~ WTF?
+    guser.greeting()
 
-    if username == "D2emon":
-        user.username = "The {0}".format(username)
-    else:
-        user.username = username
-
-    user_id = gamesys.cuserid()
-
-    print("Hello {0}".format(user.username))
-    gamesys.syslog("GAME ENTRY: {name}[{user_id}]".format(name=user.username, user_id=user_id))
+    #~ Setting up game system
     key.setup()
-
     gamebuffer.makebfr()
-    cms = -1
-    putmeon(username)
+    guser.msgId = -1
+
+    guser.puton()
+
+    #~ Some checks
     if not world.openw():
-        gamesys.crapup("Sorry AberMUD is currently unavailable")
         raise Exception("Sorry AberMUD is currently unavailable")
-    if mynum >= maxu:
-        gamesys.crapup("Sorry AberMUD is full at the moment")
+        #~ Crapup
+    if guser.userId >= maxu:
         raise Exception("Sorry AberMUD is full at the moment")
-    user.username = username
-    rte(username)
+        #~ Crapup
+
+    guser.name = username
+    guser.chkMsg()
+    
     world.closew()
-    cms= -1
-    special(".g", username)
+    
+    guser.msgId = -1
+    guser.special(".g")
+    #~ WTF?
     i_setup = 1
 
-def main_loop(username):
+def main_loop(luser):
     """This file holds the basic communications routines"""
-    from temp_talker import sendmsg, rd_qd, rte
+    from temp_talker import sendmsg, rd_qd
 
     import gamebuffer
     import world
+    import user
 
     gamebuffer.pbfr()
-    sendmsg(username)
+    sendmsg(luser.name)
     if rd_qd:
-        rte(username)
+        user.chkMsg(luser.name)
     rd_qd = False
     world.closew()
     gamebuffer.pbfr()
@@ -97,11 +104,13 @@ def main_loop(username):
 def main(username):
     import signals
     import user
+    
+    global guser
 
     before_loop(username)
     try:
         while True:
-            main_loop(user.username)
+            main_loop(guser)
             signals.sloop()
     except KeyboardInterrupt:
         signals.ctrlc()

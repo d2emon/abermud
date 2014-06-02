@@ -42,7 +42,7 @@ def unblock_alarm():
     """Unblock alarm"""
     global sigs, active, alarm
     
-	#~ signal(SIGALRM,sig_occur);
+    #~ signal(SIGALRM,sig_occur);
     sigs['alrm'] = 'sig_occur'
     print(sigs)
     if active:
@@ -54,7 +54,7 @@ def alon():
     global sigs, active, alarm
     
     active = True   
-	#~ signal(SIGALRM,sig_occur);
+    #~ signal(SIGALRM,sig_occur);
     sigs['alrm'] = 'sig_occur'
     print(sigs)
     print(active)
@@ -95,7 +95,7 @@ def init():
 
 def sloop():
     """Signals loop"""
-    globals sigs
+    global sigs
     
     if sigs['alrm']:
         print("[SIGNAL BEGIN]")
@@ -105,7 +105,6 @@ def sloop():
 def occur():
     """Signal occured"""
     from temp_aber import on_timing
-    from temp_talker import rte
 
     import user
     import world
@@ -118,7 +117,7 @@ def occur():
     aloff()
     world.openw()
     interrupt = True
-    rte(user.username)
+    user.chkMsg(user.username)
     interrupt = False
     on_timing()
     world.closew()
@@ -159,5 +158,5 @@ def main():
     return 0
 
 if __name__ == '__main__':
-	main()
+    main()
 

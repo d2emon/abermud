@@ -53,12 +53,6 @@ def syslog(args):
         x.write(log_str+"\n")
         print("<--{0}".format(log_str) )
 
-def cuserid():
-    """Get user ID"""
-    user_id = "192.168.0.78"
-    return user_id
-    pass
-    
 def main():
     """System functions"""
     print("Game system functions")
