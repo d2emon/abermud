@@ -74,12 +74,10 @@ curmode = 0
 #~ long gurum=0;
 #~ long convflg=0;
 
-def sendmsg(name):
+def sendmsg(luser):
     """Sending game messages"""
     from temp_aber import debug_mode, tty, convflg, my_lev, my_str, in_fight, fighting
     from temp_aber import pvis, pname, ploc, gamecom
-    
-    from main import guser
     
     import gamebuffer
     import key
@@ -106,7 +104,7 @@ def sendmsg(name):
         print("-csh")
         print("------------------------------------------------------------")
     else:
-        work = "   --}}----- ABERMUD -----{{--     Playing as {0}".format(name)
+        work = "   --}}----- ABERMUD -----{{--     Playing as {0}".format(luser.name)
     if pvis(mynum) == 0:
         pass
         #~ set_progname(0, work)
@@ -126,7 +124,7 @@ def sendmsg(name):
     gamebuffer.sysbuf += "\n\001"
 
     world.openw()
-    guser.chkMsg()
+    luser.chkMsg()
     world.closew()
     if convflg and not work == "**":
         convflg = 0
@@ -149,7 +147,7 @@ def sendmsg(name):
         gamecom(work)
     else:
         if (work != ".Q" and work != ".q") and work:
-            a = user.special(work, name)
+            a = luser.special(work)
     if fighting > -1:
         if not pname(fighting):
             in_fight = False

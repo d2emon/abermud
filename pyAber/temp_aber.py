@@ -100,58 +100,68 @@ def chksnp():
     
 def ploc(mynum):
     """TODO : Player location"""
-    print(">>>ploc({0})".format(mynum))
+    #~ print(">>>ploc({0})".format(mynum))
     return 0
 
 def pvis(mynum):
     """TODO : Player visibility"""
-    print(">>>pvis({0})".format(mynum))
+    #~ print(">>>pvis({0})".format(mynum))
     return 0
 
 def pname(mynum):
     """TODO : Player name"""
-    print(">>>pname({0})".format(mynum))
+    #~ print(">>>pname({0})".format(mynum))
     return ""
 
 def setpname(ct, value):
     """TODO : Set player name"""
-    print(">>>setpname({0}, {1})".format(ct, value))
+    #~ print(">>>setpname({0}, {1})".format(ct, value))
+    pass
 
 def setploc(ct, value):
     """TODO : Set player location"""
-    print(">>>setploc({0}, {1})".format(ct, value))
+    #~ print(">>>setploc({0}, {1})".format(ct, value))
+    pass
 
 def setppos(ct, value):
     """TODO : Set player position"""
-    print(">>>setppos({0}, {1})".format(ct, value))
+    #~ print(">>>setppos({0}, {1})".format(ct, value))
+    pass
 
 def setplev(ct,value):
     """TODO : Set player level"""
-    print(">>>setplev({0}, {1})".format(ct, value))
+    #~ print(">>>setplev({0}, {1})".format(ct, value))
+    pass
 
 def setpvis(ct,value):
     """TODO : Set player visibility"""
-    print(">>>setpvis({0}, {1})".format(ct, value))
+    #~ print(">>>setpvis({0}, {1})".format(ct, value))
+    pass
 
 def setpstr(ct,value):
     """TODO : Set player strength"""
-    print(">>>setpstr({0}, {1})".format(ct, value))
+    #~ print(">>>setpstr({0}, {1})".format(ct, value))
+    pass
 
 def setpwpn(ct,value):
     """TODO : Set player weapon"""
-    print(">>>setpwpn({0}, {1})".format(ct, value))
+    #~ print(">>>setpwpn({0}, {1})".format(ct, value))
+    pass
 
 def setpsex(ct,value):
     """TODO : Set player sex"""
-    print(">>>setpsex({0}, {1})".format(ct, value))
+    #~ print(">>>setpsex({0}, {1})".format(ct, value))
+    pass
 
 def setpsexall(ct,value):
     """TODO : Set player flags"""
-    print(">>>setpsexall({0}, {1})".format(ct, value))
+    #~ print(">>>setpsexall({0}, {1})".format(ct, value))
+    pass
 
 def setphelping(ct,value):
     """TODO : Set player helping"""
-    print(">>>setphelping({0}, {1})".format(ct, value))
+    #~ print(">>>setphelping({0}, {1})".format(ct, value))
+    pass
     
 def main():
     """Temporary functions"""

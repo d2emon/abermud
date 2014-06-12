@@ -141,7 +141,8 @@ def ctrlc():
     from temp_aber import in_fight
     from temp_talker import loseme
 
-    import user
+    from main import guser
+    
     import gamesys
 
     if in_fight:
@@ -149,7 +150,10 @@ def ctrlc():
 
     atexit.unregister(oops)
     aloff()
-    loseme(user.username)
+    if guser :
+        loseme(guser.name)
+    else :
+        loseme("guser.name")
     gamesys.crapup("Byeeeeeeeeee  ...........")
 
 def main():

@@ -53,7 +53,7 @@ def before_loop(username):
 
     signals.init()
     guser = User(username)
-    print("Entering Game ...");
+    print("Entering Game ...")
     #~ WTF?
     tty=0;
     #~ if tty=4: initbbc(): initscr(): topscr()
@@ -94,9 +94,9 @@ def main_loop(luser):
     import user
 
     gamebuffer.pbfr()
-    sendmsg(luser.name)
+    sendmsg(luser)
     if rd_qd:
-        user.chkMsg(luser.name)
+        luser.chkMsg()
     rd_qd = False
     world.closew()
     gamebuffer.pbfr()
@@ -110,6 +110,7 @@ def main(username):
     before_loop(username)
     try:
         while True:
+            print(guser)
             main_loop(guser)
             signals.sloop()
     except KeyboardInterrupt:
