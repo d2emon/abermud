@@ -43,8 +43,6 @@ def makebfr():
 
 def pbfr():
     """Put buffer on screen"""
-    from temp_aber import pname
-
     import world
     import snoop
     
@@ -61,7 +59,8 @@ def pbfr():
         iskb = False
         dcprnt(sysbuf, log_fl)
     if snoop.snoopd != -1:
-        fln=snoop.opens(pname(snoop.snoopd),"a")
+        fln=0
+        #~ snoop.opens(pname(snoop.snoopd),"a")
         if fln:
             iskb = False
             dcprnt(sysbuf,fln)

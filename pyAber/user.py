@@ -28,6 +28,8 @@ class User:
     msgId  = -1
     userId = 0
     locId  = -5
+    data   = ["", 1, 2, 3, -4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    #~ ublock[16*chr+4]
 
     def __init__(this, newname):
         """Set user name"""
@@ -53,7 +55,7 @@ class User:
 
     def puton(this):
         """Put user on"""
-        from temp_aber import setploc, setppos, setplev, setpvis, setpstr, setpwpn, setpsex, fpbn, pname, setpname
+        from temp_aber import fpbn
         from temp_aber import maxu
         from temp_talker import iamon
 
@@ -72,22 +74,22 @@ class User:
 
         i = 0
         for i in range(0, maxu+1):
-            if not pname(i):
+            #~ Get i user 
+            if not this.getName():
                 break
 
-        if i == maxu:
-            this.userId = maxu
+        this.userId = i
+        if this.userId == maxu:
             return False
 
-        setpname(i, this.name)
-        setploc( i, this.locId)
-        setppos( i, -1)
-        setplev( i,  1)
-        setpvis( i,  0)
-        setpstr( i, -1)
-        setpwpn( i, -1)
-        setpsex( i,  0)
-        this.userId = i
+        this.setName(this.name)
+        this.setLoc(this.locId)
+        this.setPos(-1)
+        this.setLev( 1)
+        this.setVis( 0)
+        this.setStr(-1)
+        this.setWpn(-1)
+        this.setSex( 0)
 
         #~ WTF?
         iamon = True
@@ -149,7 +151,7 @@ class User:
 
     def gameStart(this):
         """Starting command"""
-        from temp_aber import initme, setpstr, setplev, setpvis, setpwpn, setpsexall, setphelping, sendsys
+        from temp_aber import initme, sendsys
         from temp_aber import my_str, my_lev, my_sex
 
         import world
@@ -166,12 +168,12 @@ class User:
         else:
             vis = 10000
 
-        setpstr(this.userId, my_str)
-        setplev(this.userId, my_lev)
-        setpvis(this.userId, vis)
-        setpwpn(this.userId, -1)
-        setpsexall(this.userId, my_sex)
-        setphelping(this.userId, -1)
+        this.setStr(my_str)
+        this.setLev(my_lev)
+        this.setVis(vis)
+        this.setWpn(-1)
+        this.setSexAll(my_sex)
+        this.setHlp(-1)
             
         xx = "\001s{0}\001[ {0}  has entered the game ]\n\001".format(this.name)
         sendsys(this.name, this.name, -10113, this.locId, xx)
@@ -192,6 +194,102 @@ class User:
             this.locId = -183
 
         trapch(this.locId)
+
+    def getName(this) :
+        """Get user name"""
+        return this.data[0]
+       
+    def getLoc(this) :
+        """Get user location"""
+        return this.data[4]
+       
+    def getPos(this) :
+        """Get user position"""
+        return this.data[5]
+       
+    def getStr(this) :
+        """Get user strength"""
+        return this.data[7]
+       
+    def getVis(this) :
+        """Get user visibility"""
+        return this.data[8]
+       
+    def getSexAll(this) :
+        """Get user sex"""
+        return this.data[9]
+       
+    def getSex(this) :
+        """Get user sex"""
+        return this.getSexAll() % 2
+       
+    def getLev(this) :
+        """Get user level"""
+        return this.data[10]
+       
+    def getWpn(this) :
+        """Get user weapon"""
+        return this.data[11]
+       
+    def getHlp(this) :
+        """Get user helping"""
+        return this.data[13]
+       
+    def setName(this, v) :
+        """Set user name"""
+        this.data[0] = v
+       
+    def setLoc(this, v) :
+        """Set user location"""
+        this.data[4] = v
+       
+    def setPos(this, v) :
+        """Set user position"""
+        this.data[5] = v
+       
+    def setStr(this, v) :
+        """Set user strength"""
+        this.data[7] = v
+       
+    def setVis(this, v) :
+        """Set user visibility"""
+        this.data[8] = v
+       
+    def setSexAll(this, v) :
+        """Set user sex"""
+        this.data[9] = v
+       
+    def setSex(this, v) :
+        """Set user sex"""
+        this.data[9] = v
+        #~  &=
+       
+    def setLev(this, v) :
+        """Set user level"""
+        this.data[10] = v
+       
+    def setWpn(this, v) :
+        """Set user weapon"""
+        this.data[11] = v
+
+    def setHlp(this, v) :
+        """Set user helping"""
+        this.data[13] = v
+
+#~ char * pname(chr)
+#~ ploc(chr)
+#~ pchan(chr)
+#~ pstr(chr)
+#~ plev(chr)
+#~ pvis(chr)
+#~ psex(chr)
+#~ psexall(chr)
+
+#~ setplev(chr,v)
+#~ setpstr(chr,v)
+#~ setpvis(chr,v)
+#~ setpsex(chr,v)
+#~ setpsexall(chr,v)
 
 mode = 0
 

@@ -128,11 +128,14 @@ def oops():
     "Quitting"
     from temp_talker import loseme
 
+    from main import guser;
+
     import key
     import user
 
     aloff()
-    loseme(user.username)
+    if(guser) :
+        loseme(guser.name)
     key.setback()
     print("Ooops")
 

@@ -37,32 +37,6 @@
 
 #~ setoloc(ob,l,c)
 
-#~ ploc(chr)
-
-#~ char * pname(chr)
-
-#~ plev(chr)
-
-#~ setplev(chr,v)
-
-#~ pchan(chr)
-
-#~ pstr(chr)
-
-#~ setpstr(chr,v)
-
-#~ pvis(chr)
-
-#~ setpvis(chr,v)
-
-#~ psex(chr)
-
-#~ setpsex(chr,v)
-
-#~ setpsexall(chr,v)
-
-#~ psexall(chr)
-
 #~ char * oname(ob)
 
 #~ char * olongt(ob,st)
@@ -80,12 +54,6 @@
 #~ isavl(ob)
 
 #~ ospare(ob)
-
-#~ ppos(chr)
-
-#~ setppos(chr,v)
-
-#~ setploc(chr,n)
 
 #~ pwpn(chr)
 

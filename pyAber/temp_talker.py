@@ -77,7 +77,7 @@ curmode = 0
 def sendmsg(luser):
     """Sending game messages"""
     from temp_aber import debug_mode, tty, convflg, my_lev, my_str, in_fight, fighting
-    from temp_aber import pvis, pname, ploc, gamecom
+    from temp_aber import gamecom
     
     import gamebuffer
     import key
@@ -93,11 +93,11 @@ def sendmsg(luser):
     if tty == 4:
         btmscr()
 
-    prmpt = key.prmpt(vis=pvis(mynum), debug=debug_mode, wiz=(my_lev > 9), convflg=convflg)
+    prmpt = key.prmpt(vis=luser.getVis(), debug=debug_mode, wiz=(my_lev > 9), convflg=convflg)
 
     gamebuffer.pbfr()
 
-    if pvis(mynum) > 9999:
+    if luser.getVis() > 9999:
         pass
         #~ set_progname(0, "-csh")
         print("------------------------------------------------------------")
@@ -105,7 +105,7 @@ def sendmsg(luser):
         print("------------------------------------------------------------")
     else:
         work = "   --}}----- ABERMUD -----{{--     Playing as {0}".format(luser.name)
-    if pvis(mynum) == 0:
+    if luser.getVis() == 0:
         pass
         #~ set_progname(0, work)
         print("------------------------------------------------------------")
@@ -149,12 +149,13 @@ def sendmsg(luser):
         if (work != ".Q" and work != ".q") and work:
             a = luser.special(work)
     if fighting > -1:
-        if not pname(fighting):
-            in_fight = False
-            fighting = -1
-        if ploc(fighting) != curch:
-            in_fight = False
-            fighting = -1
+        pass
+        #~ if not pname(fighting):
+            #~ in_fight = False
+            #~ fighting = -1
+        #~ if ploc(fighting) != curch:
+            #~ in_fight = False
+            #~ fighting = -1
     if in_fight:
         in_fight -= 1
     return (not (work == ".Q")) or (not (work == ".q"))
@@ -196,7 +197,7 @@ mynum = 0
 
 def loseme(name):
     """Loosing the game"""
-    from temp_aber import dumpitems, pvis, pname, sendsys, saveme, chksnp, setpname
+    from temp_aber import dumpitems, sendsys, saveme, chksnp
     from temp_aber import zapped
 
     import signals
@@ -209,10 +210,10 @@ def loseme(name):
 
     unit = world.openw()
     dumpitems()
-    if pvis(mynum)<10000:
-        bk = "{0} has departed from AberMUDII\n".format(name)
-        sendsys(name, name, -10113, 0, bk)
-    setpname(mynum, "")
+    #~ if pvis(mynum)<10000:
+        #~ bk = "{0} has departed from AberMUDII\n".format(name)
+        #~ sendsys(name, name, -10113, 0, bk)
+    #~ setpname(mynum, "")
     world.closew()
     if not zapped:
         saveme()
