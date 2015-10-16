@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  без имени.py
+#  main.py
 #  
 #  Copyright 2014 МихалычЪ <МихалычЪ@PC>
 #  
@@ -22,10 +22,102 @@
 #  
 #  
 
-def main():
-    print("Hellol world!")
+import gamesys
+from user import User
+
+guser = 0
+
+#~ char **argv_p;
+#~ char privs[4];
+
+def listfl(name):
+    """List file"""
+    print(">>>listfl({0})".format(name))
+
+def getkbd(s, l):
+    """Getstr() with length limit and filter ctrl"""
+    print(">>>getkbd({0}, {1})".format(s, l))
+
+def before_loop(username):
+    """Setting up for main loop"""
+    from temp_aber import maxu
+    
+    import gamesys
+    import gamebuffer
+    import signals
+    import world
+    import user
+    import key
+
+    global guser
+
+    signals.init()
+    guser = User(username)
+    print("Entering Game ...")
+    #~ WTF?
+    tty=0;
+    #~ if tty=4: initbbc(): initscr(): topscr()
+    #~ WTF?
+    guser.greeting()
+
+    #~ Setting up game system
+    key.setup()
+    gamebuffer.makebfr()
+    guser.msgId = -1
+
+    guser.puton()
+
+    #~ Some checks
+    if not world.openw():
+        raise Exception("Sorry AberMUD is currently unavailable")
+        #~ Crapup
+    if guser.userId >= maxu:
+        raise Exception("Sorry AberMUD is full at the moment")
+        #~ Crapup
+
+    guser.name = username
+    guser.chkMsg()
+    
+    world.closew()
+    
+    guser.msgId = -1
+    guser.special(".g")
+    #~ WTF?
+    i_setup = 1
+
+def main_loop(luser):
+    """This file holds the basic communications routines"""
+    from temp_talker import sendmsg, rd_qd
+
+    import gamebuffer
+    import world
+    import user
+
+    gamebuffer.pbfr()
+    sendmsg(luser)
+    if rd_qd:
+        luser.chkMsg()
+    rd_qd = False
+    world.closew()
+    gamebuffer.pbfr()
+
+def main(username):
+    import signals
+    import user
+    
+    global guser
+
+    before_loop(username)
+    try:
+        while True:
+            print(guser)
+            main_loop(guser)
+            signals.sloop()
+    except KeyboardInterrupt:
+        signals.ctrlc()
+    
     return 0
 
 if __name__ == '__main__':
-    main()
+    main("D2emon")
 
