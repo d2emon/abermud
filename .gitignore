@@ -5,3 +5,4 @@ reset_data
 ob.out
 uaf.rand
 *.tmp
+mud_syslog
