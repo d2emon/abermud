@@ -23,9 +23,6 @@
 #
 
 
-import makefiles
-
-
 def mkDir(dirs):
     for dir in dirs:
         print("TODO: mkdir %s" % (dir))
@@ -57,37 +54,33 @@ def install():
 
     import files
     import makeworld
+    import ogenerate
+    import makeuaf
 
-    print("Compiling .h constructor")
+    print("Building path list")
     files.install()
-    print('.h built')
+    print('Built')
 
-    print('Compiling mud.exe')
-    makefiles.makeexe()
-
-    print('Compiling mud.1')
-    makefiles.makemud()
-
-    print('Done')
-    # Part 2
-
-    print('Compiling world maker')
-    makeworld.main()
+    print('Initializing game universe')
+    makeworld.make_world()
     print('Game universe intialised')
 
-    print('Compiling reset data compiler')
-    makefiles.ogenerate()
+    print('Generating reset data')
+    ogenerate.install("ob.in", "ob.out", "reset_data")
     print('Reset data generated')
 
-    print('Compiling uaf generator')
-    makefiles.makeuaf()
+    print('Gerating uaf')
+    makeuaf.install("uaf.rand")
+    print('Uaf generated')
 
-    print('Ok')
     print('Now set up a password for arthur the archwizard')
 
 
 if __name__ == "__main__":
     install()
-    makefiles.mud1()
+
     print("log on as \"debugger\", set a password, and enter the game.")
     print("Enter \"reset\" to make items and mobiles appear, and you're ready to play!")
+
+    import mud1
+    mud1.run()
