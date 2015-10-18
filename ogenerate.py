@@ -29,7 +29,7 @@ import blib
 def install(src, dst, reset):
     save(dst, load(src))
     import shutil
-    shutil.copyfile("ob.out", "reset.dat")
+    shutil.copyfile(dst, reset)
 
 
 def save(filename, blob):
@@ -64,4 +64,4 @@ def flags(s):
 
 
 if __name__ == "__main__":
-    install("ob.in", "ob.out", "reset_data")
+    install("wldsrc\ob.in", "world\ob.out", "world\reset_data")

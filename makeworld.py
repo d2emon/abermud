@@ -27,7 +27,7 @@ import blib
 
 
 def make_world():
-    filename = "world.tmp"
+    filename = "world/world.tmp"
     c = 64
     l = 4
 

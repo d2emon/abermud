@@ -66,11 +66,11 @@ def install():
     print('Game universe intialised')
 
     print('Generating reset data')
-    ogenerate.install("ob.in", "ob.out", "reset_data")
+    ogenerate.install("wldsrc/ob.in", "world/ob.out", "world/reset_data")
     print('Reset data generated')
 
     print('Gerating uaf')
-    makeuaf.install("uaf.rand")
+    makeuaf.install("world/uaf.rand")
     print('Uaf generated')
 
     print('Now set up a password for arthur the archwizard')

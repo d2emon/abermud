@@ -42,4 +42,4 @@ def generate():
 
 
 if __name__ == "__main__":
-    install("uaf.rand")
+    install("world/uaf.rand")
