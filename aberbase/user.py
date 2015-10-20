@@ -23,6 +23,50 @@
 #
 
 
+# Some tests for logging in
+# WrongHostException
+# NoLoginException
+# BannedException
+# NoPersonaFileException
+
+
+def startup_test():
+    import socket
+    test_host(socket.gethostname())
+    test_nologin()
+    return True
+
+
+def test_host(local):
+    """
+    Check we are running on the correct host
+    see the notes about the use of flock();
+    and the affects of lockf();
+    """
+    import aberbase.files
+
+    host = aberbase.files.config().HOST_MACHINE
+    if local != host:
+        raise Exception("AberMUD is only available on %s, not on %s\n" % (host, local))
+
+
+def test_nologin():
+    """
+    Check if there is a no logins file active
+    """
+    import aberbase.files
+
+    try:
+        e = ""
+        with open(aberbase.files.config().NOLOGIN, "r") as f:
+            for s in f:
+                e += s
+        raise Exception(e)
+    except OSError:
+        pass
+    return True
+
+
 def getDatabase():
     import aberbase.files
     return aberbase.files.config().PFL
@@ -32,20 +76,27 @@ def install():
     with open(getDatabase(), "w+") as f:
         pass
 
+
 class User:
+    uid = ""
     username = ""
     password = ""
+    namegive = False
 
     def __init__(self, **fields):
+        import os
+
         self.username = fields.get("username", "")
         self.password = fields.get("password", "")
+        self.uid = fields.get("uid", os.getuid())
+
+        self.namegive = (self.username == True)
 
     def load(self, username):
         """
         Return block data for user or -1 if not exist
         """
         try:
-            # unit=openlock(PFL,"r");f=0;
             with open(getDatabase(), "r") as f:
                 for s in f:
                     self.decode(s)
@@ -53,17 +104,17 @@ class User:
                         return True
         except OSError:
             raise Exception("No persona file")
+        self.username = username
         return False
 
     def save(self):
         try:
-            # fl=openlock(PFL,"a");
             with open(getDatabase(), "a+") as f:
                 f.write("%s\n" % (self.encode()))
         except OSError:
             raise Exception("No persona file....\n")
 
-    def validiate_username(self):
+    def validate_username(self):
         import aberbase.utils
         import re
 
@@ -86,11 +137,19 @@ class User:
 
     def validate_password(self):
         import re
-        if not password:
+        if not self.password:
             raise ValueError("No password")
-        if re.match('^[\w]+$', password) is None:
+        if re.match('^[\w]+$', self.password) is None:
             raise ValueError("Illegal characters in password")
         return True
+
+    def setUsername(self, username):
+        self.username = username[:15].replace(" ", "")
+        return self.validate_username()
+
+    def setPassword(self, password):
+        self.password = password
+        return self.validate_password()
 
     def encode(self):
         import json
@@ -105,3 +164,20 @@ class User:
         self.username = parsed["user"]
         self.password = parsed["password"]
         return parsed
+
+    def test_password(self, password):
+        return password == self.password
+
+    def test_banned(self):
+        """
+        Check to see if UID in banned list
+        """
+        import aberbase.files
+        try:
+            with open(aberbase.files.config().BAN_FILE, "r") as f:
+                for s in f:
+                    if s.rstrip("\n").lower() == self.uid.lower():
+                        raise Exception("I'm sorry- that userid has been banned from the Game")
+        except OSError:
+            pass
+        return True
