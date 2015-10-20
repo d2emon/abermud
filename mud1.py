@@ -39,104 +39,81 @@ def run(**args):
             "edituser",
             "ed_fld",
             "delu2",
-            "chpwd",
             "bprintf",
             "chkname",
         ),
         "gmainstubs": (),
-        "gmlnk": (
-            "talker",
-        ),
+        "gmlnk": (),
     }
     print({"mud.1": (incl, func)})
-    print("TODO: mud.1i %s" % (args))
-
+    print("TODO: mud.1 %s" % (args))
     main1(**args)
-
-    import mudexe
-    mudexe.run()
 
 
 lump = ""
 namegt = ""
-
-namegiv = False
-qnmrq = 0
+usrnam = ""
 
 
 # Program starts Here!
 # This forms the main loop of the code, as well as calling
 # all the initialising pieces
 
-# argn = argv[1].upper()
-# r = argn[0]
-# Now check the option entries
-# -n(name)
-
 
 def main1(**params):
     """ The initial routine
     """
+    import logging
+    import json
+    import datetime
+
+    import aberbase
     import aberbase.files
+    import aberbase.user
     import sys_stubs
-    import os
-    global namegiv
-    global qnmrq
+    import gmlnk
 
-    num = 0
+    logging.basicConfig(
+        # filename=logfile,
+        level=logging.INFO
+    )
 
-    test_host()
-    test_nologin()
+    created = aberbase.time_created()
+    started = aberbase.time_started()
 
-    namegt = params.get("N", "")
-    if namegt:
-        qnmrq = 1
-        ttyt = 0
-        namegiv = True
+    aberbase.user.startup_test()
+    user = aberbase.user.User(username=params.get("n", ""))
+    sys_stubs.qnmrq = user.namegive
 
-    if not namegiv:
-        show_logo()
+    show_logo(
+        created=created,
+        started=started,
+        show=sys_stubs.qnmrq,
+    )
+    user.test_banned()
+    get_login(user)
+    if user.load(username=user.username):
+        get_password(user)
+    else:
+        new_user(user)
 
-    user = login(namegt)
+    show_motd(
+        show=sys_stubs.qnmrq,
+    )
 
-    if not qnmrq:
-        sys_stubs.clear_console()
-        listfl(aberbase.files.config().MOTD)  # list the message of the day
-        input()
-        print("\n\n")
-    uid = os.getlogin()
-    syslog("Game entry by %s : UID %s" % (user, uid))  # Log entry
-    talker(user)  # Run system
-    crapup("Bye Bye")  # Exit
-
-
-def talker(u):
-    print("TODO: talker(%s)" % (u))
-
-
-def syslog(t):
-    print("TODO: syslog(%s)" % (t))
+    logging.info("Game entry by %s : UID %s" % (user.username, user.uid))
+    gmlnk.talker(user)
+    sys_stubs.crapup("Bye Bye")
 
 
-def show_logo():
+def show_logo(**params):
     """
     Check for all the created at stuff
     We use stats for this which is a UN*X system call
     """
-    import aberbase.files
-    import os
-    import time
-    import datetime
-    import json
     import sys_stubs
-
-    created = time.ctime(os.path.getmtime(aberbase.files.config().EXE))
-    try:
-        current = datetime.datetime.now() - json.load(open(aberbase.files.config().RESET_N, "r"))
-        started = "Game time elapsed: %s" % (elapsed(current))
-    except OSError:
-        started = "AberMUD has yet to ever start!!!"
-
+    if not params["show"]:
+        return False
     sys_stubs.clear_console()
     print("""
 
@@ -147,181 +124,69 @@ def show_logo():
 
                   By Alan Cox, Richard Acott Jim Finnis
 
-    This AberMUD was created: %s\n%s\n""" % (created, started))
-
-
-def elapsed(delta):
-    """
-    Elapsed time and similar goodies
-    """
-    if delta.days > 1:
-        return "Over a day!!!"
-
-    parts = []
-    hour = 60 * 60
-    hours = delta.seconds // hour
-    seconds = delta.seconds % hour
-    minutes = seconds // (60)
-
-    if hours > 1:
-        parts.append("%d hours" % (hours))
-    elif hours == 1:
-        parts.append("1 hour")
-
-    if minutes > 1:
-        parts.append("%d minutes" % (minutes))
-        return " and ".join(parts)
-    elif minutes == 1:
-        parts.append("1 minute")
-
-    seconds = (delta.seconds % 60)
-    if seconds > 1:
-        parts.append("%d seconds" % (seconds))
-    elif seconds == 1:
-        parts.append("1 second")
-
-    return " and ".join(parts)
-
-
-# Some tests for logging in
-# WrongHostException
-# NoLoginException
-# BannedException
-# NoPersonaFileException
-
-
-def test_host():
-    """
-    Check we are running on the correct host
-    see the notes about the use of flock();
-    and the affects of lockf();
-    """
-    import socket
-    import aberbase.files
-
-    local_host = socket.gethostname()
-    right_host = aberbase.files.config().HOST_MACHINE
-    if local_host != right_host:
-        raise Exception("AberMUD is only available on %s, not on %s\n" % (right_host, local_host))
-
-
-def test_nologin():
-    """
-    Check if there is a no logins file active
-    """
-    import aberbase.files
-
-    try:
-        e = ""
-        with open(aberbase.files.config().NOLOGIN, "r") as f:
-            for s in f:
-                e += s
-        raise Exception(e)
-    except OSError:
-        return True
-
-
-def test_banned(user):
-    """
-    Check to see if UID in banned list
-    """
-    import aberbase.files
-    try:
-        # a=openlock(BAN_FILE, "r+")
-        with open(aberbase.files.config().BAN_FILE, "r") as f:
-            for s in f:
-                if s.rstrip("\n").lower() == user.lower():
-                    raise Exception("I'm sorry- that userid has been banned from the Game")
-    except OSError:
-        pass
+    This AberMUD was created: %s\n%s\n""" % (params["created"], params["started"]))
     return True
 
 
-usrnam = ""
+def show_motd(**params):
+    import sys_stubs
+    import aberbase.motd
+    if not params["show"]:
+        return False
+    sys_stubs.clear_console()
+    aberbase.motd.show()
+    input("\n\n")
+    return True
 
 
-def login(namegt=""):
+def get_login(user):
     """
     Does all the login stuff
     The whole login system is called from this
     """
-    import os
-    import aberbase.user
-    global namegiv
-
-    # Check if banned first
-    test_banned(os.getlogin())
-
-    # Get the user name
-    if namegiv:
-        user = namegt
-    u = aberbase.user.User()
-    unnamed = True
-    while unnamed:
-        if not namegiv:
-            user = input("By what name shall I call you ?\n")[:15].replace(" ", "")
-
-        # Check for legality of names
-        namegiv = False
+    while True:
+        if not user.username:
+            user.username = input("By what name shall I call you ?\n")
 
         try:
-            u.username = user
-            unnamed = not u.validiate_username()
+            if user.validate_username():
+                break
         except ValueError as e:
             print(e)
-            continue
-
-        break
-    if u.load(username=user):
-        logpass(u)
-    else:
-        new_user(u)
+            user.username = ""
+    return True
 
 
-def logpass(user):
+def get_password(user):
     """
     Check name
     Password checking
     """
-    import sys_stubs
     import getpass
-
-    if not user:
-        return False
-
     for tries in range(0, 3):
-        sys_stubs.clear_console()
-        pwd = getpass.getpass("This persona already exists, what is the password ?")
-        sys_stubs.clear_console()
-        if pwd == user.password:
+        password = getpass.getpass("This persona already exists, what is the password ?")
+        if user.test_password(password):
             return True
-    crapup("\nNo!\n\n")
+    raise Exception("Wrong password!")
 
 
-def new_user(u):
+def new_user(user):
     """
     If he/she doesnt exist
     """
-    import sys_stubs
     import getpass
+    answer = input("Did I get the name right, %s ? " % (user.username)).lower()
+    if answer[0] == 'n':
+        raise Exception("Wrong name")
 
-    answer = input("\nDid I get the name right, %s ?" % (u.username))
-    if answer.lower()[0] == 'n':
-        return False
-
-    # this bit registers the new user
-    print("Creating new persona...\n")
-    print("Give me a password for this persona\n")
+    print("Creating new persona...")
     while True:
         try:
-            sys_stubs.clear_console()
-            u.password = getpass.getpass("*")
-            u.validate_password()
+            user.setPassword(getpass.getpass("Give me a password for this persona: "))
             break
         except ValueError as e:
             print(e)
-            continue
-    return u.save()
+    return user.save()
 
 
 # getunm
@@ -331,23 +196,6 @@ def new_user(u):
 # edituser
 # ed_fld
 # delu2
-# chpwd
-
-def listfl(name):
-    try:
-        with open(name, "r+") as f:
-            # unit=openlock(name,"r+");
-            print(f.read())
-    except OSError:
-        print("[Cannot Find -> %s]\n" % (name))
-
-
-def crapup(ptr):
-    import sys
-
-    input("\n%s\n\nHit Return to Continue...\n" % (ptr))
-    sys.exit(1)
-
 
 # bprintf
 # chkname
@@ -358,6 +206,6 @@ if __name__ == "__main__":
     params = {}
     for i, arg in enumerate(sys.argv):
         if arg[0] == '-':
-            params[arg[1:]] = sys.argv[i + 1]
+            params[arg[1:].lower()] = sys.argv[i + 1]
     print(params)
     run(**params)
