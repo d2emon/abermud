@@ -44,22 +44,25 @@ def install():
         "TEXT/ROOMS"
     ))
 
-    print('initialising files')
-    catNull((
-        "mud_syslog",
-        "reset_t",
-        "reset_n",
-        "user_file"
-    ))
+    import os
 
-    import files
+    import aberbase.files
+    import aberbase.user
     import makeworld
     import ogenerate
     import makeuaf
 
     print("Building path list")
-    files.install()
+    aberbase.files.install(os.path.dirname(os.path.abspath(__file__)))
     print('Built')
+
+    print('initialising files')
+    catNull((
+        "mud_syslog",
+        "reset_t",
+        "reset_n",
+    ))
+    aberbase.user.install()
 
     print('Initializing game universe')
     makeworld.make_world()
@@ -73,14 +76,15 @@ def install():
     makeuaf.install("world/uaf.rand")
     print('Uaf generated')
 
-    print('Now set up a password for arthur the archwizard')
-
 
 if __name__ == "__main__":
     install()
 
+    print("")
+    print('Now set up a password for arthur the archwizard')
     print("log on as \"debugger\", set a password, and enter the game.")
     print("Enter \"reset\" to make items and mobiles appear, and you're ready to play!")
+    print("")
 
     import mud1
     mud1.run()
