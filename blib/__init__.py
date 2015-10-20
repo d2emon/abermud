@@ -27,24 +27,8 @@
 # char *uppercase(str)
 # char *trim(str)
 # long numarg(str)
-
 # int any(ch,str)
-# char ch;
-# char *str;
-# {
-# 	extern char *strchr();
-# 	if(strchr(str,ch)==NULL) return(-1);
-# 	return(strchr(str,ch)-str);
-# }
-
 # void gepass(str)
-# {
-# 	char key[33],pw[16];
-#
-# 	strcpy(key,getpass(""));
-# 	strcpy(pw,crypt(key,"XX"));
-# 	strcpy(str,pw);
-# }
 
 
 def scan(s, start, skips, stops):
@@ -128,17 +112,3 @@ def sec_write(unit, block, pos, len):
     unit.write("Size %d\n" % (len*l))
     unit.write(json.dumps(block))
     unit.write("\n")
-
-# char *cuserid(str)
-# char *str;
-# {
-# # /*
-# #	extern char *strchr();
-# #	getpw(getuid(),ary);
-# #	*strchr(ary,':')=0;
-# # */
-# 	static char ary[128];
-# 	strcpy(ary,getpwuid(getuid())->pw_name);
-# 	if(str!=NULL) strcpy(str,ary);
-# 	return(ary);
-# }
