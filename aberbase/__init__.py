@@ -21,3 +21,34 @@
 #  MA 02110-1301, USA.
 #
 #
+
+
+def time_created():
+    import time
+    import os
+
+    import aberbase.files
+
+    return time.ctime(os.path.getmtime(aberbase.files.config().EXE))
+
+
+def time_started():
+    import sys_stubs
+    import datetime
+    import json
+
+    import aberbase.files
+
+    try:
+        current = datetime.datetime.now() - json.load(open(aberbase.files.config().RESET_N, "r"))
+        return "Game time elapsed: %s" % (sys_stubs.elapsed(current))
+    except OSError:
+        return "AberMUD has yet to ever start!!!"
+
+
+def listfl(name):
+    try:
+        with open(name, "r+") as f:
+            print(f.read())
+    except OSError:
+        print("[Cannot Find -> %s]\n" % (name))
