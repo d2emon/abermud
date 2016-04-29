@@ -62,7 +62,7 @@ def install():
         "reset_t",
         "reset_n",
     ))
-    aberbase.user.install()
+    aberbase.user.User().install()
 
     print('Initializing game universe')
     makeworld.make_world()

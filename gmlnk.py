@@ -31,7 +31,7 @@ def talker(user):
     while True:
         if sys_stubs.qnmrq:
             if not execl("   --}----- ABERMUD -----{--    Playing as ", user.username, 0):
-                crapup("mud.exe : Not found")
+                sys_stubs.crapup("mud.exe : Not found")
         sys_stubs.clear_console()
         options = {
             "1": {"wiz": False, "action": start_game, "text": "1]\tEnter The Game"},
@@ -59,11 +59,11 @@ def talker(user):
                 print(i["text"])
         print("\n")
         option = options.get(input("Select > ")[:1],
-            {"wiz": False, "action": bad_option})
+                             {"wiz": False, "action": bad_option})
         action = option.get("action", bad_option)
         can_run = (not option.get("wiz", False)) or is_wizard
         if can_run:
-            if not action(user.username):
+            if not action(user):
                 break
 
 
@@ -77,8 +77,8 @@ booted feet. You stride on down the hall, choose your masque and enter the
 worlds beyond the known......
 
 """)
-    execl("   --{----- ABERMUD -----}--      Playing as ", nam, 0)
-    sys_stubs.crapup("mud.exe: Not Found")
+    if not execl("   --{----- ABERMUD -----}--      Playing as ", nam.username, 0):
+        sys_stubs.crapup("mud.exe: Not Found")
     return True
 
 
@@ -86,31 +86,23 @@ def change_pwd(user):
     import getpass
     print("TODO: chpwd(%s)" % (user))
 
-    data = user
-    # logscan(user, block)
-    user = data
-    # a = scan(data, block, 0, "", ".")
-    # a = scan(pwd, block, a+1, "", ".")
-    data = getpass.getpass("\nOld Password\n*")
-    if data == pwd:
+    if getpass.getpass("\nOld Password\n*") != user.password:
         print("\nIncorrect Password")
     else:
         print("\nNew Password")
-        # chptagn:
-        pwd = getpass.getpass("*")
-        print("")
-        if not pwd:
-            pass
-            # goto chptagn
-        if '.' in pwd:
-            print("Illegal Character in password")
-            # goto chptagn;
-        pv = getpass.getpass("\nVerify Password\n*")
-        print("\n")
-        if pv == pwd:
-            print("\nNO!")
-            # goto chptagn
-        block = "%s%s%s%s%s%s%s%s" % (user,".",pwd,".",".",".",".",".")
+        while True:
+            try:
+                user.setPassword(getpass.getpass("*"))
+            except ValueError as e:
+                print(e)
+                continue
+            pv = getpass.getpass("\nVerify Password\n*")
+            if pv != user.password:
+                print("\nNO!")
+                continue
+            else:
+                break
+        block = "%s.%s....." % (user.username, user.password)
         print(block)
         # delu2(user)
 
@@ -132,8 +124,9 @@ def exit_mud(nam):
 
 
 def test_mud(nam):
+    import sys_stubs
     sys_stubs.clear_console()
-    print("Entering Test Version");
+    print("Entering Test Version")
     return True
 
 

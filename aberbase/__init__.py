@@ -52,3 +52,65 @@ def listfl(name):
             print(f.read())
     except OSError:
         print("[Cannot Find -> %s]\n" % (name))
+
+
+class AberDb:
+    __data = {}
+    __fields = {}
+    __index = 0
+
+    def __init__(self, **fields):
+        self.__fields = fields
+
+    def database(self):
+        return("db.json")
+
+    def install(self):
+        import json
+        with open(self.database(), "w+") as f:
+            json.dump(self.__data, open(self.database(), "w"))
+
+    @property
+    def index(self):
+        return self.__index
+
+    def __str__(self):
+        return self.__fields.__str__()
+
+    def __getitem__(self, key):
+        return self.__fields[key]
+
+    def __setitem__(self, key, value):
+        self.__fields[key] = value
+
+    def __getattr__(self, key):
+        return self.__fields[key]
+
+    def __setattr__(self, key, value):
+        if key == "_AberDb__fields":
+            for k in list(value):
+                self[k] = value[k]
+        else:
+            self.__fields[key] = value
+
+    def load_data(self):
+        import json
+        self.__data = json.load(open(self.database(), "r"))
+        return self.__data
+
+    def save_data(self):
+        import json
+        self.__data[self.index] = self.__fields
+        return json.dump(self.__data, open(self.database(), "w"))
+
+    def load(self, index):
+        """
+        Return block data for user or -1 if not exist
+        """
+        self.load_data()
+        self.fields = self.load_data().get(index)
+        return self.fields
+
+    def save(self):
+        self.__data[self.index] = self.fields
+        self.save_data()

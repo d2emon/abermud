@@ -50,11 +50,6 @@ def run(**args):
     main1(**args)
 
 
-lump = ""
-namegt = ""
-usrnam = ""
-
-
 # Program starts Here!
 # This forms the main loop of the code, as well as calling
 # all the initialising pieces
@@ -78,24 +73,26 @@ def main1(**params):
         level=logging.INFO
     )
 
-    created = aberbase.time_created()
-    started = aberbase.time_started()
 
     aberbase.user.startup_test()
     user = aberbase.user.User(username=params.get("n", ""))
-    sys_stubs.qnmrq = user.namegive
+    user.load_data()
+    print(user)
+
+    sys_stubs.qnmrq = user.username is not False
+    show_screens = sys_stubs.qnmrq
 
     show_logo(
-        created=created,
-        started=started,
-        show=sys_stubs.qnmrq,
+        created=aberbase.time_created(),
+        started=aberbase.time_started(),
+        show=show_screens,
     )
-    user.test_banned()
-    get_login(user)
-    if user.load(username=user.username):
-        get_password(user)
+
+    user.login()
+    if get_login(user=user):
+        get_password(user=user)
     else:
-        new_user(user)
+        new_user(user=user)
 
     show_motd(
         show=sys_stubs.qnmrq,
@@ -139,11 +136,12 @@ def show_motd(**params):
     return True
 
 
-def get_login(user):
+def get_login(**params):
     """
     Does all the login stuff
     The whole login system is called from this
     """
+    user = params["user"]
     while True:
         if not user.username:
             user.username = input("By what name shall I call you ?\n")
@@ -152,9 +150,9 @@ def get_login(user):
             if user.validate_username():
                 break
         except ValueError as e:
-            print(e)
             user.username = ""
-    return True
+            print(e)
+    return user.load(user.username)
 
 
 def get_password(user):

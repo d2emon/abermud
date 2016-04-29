@@ -23,6 +23,8 @@
 #
 
 
+import aberbase
+
 # Some tests for logging in
 # WrongHostException
 # NoLoginException
@@ -67,64 +69,42 @@ def test_nologin():
     return True
 
 
-def getDatabase():
-    import aberbase.files
-    return aberbase.files.config().PFL
-
-
-def install():
-    with open(getDatabase(), "w+") as f:
-        pass
-
-
-class User:
-    uid = ""
-    username = ""
-    password = ""
-    namegive = False
-
+class User(aberbase.AberDb):
     def __init__(self, **fields):
+        aberbase.AberDb.__init__(self, **fields)
+
         import os
+        self.uid = os.getlogin()
 
-        self.username = fields.get("username", "")
-        self.password = fields.get("password", "")
-        self.uid = fields.get("uid", os.getuid())
+    def database(self):
+        import aberbase.files
+        return aberbase.files.config().PFL
 
-        self.namegive = (self.username == True)
+    # Fields
 
-    def load(self, username):
-        """
-        Return block data for user or -1 if not exist
-        """
-        try:
-            with open(getDatabase(), "r") as f:
-                for s in f:
-                    self.decode(s)
-                    if self.username.lower() == username.lower():
-                        return True
-        except OSError:
-            raise Exception("No persona file")
-        self.username = username
-        return False
+    @property
+    def index(self):
+        return self.username
 
-    def save(self):
-        try:
-            with open(getDatabase(), "a+") as f:
-                f.write("%s\n" % (self.encode()))
-        except OSError:
-            raise Exception("No persona file....\n")
+    def setUsername(self, username):
+        self.username = username[:15].replace(" ", "")
+        return self.validate_username()
 
+    def setPassword(self, password):
+        self.password = password
+        return self.validate_password()
+
+    # Validators
     def validate_username(self):
-        import aberbase.utils
-        import re
-
         # test user
+        import re
         if not self.username:
             raise ValueError("No user name")
         if re.match('^[\w]+$', self.username) is None:
             raise ValueError("Illegal characters in user name")
 
         # validate user
+        import aberbase.utils
         if aberbase.utils.resword(self.username):
             raise ValueError("Sorry I cant call you that")
         if len(self.username) not in range(1, 10):
@@ -141,43 +121,27 @@ class User:
             raise ValueError("No password")
         if re.match('^[\w]+$', self.password) is None:
             raise ValueError("Illegal characters in password")
+
+        import aberbase.utils
+        if len(self.password) not in range(1, 10):
+            raise ValueError("Too long password")
+        if " " in self.password:
+            raise ValueError("Spaces in password")
+        if aberbase.utils.fobn(self.username):
+            raise ValueError("I can't call you that , It would be confused with an object")
         return True
 
-    def setUsername(self, username):
-        self.username = username[:15].replace(" ", "")
-        return self.validate_username()
-
-    def setPassword(self, password):
-        self.password = password
-        return self.validate_password()
-
-    def encode(self):
-        import json
-        return json.dumps({
-            "user": self.username,
-            "password": self.password
-        })
-
-    def decode(self, data):
-        import json
-        parsed = json.loads(data)
-        self.username = parsed["user"]
-        self.password = parsed["password"]
-        return parsed
-
-    def test_password(self, password):
+    # Tests
+    def is_authorized(self, password):
         return password == self.password
 
-    def test_banned(self):
+    def is_banned(self):
         """
         Check to see if UID in banned list
         """
-        import aberbase.files
-        try:
-            with open(aberbase.files.config().BAN_FILE, "r") as f:
-                for s in f:
-                    if s.rstrip("\n").lower() == self.uid.lower():
-                        raise Exception("I'm sorry- that userid has been banned from the Game")
-        except OSError:
-            pass
-        return True
+        import aberbase.ban
+        return self.uid.lower() in aberbase.ban.banned()
+
+    def login(self):
+        if self.is_banned():
+            raise Exception("I'm sorry- that userid has been banned from the Game")
