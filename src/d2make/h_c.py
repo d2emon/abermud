@@ -7,7 +7,7 @@ FSEG = {
     "ROOMS": os.path.join("TEXT", "ROOMS"),
     "LOG_FILE": "mud_syslog",
     "BAN_FILE": "banned_file",
-    "NOLOGIN": "nologin",
+    "NOLOGIN": os.path.join("..", "data", "nologin"),
     "RESET_T": "reset_t",
     "RESET_N": "reset_n",
     "RESET_DATA": "reset_data",
@@ -22,7 +22,7 @@ FSEG = {
     "LEVELS": os.path.join("TEXT", "level.txt"),
     "PFL": os.path.join("..", "data", "user_file"),
     "PFT": "user_file.b",
-    "EXE": "mud.exe",
+    "EXE": "run_mud.py",  # "EXE": "mud.exe",
     "EXE2": "mud.1",
     "SNOOP": "SNOOP",
 }

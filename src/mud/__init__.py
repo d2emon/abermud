@@ -3,6 +3,7 @@ import os
 import config
 from mud.utils import ttyt, getty, cls, validname, dcrypt
 from d2lib import cuserid
+from datetime import datetime, timedelta
 
 
 # include "files.h"
@@ -25,45 +26,19 @@ This forms the main loop of the code, as well as calling
 all the initialising pieces
 ''' 
 
-def time_ago():
-    def time_add(r):
-        if r % 60 == 1:
-            return "1 second\n"
-        else:
-            return "{} seconds.\n".format(r % 60)
-    
+def elapsed():
+    import humanize
     a = FILES["RESET_N"]
-    if a is None:
-        return "AberMUD has yet to ever start!!!\n"
-    r = 0  # fscanf(a, "%ld")
-    # fclose(a)
-    ct = 0  # time()
-    r = ct - r
-        
-    res = "Game time elapsed: "
-    # Elapsed time and similar goodies
-    if r > 24 * 60 * 60:
-        return res + "Over a day!!!\n" # Add a Day !
-    if r < 61:
-        return res + time_add(r)
-    if r == 60:
-        return res + "1 minute\n"
-    if r < 120:
-        return res + "1 minute and " + time_add(r)
-    if r / 60 == 60:
-        return res + "1 hour\n"
-    if r < 3600:
-        return res + "{} minutes and ".format(r / 60) + time_add(r)
-    if r < 7200:
-        res = res + "1 hour and "
-    else:
-        res = res + "{} hours and ".format(r / 3600)
-    if (r / 60) % 60 != 1:
-        return res + "{} minutes.\n".format((r / 60) % 60)
-    else:
-        return res + "1 minute\n"
-    return res + time_add(r)
+    try:
+        with open(a) as f:
+            d = yaml.load(f)
+            r = d['started']
+    except:
+        return "AberMUD has yet to ever start!!!"
 
+    dt = humanize.naturaltime(datetime.now() - r)
+    return "Game time elapsed: {}".format(dt)
+    
 
 def main(*argv):
     '''
@@ -87,7 +62,7 @@ def main(*argv):
 
     # Check if there is a no logins file active
     print("\n\n\n\n")
-    # chknolog();
+    chknolog()
     if len(argv) > 1:
         arg = argv[1].upper()
     else:
@@ -111,19 +86,24 @@ def main(*argv):
     # Check for all the created at stuff
     # We use stats for this which is a UN*X system call
     if not namegiv:
-        try:
-            space = os.path.getmtime(FILES("EXE"))
-        except:
-            space = "<unknown>\n"
+        print(FILES["EXE"])
         cls()
+
+        try:
+            space = os.path.getmtime(FILES["EXE"])
+            space = datetime.fromtimestamp(space).strftime("%x %X")
+        except:
+            space = "<unknown>"
+        ta = elapsed()
+        
         print("""
                          A B E R  M U D
         
                   By Alan Cox, Richard Acott Jim Finnis
                   
-        This AberMUD was created:{}
-        """.format(space))
-        time_ago()
+        This AberMUD was created: {}
+        {}
+        """.format(space, ta))
     login(namegt)
     # Does all the login stuff
     if not qnmrq:
@@ -313,7 +293,7 @@ def crapup(ptr):
     input("\n{}\n\nHit Return to Continue...\n".format(ptr))
 
     import sys
-    sys.exit()
+    sys.exit(0)
 
  
 def chkname(user):
@@ -321,7 +301,16 @@ def chkname(user):
     return re.match("^\w*$", user)
 
 
-# void chknolog()
+def chknolog():
+    try:
+        with open(FILES["NOLOGIN"]) as a:
+            s = a.read()
+        print(s)
+    except:
+        return
+
+    import sys
+    sys.exit(0)
 
 
 if __name__ == "__main__":
