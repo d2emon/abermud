@@ -7,4 +7,4 @@ def clear_file(filename):
     
     
 def cp(filename1, filename2):
-    print("--->\tcp {} {}".format(filename1, filename2))    
+    print("--->\tcp {} {}".format(filename1, filename2))

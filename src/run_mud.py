@@ -1,11 +1,16 @@
 #! /usr/bin/env python
-import d2make
+import mud
 
 
 def compile():
-    OBJ = ["""
-    blib.o gmain2.o gmainstubs.o gmlnk.o obdat.o flock.o
-    """, ]
+    OBJ = [
+        "blib",
+        "gmain2",
+        "gmainstubs",
+        "gmlnk",
+        "obdat",
+        "flock",
+    ]
 
     INCL = [
         "object.h",
@@ -19,11 +24,12 @@ def compile():
     }
 
     print('Compiling mud.1')
-    d2make.gcc_compiler(res)
+    print(res)
 
 
 def main():
-    pass
+    import sys
+    mud.main(*sys.argv)
 
 
 if __name__ == "__main__":

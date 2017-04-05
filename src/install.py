@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 from dummysh import mkdir, clear_file
+import run_mud
 import d2make
 import d2make.exe
-import mud
 import d2make.makeworld
 import d2make.ogenerate
 import d2make.makeuaf
@@ -29,7 +29,7 @@ def main():
     init_files()
     d2make.compile_h()
     d2make.exe.compile()
-    mud.compile()
+    run_mud.compile()
     print('Done')
 
     d2make.makeworld.compile()

@@ -1,8 +1,11 @@
 import os
 import socket
+import yaml
 
-    
-FSEG = {
+
+basedir = os.path.join(os.getcwd(), '..')
+config_file = os.path.join(basedir, 'config', 'files.yml')
+FILES = {
     "UAF_RAND": "uaf.rand",
     "ROOMS": os.path.join("TEXT", "ROOMS"),
     "LOG_FILE": "mud_syslog",
@@ -20,29 +23,30 @@ FSEG = {
     "CREDITS": os.path.join("TEXT", "credits"),
     "EXAMINES": "EXAMINES",
     "LEVELS": os.path.join("TEXT", "level.txt"),
-    "PFL": os.path.join("..", "data", "user_file"),
+    "PFL": "user_file",
     "PFT": "user_file.b",
     "EXE": "mud.exe",
     "EXE2": "mud.1",
     "SNOOP": "SNOOP",
+    "HOST_MACHINE": socket.gethostname(),
 }
+CONFIG = dict()
 
 
-def main():
-    res = packitems(os.getcwd())
-    res["HOST_MACHINE"] = socket.gethostname()
+def load():
+    global CONFIG
+    data = None
+    with open(config_file, "r") as f:
+        data = yaml.load(f)
+    print(data)
+    CONFIG = data
+    return data
     
-    import config
-    config.save(res)
-    return res
-
-
-def packitems(ary):
-    res = dict()
-    for k, v in FSEG.items():
-        res[k] = os.path.join(ary, v)
-    return res
+    
+def save(data):
+    with open(config_file, "w") as f:
+        yaml.dump(data, f, default_flow_style=False)
 
 
 if __name__ == "__main__":
-    print(main())
+    print(load())
