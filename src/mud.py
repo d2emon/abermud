@@ -1,7 +1,8 @@
+#! /usr/bin/env python
 import d2make
 
 
-def main():
+def compile():
     OBJ = ["""
     blib.o gmain2.o gmainstubs.o gmlnk.o obdat.o flock.o
     """, ]
@@ -16,9 +17,14 @@ def main():
         "obj": OBJ,
         "include": INCL,
     }
-    return res
 
-
-def compile():
     print('Compiling mud.1')
-    d2make.gcc_compiler(main())
+    d2make.gcc_compiler(res)
+
+
+def main():
+    pass
+
+
+if __name__ == "__main__":
+    main()

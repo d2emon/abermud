@@ -2,7 +2,7 @@
 from dummysh import mkdir, clear_file
 import d2make
 import d2make.exe
-import d2make.mud
+import mud
 import d2make.makeworld
 import d2make.ogenerate
 import d2make.makeuaf
@@ -29,7 +29,7 @@ def main():
     init_files()
     d2make.compile_h()
     d2make.exe.compile()
-    d2make.mud.compile()
+    mud.compile()
     print('Done')
 
     d2make.makeworld.compile()
