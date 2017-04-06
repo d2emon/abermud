@@ -102,20 +102,11 @@ class User():
         '''
         Return block data for user or -1 if not exist
         '''
-        # unit = openlock(PFL,"r")
-        # if unit is None:
-        #     raise Exception("No persona file")
-        with open(CONFIG["PFL"]) as f:
-            persons = yaml.load(f)
-            # block = dcrypt(block)
-
-        if persons is None:
-            return None
-    
-        for p in persons:
-            print(p['username'], username)
-            if p['username'].lower() == username.lower():
-                return User(p['username'], p['password'])
+        users = User.load()
+        for u in users:
+            print(u.username, username)
+            if u.username.lower() == username.lower():
+                return u
         return None
 
 
@@ -153,25 +144,10 @@ class User():
                 print("\n")
                 if user.valid_password():
                     break
-            block = {
-                "username": user.username,
-                "password": user.password,
-            }
         
-            with open(CONFIG["PFL"]) as f:
-                persons = yaml.load(f)
-
-            if persons is None:
-                persons = []
-
-            persons.append(block)
-
-            # unit = openlock(PFL,"a")
-            # if unit is None:
-            #     raise Exception("No persona file")
-            with open(CONFIG["PFL"], "w") as f:
-                # block = dcrypt(block)
-                yaml.dump(persons, f)
+            persons = User.load()
+            persons.append(user)
+            persons.save()
         cls()
         return True
 
@@ -179,3 +155,35 @@ class User():
     def chkname(username):
         import re
         return re.match("^\w*$", username)
+    
+    @staticmethod
+    def from_dict(data):
+        return User(data.get('username', ''), data.get('password', ''))
+    
+    def to_dict(self):
+        return {
+            "username": self.username,
+            "password": self.password,
+        }
+    
+    @staticmethod
+    def load():
+        # unit = openlock(PFL,"r")
+        # if unit is None:
+        #     raise Exception("No persona file")
+        with open(CONFIG["PFL"]) as f:
+            # block = dcrypt(block)
+            data = yaml.load(f)
+        
+        return [User.from_dict(u) for u in data]
+    
+    @staticmethod
+    def save(users):
+        data = [u.to_dict() for u in users]
+
+        # unit = openlock(PFL,"a")
+        # if unit is None:
+        #     raise Exception("No persona file")
+        with open(CONFIG["PFL"], "w") as f:
+            # block = dcrypt(block)
+            yaml.dump(data, f)
