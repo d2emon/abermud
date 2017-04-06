@@ -48,5 +48,8 @@ def save(data):
         yaml.dump(data, f, default_flow_style=False)
 
 
+load()
+
+
 if __name__ == "__main__":
     print(load())

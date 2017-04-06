@@ -22,7 +22,8 @@ def getty():
     
 
 def cls():
-    print("--->\tcls()")  
+    print("--->\tcls()") 
+    print("=-" * 40) 
     print("\n" * 24)  
 
 
