@@ -2,13 +2,19 @@ from d2lib import cuserid
 from mud.utils import cls, validname
 from config import CONFIG
 import yaml
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
 
 
-class User():
-    def __init__(self, username='', password=''):
-        self.username = username
-        self.password = password
-        
+Base = declarative_base()
+
+
+class User(Base):
+    __tablename__ = "user"
+    id = Column(Integer, primary_key=True)
+    username = Column(String(16))
+    password = Column(String(16))
+    
     def validate_username(self):
         # Check for legality of names
         if not self.username:
