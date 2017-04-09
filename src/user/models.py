@@ -3,6 +3,7 @@ from mud.utils import cls, validname
 from config import CONFIG
 import yaml
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import validates
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -12,28 +13,45 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True)
-    username = Column(String(16))
-    password = Column(String(16))
-    
-    def validate_username(self):
+    username = Column(String(16), nullable=False)
+    password = Column(String(16), nullable=False)
+
+    def __init__(self, username=None, password=None):
+        Base.__init__(self)
+        if username:
+            self.username = username
+        if password:
+            self.password = password
+
+    @validates('username')
+    def validate_username(self, key, username):
+        assert username is not None
+        username = username.strip()
+        assert username, "Empty username"
+        assert '.' not in username, "Illegal characters in username"
+        assert ' ' not in username, "Illegal characters in username"
+        assert User.chkname(username), "Illegal characters in username"
+        assert validname(username), "Bye Bye"
+        return username
+
+    @validates('password')
+    def validate_password(self, key, password):
         # Check for legality of names
-        if not self.username:
-            raise ValueError("Empty user name")
+        assert password is not None
+        assert password, "Empty password"
+        assert '.' not in password, "Illegal characters in password"
+        assert ' ' not in password, "Illegal characters in password"
+        return password
 
-        if '.' in self.username:
-            raise ValueError("Illegal characters in user name")
+    def get_username(self, username):
+        # Check for legality of names
+        try:
+            self.username = self.validate_username(self.id, username)
+        except AssertionError as e:
+            print("ASSERTION ERROR", e)
+            return False
 
-        username = self.username.strip()
-        if ' ' in username:
-            raise ValueError("Illegal characters in user name")
-
-        if not User.chkname(username):
-            raise ValueError("")
-
-        if not validname(username):
-            raise ValueError("Bye Bye")
-
-        a = User.logscan(username)
+        a = User.logscan(self.username)
         if a is None:
             # If he/she doesnt exist
             a = input("\nDid I get the name right {} ?".format(self.username)).lower()
@@ -42,53 +60,38 @@ class User(Base):
             return c == 'y'
             # Check name
         return True
-    
-    def validate_password(self):
-        # Check for legality of names
-        if not self.password:
-            raise ValueError("Empty password")
 
-        if '.' in self.password:
-            raise ValueError("Illegal characters in password")
+    def get_password(self, password):
+        try:
+            self.password = self.validate_password(self.id, password)
+        except AssertionError as e:
+            print("ASSERTION ERROR", e)
+            return False
         return True
-    
-    def valid_username(self):
-        try:
-            return self.validate_username()
-        except ValueError as e:
-            print(e)
-            return False
-        
-    def valid_password(self):
-        try:
-            return self.validate_password()
-        except ValueError as e:
-            print(e)
-            return False
-        
+
     def login(self):
         '''
         The whole login system is called from this
         '''
         # Check if banned first
-        b = self.chkbnid(cuserid())  
+        b = self.chkbnid(cuserid())
         # cuserid(NULL));
         print(b)
-    
+
         namegiv = False
-        while not self.valid_username():
+        username = None
+        while not self.get_username(username):
             # Get the user name
-            self.username = input("By what name shall I call you ?\n*")[:15]
-            print("INPUT", self.username)
-        self.logpass(self.username)  # Password checking        
-        
-        
+            username = input("By what name shall I call you ?\n*")[:15]
+            print("INPUT", username)
+        self.logpass(self.username)  # Password checking
+
     def chkbnid(self, user):
         '''
         Check to see if UID in banned list
         '''
         c = user.lower()
-    
+
         a = ""  # openlock(BAN_FILE,"r+");
         if a is None:
             return False
@@ -101,23 +104,26 @@ class User(Base):
                 raise Exception("I'm sorry- that userid has been banned from the Game")
         # fclose(a);
         return False
-        
 
     @staticmethod
-    def logscan(username):
+    def logscan(username, session=None):
         '''
         Return block data for user or -1 if not exist
         '''
-        users = User.load()
+        # users = User.load()
+        if session is None:
+            import db
+            engine, session = db.connect()
+        query = session.query(User)
+        users = query.all()
         for u in users:
             print(u.username, username)
             if u.username.lower() == username.lower():
                 return u
         return None
 
-
     @staticmethod
-    def logpass(username):
+    def logpass(username, session=None):
         '''
         Main login code
         '''
@@ -130,10 +136,10 @@ class User(Base):
                 # fflush(stdout)
                 # gepass(block)
                 print("\n")
-            
+
                 if pwd == user.password:
                     return True
-            
+
                 tries -= 1
                 if not tries:
                     raise Exception("\nNo!\n\n")
@@ -142,18 +148,20 @@ class User(Base):
             print("Creating new persona...\n")
             user = User(username)
             print("Give me a password for this persona\n")
-            while True:
+            password = None
+            while not user.get_password(password):
                 # repass:
-                user.password = input("*")
+                password = input("*")
                 # fflush(stdout)
                 # gepass(block)
                 print("\n")
-                if user.valid_password():
-                    break
-        
-            persons = User.load()
-            persons.append(user)
-            persons.save()
+            user.password = password
+
+            if session is None:
+                import db
+                engine, session = db.connect()
+            session.add(user)
+            session.commit()
         cls()
         return True
 
@@ -161,35 +169,21 @@ class User(Base):
     def chkname(username):
         import re
         return re.match("^\w*$", username)
-    
-    @staticmethod
-    def from_dict(data):
-        return User(data.get('username', ''), data.get('password', ''))
-    
-    def to_dict(self):
-        return {
-            "username": self.username,
-            "password": self.password,
-        }
-    
-    @staticmethod
-    def load():
-        # unit = openlock(PFL,"r")
-        # if unit is None:
-        #     raise Exception("No persona file")
-        with open(CONFIG["PFL"]) as f:
-            # block = dcrypt(block)
-            data = yaml.load(f)
-        
-        return [User.from_dict(u) for u in data]
-    
-    @staticmethod
-    def save(users):
-        data = [u.to_dict() for u in users]
 
-        # unit = openlock(PFL,"a")
-        # if unit is None:
+    # @staticmethod
+    # def load():
+        # if f is None:
         #     raise Exception("No persona file")
-        with open(CONFIG["PFL"], "w") as f:
-            # block = dcrypt(block)
-            yaml.dump(data, f)
+        # with open(CONFIG["PFL"]) as f:
+        #     # block = dcrypt(block)
+        #     data = yaml.load(f)
+        # return [User.from_dict(u) for u in data]
+
+    # @staticmethod
+    # def save(users):
+        # data = [u.to_dict() for u in users]
+        # if f is None:
+        #     raise Exception("No persona file")
+        # with open(CONFIG["PFL"], "w") as f:
+        #     # block = dcrypt(block)
+        #     yaml.dump(data, f)

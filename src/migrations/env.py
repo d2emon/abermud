@@ -11,9 +11,14 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
+# Setting up path
+import os
+import sys
+sys.path.append(os.getcwd())
+
 # add your model's MetaData object here
 # for 'autogenerate' support
-from users.models import Base
+from user.models import Base
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
