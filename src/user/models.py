@@ -1,7 +1,6 @@
-from d2lib import cuserid
-from mud.utils import cls, validname
+from mud.utils import validname
 from config import CONFIG
-import yaml
+# import yaml
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.declarative import declarative_base
@@ -29,6 +28,7 @@ class User(Base):
 
     @validates('username')
     def validate_username(self, key, username):
+        print("USERNAME", username)
         assert username is not None
         username = username.strip()
         assert username, "Empty username"
@@ -53,7 +53,8 @@ class User(Base):
     def get_username(self, username):
         # Check for legality of names
         try:
-            self.username = self.validate_username(self.id, username)
+            # self.username = self.validate_username(self.id, username)
+            self.username = username
         except AssertionError as e:
             print("ASSERTION ERROR", e)
             return False
@@ -67,36 +68,6 @@ class User(Base):
             print("ASSERTION ERROR", e)
             return False
         return True
-
-    @staticmethod
-    def login(session=None):
-        '''
-        The whole login system is called from this
-        '''
-        # Check if banned first
-        b = User.chkbnid(cuserid())
-        # cuserid(NULL));
-        print("BANNED", b)
-
-        user = User()
-        logged = None
-        username = None
-        while not user.get_username(username):
-            # Get the user name
-            username = input("By what name shall I call you?\n*\t")[:15]
-            logged = User.input_username(username)
-            if not logged:
-                username = None
-            print("USER", user, logged)
-
-        user = logged
-        # Password checking
-        print("LOGGED USER", user)
-        if user:
-            user.authenticate(session)
-        else:
-            User.register(username, session)
-        cls()
 
 
     def authenticate(self, session=None):
@@ -131,22 +102,8 @@ class User(Base):
         if session is None:
             import db
             engine, session = db.connect()
-        session.add(user)
+        session.add(self)
         session.commit()
-
-    @staticmethod
-    def input_username(username):
-        # Check name
-        user = User.by_username(username)
-        if user is not None:
-            return user
-        # If he/she doesnt exist
-        answer = input("\nDid I get the name right {}? ".format(username)).lower()
-        c = answer[0]
-        print("\n")
-        if c == 'y':
-            return User(username=username)
-        return None
 
     @staticmethod
     def input_password():

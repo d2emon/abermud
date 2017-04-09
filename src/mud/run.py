@@ -5,6 +5,7 @@ from d2lib import cuserid
 from mud.utils import getty, cls
 from datetime import datetime
 from user.models import User
+from user.login import login
 import yaml
 
 
@@ -99,8 +100,7 @@ def main(*argv):
         {}
         """.format(space, ta))
 
-    user = User(namegt)
-    user.login()
+    login(username=namegt)
     # Does all the login stuff
 
     if not qnmrq:
