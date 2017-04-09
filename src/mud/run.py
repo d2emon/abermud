@@ -5,7 +5,7 @@ from d2lib import cuserid
 from mud.utils import getty, cls
 from datetime import datetime
 from user.models import User
-from user.login import login
+from user.login import chknolog, login
 import yaml
 
 
@@ -21,9 +21,18 @@ namegiv = False
 namegt = None
 qnmrq = False
 FILES = dict()
+# char usrnam[44];
 
 
-def elapsed():
+def time_created():
+    try:
+        created = os.path.getmtime(FILES["EXE"])
+        return datetime.fromtimestamp(space).strftime("%x %X")
+    except:
+        return "<unknown>"
+
+
+def time_elapsed():
     import humanize
     a = FILES["RESET_N"]
     try:
@@ -46,15 +55,15 @@ def main(*argv):
 
     namegiv = False
     namegt = ""
+    user = None
     qnmrq = False
     # FILE *a;
 
     # Check we are running on the correct host
     # see the notes about the use of flock();
     # and the affects of lockf();
-    user = socket.gethostname()
-    if user != FILES["HOST_MACHINE"]:
-        raise Exception("AberMUD is only available on {}, not on {}".format(FILES["HOST_MACHINE"], user))
+    host = socket.gethostname()
+    assert host == FILES["HOST_MACHINE"], "AberMUD is only available on {}, not on {}".format(FILES["HOST_MACHINE"], host)
     b = [0, 0, 0]
 
     # Check if there is a no logins file active
@@ -72,8 +81,9 @@ def main(*argv):
         if key == 'N':
             qnmrq = True
             ttyt = 0
-            namegt = arg[2:]
-            namegiv = True
+            # namegt = arg[2:]
+            # namegiv = True
+            user = login(username=arg[2:])
         else:
             getty()
     else:
@@ -82,15 +92,8 @@ def main(*argv):
     num = 0
     # Check for all the created at stuff
     # We use stats for this which is a UN*X system call
-    if not namegiv:
+    if user is None:
         cls()
-        try:
-            space = os.path.getmtime(FILES["EXE"])
-            space = datetime.fromtimestamp(space).strftime("%x %X")
-        except:
-            space = "<unknown>"
-        ta = elapsed()
-
         print("""
                          A B E R  M U D
 
@@ -98,10 +101,8 @@ def main(*argv):
 
         This AberMUD was created: {}
         {}
-        """.format(space, ta))
-
-    login(username=namegt)
-    # Does all the login stuff
+        """.format(time_created(), time_elapsed()))
+        user = login()
 
     if not qnmrq:
         cls()
@@ -112,10 +113,11 @@ def main(*argv):
     space = cuserid()
     # syslog("Game entry by %s : UID %s",user,space); /* Log entry */
     # talker(user);                /* Run system */
-    crapup("Bye Bye")  # Exit
+
+    # Exit
+    crapup("Bye Bye")
 
 
-# char usrnam[44];
 
 
 # void getunm(name)
@@ -132,18 +134,6 @@ def main(*argv):
 
 def crapup(ptr):
     input("\n{}\n\nHit Return to Continue...\n".format(ptr))
-
-    import sys
-    sys.exit(0)
-
-
-def chknolog():
-    try:
-        with open(FILES["NOLOGIN"]) as a:
-            s = a.read()
-        print(s)
-    except:
-        return
 
     import sys
     sys.exit(0)

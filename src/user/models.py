@@ -17,9 +17,9 @@ class User(Base):
 
     def __init__(self, username=None, password=None):
         Base.__init__(self)
-        if username:
+        if username is not None:
             self.username = username
-        if password:
+        if password is not None:
             self.password = password
         self.namegiv = False
 
@@ -50,69 +50,12 @@ class User(Base):
         assert password == self.password, "Wrong password"
         return True
 
-    def get_username(self, username):
-        # Check for legality of names
-        try:
-            # self.username = self.validate_username(self.id, username)
-            self.username = username
-        except AssertionError as e:
-            print("ASSERTION ERROR", e)
-            return False
-        return True
-
-    def get_password(self, password):
-        # Check for legality of names
-        try:
-            self.password = self.validate_password(self.id, password)
-        except AssertionError as e:
-            print("ASSERTION ERROR", e)
-            return False
-        return True
-
-
-    def authenticate(self, session=None):
-        '''
-        Main login code
-        '''
-        print("\nThis persona already exists, what is the password?")
-        tries = 3
-        while tries:
-            password = User.input_password()
-            try:
-                return self.check_password(password)
-            except AssertionError as e:
-                print(e)
-                tries -= 1
-            assert tries > 0, "\nNo!\n\n"
-        return True
-
-    @staticmethod
-    def register(username, session=None):
-        # this bit registers the new user
-        print("Creating new persona...\n")
-        user = User(username=username)
-        print("Give me a password for this persona\n")
-        password = None
-        while not user.get_password(password):
-            password = User.input_password()
-        user.password = password
-        user.save(session)
-
     def save(self, session=None):
         if session is None:
             import db
             engine, session = db.connect()
         session.add(self)
         session.commit()
-
-    @staticmethod
-    def input_password():
-        # repass:
-        password = input("*\t")
-        # fflush(stdout)
-        # gepass(block)
-        print("\n")
-        return password
 
     @staticmethod
     def chkbnid(user):
