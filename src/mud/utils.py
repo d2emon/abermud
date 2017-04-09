@@ -19,12 +19,12 @@ ttyt = 0
 
 def getty():
     print("--->\tgetty()")
-    
+
 
 def cls():
-    print("--->\tcls()") 
-    print("=-" * 40) 
-    print("\n" * 24)  
+    print("--->\tcls()")
+    print("=-" * 40)
+    print("\n" * 24)
 
 
 # FILE *openlock(file,perm)

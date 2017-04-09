@@ -1,9 +1,10 @@
 import socket
 import os
 import config
-from d2lib import cuserid
+from d2lib import cuserid, printfile
 from mud.utils import getty, cls
 from datetime import datetime
+from getpass import getpass
 from user.models import User
 from user.login import chknolog, login, authenticate
 import yaml
@@ -44,6 +45,28 @@ def time_elapsed():
 
     dt = humanize.naturaltime(datetime.now() - r)
     return "Game time elapsed: {}".format(dt)
+
+
+def show_title():
+    cls()
+    print("""
+                     A B E R  M U D
+
+              By Alan Cox, Richard Acott Jim Finnis
+
+    This AberMUD was created: {}
+    {}
+    """.format(time_created(), time_elapsed()))
+
+
+def show_motd():
+    '''
+    list the message of the day
+    '''
+    cls()
+    printfile(FILES['MOTD'])
+    getpass("")
+    print("\n\n")
 
 
 def main(*argv):
@@ -94,32 +117,20 @@ def main(*argv):
     # Check for all the created at stuff
     # We use stats for this which is a UN*X system call
     if user is None:
-        cls()
-        print("""
-                         A B E R  M U D
-
-                  By Alan Cox, Richard Acott Jim Finnis
-
-        This AberMUD was created: {}
-        {}
-        """.format(time_created(), time_elapsed()))
+        show_title()
         user = login()
 
     if not qnmrq:
-        cls()
-        listfl(FILES['MOTD'])
-        # list the message of the day
-        space = input("399")
-        print("\n\n")
+        show_motd()
 
     space = cuserid()
-    # syslog("Game entry by %s : UID %s",user,space); /* Log entry */
-    # talker(user);                /* Run system */
+    # syslog("Game entry by %s : UID %s",user,space)
+    # Log entry
+    # talker(user)
+    # Run system
 
     # Exit
     crapup("Bye Bye")
-
-
 
 
 # void getunm(name)
@@ -131,19 +142,9 @@ def main(*argv):
 # void delu2(name)   /* For delete and edit */
 # void chpwd(user)   /* Change your password */
 
-# void listfl(name)
-def listfl(filename):
-    print("--->\tlistfl(\"{}\")".format(filename))
-    try:
-        with open(filename) as a:
-            s = a.read()
-        print(s)
-    except:
-        return
-
 
 def crapup(ptr):
-    input("\n{}\n\nHit Return to Continue...\n".format(ptr))
+    getpass("\n{}\n\nHit Return to Continue...\n".format(ptr))
 
     import sys
     sys.exit(0)
