@@ -4,7 +4,7 @@ import socket
 
 FSEG = {
     "UAF_RAND": "uaf.rand",
-    "ROOMS": os.path.join("TEXT", "ROOMS"),
+    "ROOMS": os.path.join("..", "data", "text", "ROOMS"),
     "LOG_FILE": "mud_syslog",
     "BAN_FILE": "banned_file",
     "NOLOGIN": os.path.join("..", "data", "nologin"),
@@ -13,18 +13,18 @@ FSEG = {
     "RESET_DATA": "reset_data",
     "MOTD": os.path.join("..", "data", "text", "gmotd2"),
     "GWIZ": os.path.join("TEXT", "gwiz"),
-    "HELP1": os.path.join("TEXT", "help1"),
-    "HELP2": os.path.join("TEXT", "help2"),
-    "HELP3": os.path.join("TEXT", "help3"),
-    "WIZLIST": os.path.join("TEXT", "wiz.list"),
-    "CREDITS": os.path.join("TEXT", "credits"),
-    "EXAMINES": "EXAMINES",
-    "LEVELS": os.path.join("TEXT", "level.txt"),
-    "PFL": os.path.join("..", "data", "user_file"),
+    "HELP1": os.path.join("..", "data", "text", "help1"),
+    "HELP2": os.path.join("..", "data", "text", "help2"),
+    "HELP3": os.path.join("..", "data", "text", "help3"),
+    "WIZLIST": os.path.join("..", "data", "text", "wiz.list"),
+    "CREDITS": os.path.join("..", "data", "text", "credits"),
+    "EXAMINES": os.path.join("..", "data", "examines"),
+    "LEVELS": os.path.join("..", "data", "levels.txt"),
+    # "PFL": os.path.join("..", "data", "user_file"),
     "PFT": "user_file.b",
     "EXE": "run_mud.py",  # "EXE": "mud.exe",
     "EXE2": "mud.1",
-    "SNOOP": "SNOOP",
+    "SNOOP": os.path.join("..", "data", "snoop"),
 }
 
 
@@ -37,10 +37,10 @@ def main():
     return res
 
 
-def packitems(ary):
+def packitems(basedir):
     res = dict()
     for k, v in FSEG.items():
-        res[k] = os.path.abspath(os.path.join(ary, v))
+        res[k] = os.path.abspath(os.path.join(basedir, v))
     return res
 
 
