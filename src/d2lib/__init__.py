@@ -35,7 +35,7 @@ def scan(v_out, v_in, v_start, v_skips, v_stops):
 # void f_listfl(name,file)
 # void listfl(name)
 def printfile(filename):
-    print("--->\tlistfl(\"{}\")".format(filename))
+    # print("--->\tlistfl(\"{}\")".format(filename))
     print("\n")
     try:
         with open(filename) as a:

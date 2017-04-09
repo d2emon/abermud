@@ -1,13 +1,19 @@
-import socket
 import os
+import logging
+import socket
+import yaml
+
 import config
-from d2lib import cuserid, printfile
-from mud.utils import getty, cls
+
+
+
 from datetime import datetime
 from getpass import getpass
+
+from d2lib import cuserid, printfile
+from mud.utils import getty, cls
 from user.models import User
 from user.login import chknolog, login, authenticate
-import yaml
 
 
 # include "files.h"
@@ -47,7 +53,21 @@ def time_elapsed():
     return "Game time elapsed: {}".format(dt)
 
 
+def check_host(game_host):
+    '''
+    Check we are running on the correct host
+    see the notes about the use of flock();
+    and the affects of lockf();
+    '''
+    user_host = socket.gethostname()
+    assert user_host == game_host, "AberMUD is only available on {}, not on {}".format(game_host, user_host)
+
+
 def show_title():
+    '''
+    Check for all the created at stuff
+    We use stats for this which is a UN*X system call
+    '''
     cls()
     print("""
                      A B E R  M U D
@@ -76,22 +96,13 @@ def main(*argv):
     global FILES
     FILES = config.load()
 
-    namegiv = False
-    namegt = ""
-    user = None
-    qnmrq = False
-    # FILE *a;
-
-    # Check we are running on the correct host
-    # see the notes about the use of flock();
-    # and the affects of lockf();
-    host = socket.gethostname()
-    assert host == FILES["HOST_MACHINE"], "AberMUD is only available on {}, not on {}".format(FILES["HOST_MACHINE"], host)
-    b = [0, 0, 0]
+    check_host(FILES['HOST_MACHINE'])
 
     # Check if there is a no logins file active
     print("\n\n\n\n")
     chknolog()
+
+    user = None
     if len(argv) > 1:
         arg = argv[1].upper()
     else:
@@ -102,32 +113,27 @@ def main(*argv):
         # -n(name)
         key = arg[1]
         if key == 'N':
-            qnmrq = True
-            ttyt = 0
-            # namegt = arg[2:]
-            # namegiv = True
             user = User.by_username(arg[2:])
             authenticate(user)
+            user.qnmrq = True
+            user.ttyt = 0
         else:
             getty()
     else:
         getty()
 
-    num = 0
-    # Check for all the created at stuff
-    # We use stats for this which is a UN*X system call
     if user is None:
         show_title()
         user = login()
 
-    if not qnmrq:
+    if not user.qnmrq:
         show_motd()
 
-    space = cuserid()
-    # syslog("Game entry by %s : UID %s",user,space)
     # Log entry
-    # talker(user)
+    logging.info("Game entry by %s : UID %s", user, os.getuid())
+
     # Run system
+    # talker(user)
 
     # Exit
     crapup("Bye Bye")

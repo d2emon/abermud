@@ -22,6 +22,7 @@ class User(Base):
         if password is not None:
             self.password = password
         self.namegiv = False
+        self.qnmrq = False
 
     def __repr__(self):
         return "<User '{}'\t[password: '{}']>".format(self.username, self.password)
@@ -87,7 +88,11 @@ class User(Base):
             import db
             engine, session = db.connect()
         query = session.query(User)
-        return query.filter_by(username=username.lower()).first()
+        user = query.filter_by(username=username.lower()).first()
+        user.namegiv = False
+        user.qnmrq = False
+        user.ttyt = 0
+        return user
 
     @staticmethod
     def chkname(username):
