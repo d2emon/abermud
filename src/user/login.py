@@ -1,6 +1,7 @@
 from d2lib import cuserid
 from mud.utils import cls
 from user.models import User
+from getpass import getpass
 
 
 TRIES = 3
@@ -28,13 +29,8 @@ def input_username(username):
     return user
 
 
-def input_password():
-    # repass:
-    password = input("*\t")
-    # fflush(stdout)
-    # gepass(block)
-    print("\n")
-    return password
+def input_password(prompt='Password: '):
+    return getpass(prompt)
 
 
 def login(username=None, session=None):
@@ -43,7 +39,7 @@ def login(username=None, session=None):
     The whole login system is called from this
     '''
     if username:
-        user = User(username)
+        user = User.by_username(username)
         authenticate(user, session)
         return user
 
@@ -70,11 +66,11 @@ def authenticate(user, session=None):
     '''
     Main login code
     '''
-    print("This user already exists, what is the password?")
     tries = TRIES
     while tries:
         try:
-            return user.check_password(input_password())
+            prompt = "This user already exists, what is the password? "
+            return user.check_password(input_password(prompt))
         except AssertionError as e:
             print(e)
             tries -= 1
@@ -88,11 +84,11 @@ def register(user, session=None):
     '''
     print("Creating new user...")
 
-    print("Give me a password for this user")
     password = None
     while True:
         try:
-            user.password = input_password()
+            prompt = "Give me a password for this user "
+            user.password = input_password(prompt)
             break
         except AssertionError as e:
             print(e)

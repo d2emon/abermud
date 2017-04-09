@@ -5,7 +5,7 @@ from d2lib import cuserid
 from mud.utils import getty, cls
 from datetime import datetime
 from user.models import User
-from user.login import chknolog, login
+from user.login import chknolog, login, authenticate
 import yaml
 
 
@@ -83,7 +83,8 @@ def main(*argv):
             ttyt = 0
             # namegt = arg[2:]
             # namegiv = True
-            user = login(username=arg[2:])
+            user = User.by_username(arg[2:])
+            authenticate(user)
         else:
             getty()
     else:
@@ -106,7 +107,8 @@ def main(*argv):
 
     if not qnmrq:
         cls()
-        # listfl(MOTD);             /* list the message of the day */
+        listfl(FILES['MOTD'])
+        # list the message of the day
         space = input("399")
         print("\n\n")
 
@@ -130,6 +132,14 @@ def main(*argv):
 # void chpwd(user)   /* Change your password */
 
 # void listfl(name)
+def listfl(filename):
+    print("--->\tlistfl(\"{}\")".format(filename))
+    try:
+        with open(filename) as a:
+            s = a.read()
+        print(s)
+    except:
+        return
 
 
 def crapup(ptr):
