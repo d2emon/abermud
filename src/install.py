@@ -1,5 +1,6 @@
 #! /usr/bin/env python
-from dummysh import mkdir, clear_file
+from dummysh import clear_file
+import os
 import run_mud
 import d2make
 import d2make.exe
@@ -10,10 +11,20 @@ import d2make.makeuaf
 
 def make_dirs():
     print('Making directories')
-    mkdir("TEXT")
-    mkdir("SNOOP")
-    mkdir("EXAMINES")
-    mkdir("TEXT/ROOMS")
+    datadir = os.path.abspath(os.path.join(os.getcwd(), '..', 'data'))
+    dirs = [
+        "text",
+        "snoop",
+        "examines",
+        os.path.join("text", "rooms"),
+    ]
+    for d in dirs:
+        try:
+            path = os.path.join(datadir, d)
+            print("Making {}".format(path))
+            os.mkdir(path)
+        except FileExistsError as e:
+            print(e)
 
 
 def init_files():
