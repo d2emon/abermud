@@ -22,6 +22,10 @@ class User(Base):
             self.username = username
         if password:
             self.password = password
+        self.namegiv = False
+
+    def __repr__(self):
+        return "<User '{}'\t[password: '{}']>".format(self.username, self.password)
 
     @validates('username')
     def validate_username(self, key, username):
@@ -36,12 +40,15 @@ class User(Base):
 
     @validates('password')
     def validate_password(self, key, password):
-        # Check for legality of names
         assert password is not None
         assert password, "Empty password"
         assert '.' not in password, "Illegal characters in password"
         assert ' ' not in password, "Illegal characters in password"
         return password
+
+    def check_password(self, password):
+        assert password == self.password, "Wrong password"
+        return True
 
     def get_username(self, username):
         # Check for legality of names
@@ -50,18 +57,10 @@ class User(Base):
         except AssertionError as e:
             print("ASSERTION ERROR", e)
             return False
-
-        a = User.logscan(self.username)
-        if a is None:
-            # If he/she doesnt exist
-            a = input("\nDid I get the name right {} ?".format(self.username)).lower()
-            c = a[0]
-            print("\n")
-            return c == 'y'
-            # Check name
         return True
 
     def get_password(self, password):
+        # Check for legality of names
         try:
             self.password = self.validate_password(self.id, password)
         except AssertionError as e:
@@ -69,24 +68,97 @@ class User(Base):
             return False
         return True
 
-    def login(self):
+    @staticmethod
+    def login(session=None):
         '''
         The whole login system is called from this
         '''
         # Check if banned first
-        b = self.chkbnid(cuserid())
+        b = User.chkbnid(cuserid())
         # cuserid(NULL));
-        print(b)
+        print("BANNED", b)
 
-        namegiv = False
+        user = User()
+        logged = None
         username = None
-        while not self.get_username(username):
+        while not user.get_username(username):
             # Get the user name
-            username = input("By what name shall I call you ?\n*")[:15]
-            print("INPUT", username)
-        self.logpass(self.username)  # Password checking
+            username = input("By what name shall I call you?\n*\t")[:15]
+            logged = User.input_username(username)
+            if not logged:
+                username = None
+            print("USER", user, logged)
 
-    def chkbnid(self, user):
+        user = logged
+        # Password checking
+        print("LOGGED USER", user)
+        if user:
+            user.authenticate(session)
+        else:
+            User.register(username, session)
+        cls()
+
+
+    def authenticate(self, session=None):
+        '''
+        Main login code
+        '''
+        print("\nThis persona already exists, what is the password?")
+        tries = 3
+        while tries:
+            password = User.input_password()
+            try:
+                return self.check_password(password)
+            except AssertionError as e:
+                print(e)
+                tries -= 1
+            assert tries > 0, "\nNo!\n\n"
+        return True
+
+    @staticmethod
+    def register(username, session=None):
+        # this bit registers the new user
+        print("Creating new persona...\n")
+        user = User(username=username)
+        print("Give me a password for this persona\n")
+        password = None
+        while not user.get_password(password):
+            password = User.input_password()
+        user.password = password
+        user.save(session)
+
+    def save(self, session=None):
+        if session is None:
+            import db
+            engine, session = db.connect()
+        session.add(user)
+        session.commit()
+
+    @staticmethod
+    def input_username(username):
+        # Check name
+        user = User.by_username(username)
+        if user is not None:
+            return user
+        # If he/she doesnt exist
+        answer = input("\nDid I get the name right {}? ".format(username)).lower()
+        c = answer[0]
+        print("\n")
+        if c == 'y':
+            return User(username=username)
+        return None
+
+    @staticmethod
+    def input_password():
+        # repass:
+        password = input("*\t")
+        # fflush(stdout)
+        # gepass(block)
+        print("\n")
+        return password
+
+    @staticmethod
+    def chkbnid(user):
         '''
         Check to see if UID in banned list
         '''
@@ -106,7 +178,7 @@ class User(Base):
         return False
 
     @staticmethod
-    def logscan(username, session=None):
+    def by_username(username, session=None):
         '''
         Return block data for user or -1 if not exist
         '''
@@ -115,55 +187,7 @@ class User(Base):
             import db
             engine, session = db.connect()
         query = session.query(User)
-        users = query.all()
-        for u in users:
-            print(u.username, username)
-            if u.username.lower() == username.lower():
-                return u
-        return None
-
-    @staticmethod
-    def logpass(username, session=None):
-        '''
-        Main login code
-        '''
-        user = User.logscan(username)
-        if user:
-            tries = 3
-            while tries:
-                # pastry:
-                pwd = input("\nThis persona already exists, what is the password ?\n*")
-                # fflush(stdout)
-                # gepass(block)
-                print("\n")
-
-                if pwd == user.password:
-                    return True
-
-                tries -= 1
-                if not tries:
-                    raise Exception("\nNo!\n\n")
-        else:
-            # this bit registers the new user
-            print("Creating new persona...\n")
-            user = User(username)
-            print("Give me a password for this persona\n")
-            password = None
-            while not user.get_password(password):
-                # repass:
-                password = input("*")
-                # fflush(stdout)
-                # gepass(block)
-                print("\n")
-            user.password = password
-
-            if session is None:
-                import db
-                engine, session = db.connect()
-            session.add(user)
-            session.commit()
-        cls()
-        return True
+        return query.filter_by(username=username.lower()).first()
 
     @staticmethod
     def chkname(username):
