@@ -1,3 +1,6 @@
+from getpass import getpass
+
+
 # include <stdio.h>
 # include <sys/errno.h>
 # include <sys/file.h>
@@ -40,3 +43,10 @@ def validname(name):
 # extern OBJECT objects[];
 
 # fobn(name)
+
+
+def crapup(ptr):
+    getpass("\n{}\n\nHit Return to Continue...\n".format(ptr))
+
+    import sys
+    sys.exit(0)

@@ -89,6 +89,8 @@ class User(Base):
             engine, session = db.connect()
         query = session.query(User)
         user = query.filter_by(username=username.lower()).first()
+        if user is None:
+            return user
         user.namegiv = False
         user.qnmrq = False
         user.ttyt = 0

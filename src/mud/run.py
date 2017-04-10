@@ -8,10 +8,10 @@ import config
 
 
 from datetime import datetime
-from getpass import getpass
 
 from d2lib import cuserid, printfile
-from mud.utils import getty, cls
+from mud.utils import getty, cls, crapup
+from mud.talker import talker
 from user.models import User
 from user.login import chknolog, login, authenticate
 
@@ -133,7 +133,7 @@ def main(*argv):
     logging.info("Game entry by %s : UID %s", user, os.getuid())
 
     # Run system
-    # talker(user)
+    talker(user)
 
     # Exit
     crapup("Bye Bye")
@@ -147,10 +147,3 @@ def main(*argv):
 # void ed_fld(name,string)
 # void delu2(name)   /* For delete and edit */
 # void chpwd(user)   /* Change your password */
-
-
-def crapup(ptr):
-    getpass("\n{}\n\nHit Return to Continue...\n".format(ptr))
-
-    import sys
-    sys.exit(0)
