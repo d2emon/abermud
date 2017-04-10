@@ -14,6 +14,7 @@ from mud.utils import getty, cls, crapup
 from mud.talker import talker
 from user.models import User
 from user.login import chknolog, login, authenticate
+from getpass import getpass
 
 
 # include "files.h"
