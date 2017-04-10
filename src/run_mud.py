@@ -28,6 +28,9 @@ def compile():
 
 
 def main():
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+
     import sys
     mud.main(*sys.argv)
 

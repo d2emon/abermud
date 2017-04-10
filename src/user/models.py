@@ -1,88 +1,70 @@
-from d2lib import cuserid
-from mud.utils import cls, validname
+from mud.utils import validname
 from config import CONFIG
-import yaml
+# import yaml
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import validates
+from sqlalchemy.ext.declarative import declarative_base
 
 
-class User():
-    def __init__(self, username='', password=''):
-        self.username = username
-        self.password = password
-        
-    def validate_username(self):
-        # Check for legality of names
-        if not self.username:
-            raise ValueError("Empty user name")
+Base = declarative_base()
 
-        if '.' in self.username:
-            raise ValueError("Illegal characters in user name")
 
-        username = self.username.strip()
-        if ' ' in username:
-            raise ValueError("Illegal characters in user name")
+class User(Base):
+    __tablename__ = "user"
+    id = Column(Integer, primary_key=True)
+    username = Column(String(16), nullable=False)
+    password = Column(String(16), nullable=False)
 
-        if not User.chkname(username):
-            raise ValueError("")
+    def __init__(self, username=None, password=None):
+        Base.__init__(self)
+        if username is not None:
+            self.username = username
+        if password is not None:
+            self.password = password
+        self.namegiv = False
+        self.qnmrq = False
 
-        if not validname(username):
-            raise ValueError("Bye Bye")
+    def __repr__(self):
+        return "<User '{}'\t[password: '{}']>".format(self.username, self.password)
 
-        a = User.logscan(username)
-        if a is None:
-            # If he/she doesnt exist
-            a = input("\nDid I get the name right {} ?".format(self.username)).lower()
-            c = a[0]
-            print("\n")
-            return c == 'y'
-            # Check name
+    @validates('username')
+    def validate_username(self, key, username):
+        print("USERNAME", username)
+        assert username is not None
+        username = username.strip()
+        assert username, "Empty username"
+        assert '.' not in username, "Illegal characters in username"
+        assert ' ' not in username, "Illegal characters in username"
+        assert User.chkname(username), "Illegal characters in username"
+        assert validname(username), "Bye Bye"
+        return username
+
+    @validates('password')
+    def validate_password(self, key, password):
+        assert password is not None
+        assert password, "Empty password"
+        assert '.' not in password, "Illegal characters in password"
+        assert ' ' not in password, "Illegal characters in password"
+        return password
+
+    def check_password(self, password):
+        assert password == self.password, "Wrong password"
         return True
-    
-    def validate_password(self):
-        # Check for legality of names
-        if not self.password:
-            raise ValueError("Empty password")
 
-        if '.' in self.password:
-            raise ValueError("Illegal characters in password")
-        return True
-    
-    def valid_username(self):
-        try:
-            return self.validate_username()
-        except ValueError as e:
-            print(e)
-            return False
-        
-    def valid_password(self):
-        try:
-            return self.validate_password()
-        except ValueError as e:
-            print(e)
-            return False
-        
-    def login(self):
-        '''
-        The whole login system is called from this
-        '''
-        # Check if banned first
-        b = self.chkbnid(cuserid())  
-        # cuserid(NULL));
-        print(b)
-    
-        namegiv = False
-        while not self.valid_username():
-            # Get the user name
-            self.username = input("By what name shall I call you ?\n*")[:15]
-            print("INPUT", self.username)
-        self.logpass(self.username)  # Password checking        
-        
-        
-    def chkbnid(self, user):
+    def save(self, session=None):
+        if session is None:
+            import db
+            engine, session = db.connect()
+        session.add(self)
+        session.commit()
+
+    @staticmethod
+    def chkbnid(user):
         '''
         Check to see if UID in banned list
         '''
         c = user.lower()
-    
+
         a = ""  # openlock(BAN_FILE,"r+");
         if a is None:
             return False
@@ -95,95 +77,44 @@ class User():
                 raise Exception("I'm sorry- that userid has been banned from the Game")
         # fclose(a);
         return False
-        
 
     @staticmethod
-    def logscan(username):
+    def by_username(username, session=None):
         '''
         Return block data for user or -1 if not exist
         '''
-        users = User.load()
-        for u in users:
-            print(u.username, username)
-            if u.username.lower() == username.lower():
-                return u
-        return None
-
-
-    @staticmethod
-    def logpass(username):
-        '''
-        Main login code
-        '''
-        user = User.logscan(username)
-        if user:
-            tries = 3
-            while tries:
-                # pastry:
-                pwd = input("\nThis persona already exists, what is the password ?\n*")
-                # fflush(stdout)
-                # gepass(block)
-                print("\n")
-            
-                if pwd == user.password:
-                    return True
-            
-                tries -= 1
-                if not tries:
-                    raise Exception("\nNo!\n\n")
-        else:
-            # this bit registers the new user
-            print("Creating new persona...\n")
-            user = User(username)
-            print("Give me a password for this persona\n")
-            while True:
-                # repass:
-                user.password = input("*")
-                # fflush(stdout)
-                # gepass(block)
-                print("\n")
-                if user.valid_password():
-                    break
-        
-            persons = User.load()
-            persons.append(user)
-            persons.save()
-        cls()
-        return True
+        # users = User.load()
+        if session is None:
+            import db
+            engine, session = db.connect()
+        query = session.query(User)
+        user = query.filter_by(username=username.lower()).first()
+        if user is None:
+            return user
+        user.namegiv = False
+        user.qnmrq = False
+        user.ttyt = 0
+        return user
 
     @staticmethod
     def chkname(username):
         import re
         return re.match("^\w*$", username)
-    
-    @staticmethod
-    def from_dict(data):
-        return User(data.get('username', ''), data.get('password', ''))
-    
-    def to_dict(self):
-        return {
-            "username": self.username,
-            "password": self.password,
-        }
-    
-    @staticmethod
-    def load():
-        # unit = openlock(PFL,"r")
-        # if unit is None:
-        #     raise Exception("No persona file")
-        with open(CONFIG["PFL"]) as f:
-            # block = dcrypt(block)
-            data = yaml.load(f)
-        
-        return [User.from_dict(u) for u in data]
-    
-    @staticmethod
-    def save(users):
-        data = [u.to_dict() for u in users]
 
-        # unit = openlock(PFL,"a")
-        # if unit is None:
+    # @staticmethod
+    # def load():
+        # if f is None:
         #     raise Exception("No persona file")
-        with open(CONFIG["PFL"], "w") as f:
-            # block = dcrypt(block)
-            yaml.dump(data, f)
+        # with open(CONFIG["PFL"]) as f:
+        #     # block = dcrypt(block)
+        #     data = yaml.load(f)
+        # return [User.from_dict(u) for u in data]
+
+    # @staticmethod
+    # def save(users):
+        # data = [u.to_dict() for u in users]
+        # if f is None:
+        #     raise Exception("No persona file")
+        # with open(CONFIG["PFL"], "w") as f:
+        #     # block = dcrypt(block)
+        #     yaml.dump(data, f)

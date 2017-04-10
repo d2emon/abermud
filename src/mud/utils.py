@@ -1,3 +1,6 @@
+from getpass import getpass
+
+
 # include <stdio.h>
 # include <sys/errno.h>
 # include <sys/file.h>
@@ -19,12 +22,12 @@ ttyt = 0
 
 def getty():
     print("--->\tgetty()")
-    
+
 
 def cls():
-    print("--->\tcls()") 
-    print("=-" * 40) 
-    print("\n" * 24)  
+    print("--->\tcls()")
+    print("=-" * 40)
+    print("\n" * 24)
 
 
 # FILE *openlock(file,perm)
@@ -40,3 +43,10 @@ def validname(name):
 # extern OBJECT objects[];
 
 # fobn(name)
+
+
+def crapup(ptr):
+    getpass("\n{}\n\nHit Return to Continue...\n".format(ptr))
+
+    import sys
+    sys.exit(0)
