@@ -4,9 +4,14 @@
 
 def compile():
     OBJ = [
+        "tk",
         """
-        tk.o parse.o objsys.o extra.o magic.o blood.o weather.o obdat.o new1.o
-        support.o zones.o mobile.o bprintf.o bbc.o
+        parse.o objsys.o extra.o magic.o blood.o weather.o obdat.o new1.o
+        support.o zones.o mobile.o
+        """,
+        "bprintf",
+        """
+        bbc.o
         """,
         "blib",
         """

@@ -18,16 +18,15 @@ def main(*argv):
     if len(argv) > 1:
         run_data['user'] = argv[1]
     print("RUN DATA: ", run_data)
+
     print("="*80)
     if run_data['user']:
-        username = run_data['user']
+        username = run_data['user'].username
     else:
         username = '<UNNAMED>'
     print(run_data['filename'])
     print("{}{}".format(run_data['title'], username))
-
-    # extern char globme[];
-    # extern long tty;
+    print("="*80)
 
     init()
 

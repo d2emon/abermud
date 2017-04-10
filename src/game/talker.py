@@ -11,6 +11,7 @@
 
 '''
 from player import MAX_PLAYERS, Player
+from bprintf import makebfr
 
 
 # long i_setup=0;
@@ -74,11 +75,10 @@ def talker(user):
     player = Player()
 
     # extern long curch
-    # extern long maxu;
     # FILE *fl;
     # char string[128];
+    buff = makebfr()
 
-    # makebfr();
     player.cms = -1
     # putmeon(name);
     # if openworld() is None:
@@ -93,15 +93,14 @@ def talker(user):
     # special(".g",name);
     i_setup = 1
     while True:
-        pass
-        # pbfr()
+        buff.pbfr()
         # sendmsg(name)
         if player.rd_qd:
             pass
             # rte(name)
         player.rd_qd = False
         # closeworld()
-        # pbfr()
+        buff.pbfr()
         break
 
 # cleanup(inpbk)
