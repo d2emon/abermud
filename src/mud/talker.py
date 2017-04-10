@@ -25,27 +25,27 @@ def change_password(user):
 
 
 def test_game(user):
-    # if not user.isawiz:
-    #    return
+    if not user.isawiz:
+       return
     cls()
     print("Entering Test Version")
 
 
 def show_user(user):
-    # if not user.isawiz:
-    #    return
+    if not user.isawiz:
+       return
     print("--->\tshowuser({})".format(user))
 
 
 def edit_user(user):
-    # if not user.isawiz:
-    #    return
+    if not user.isawiz:
+       return
     print("--->\tedituser({})".format(user))
 
 
 def del_user(user):
-    # if not user.isawiz:
-    #    return
+    if not user.isawiz:
+       return
     print("--->\tdeluser({})".format(user))
 
 
@@ -77,13 +77,11 @@ def talker(user):
         print("\n\n")
         print("0] Exit AberMUD")
         print("\n")
-        isawiz = False
-        if user.id in [1, ]:
+        if user.isawiz:
             print("4] Run TEST game")
             print("A] Show persona")
             print("B] Edit persona")
             print("C] Delete persona")
-            isawiz = True
         print("\n\n")
         # l2:
         answer = input("Select > ").lower()

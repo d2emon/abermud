@@ -6,14 +6,13 @@ import yaml
 import config
 
 
-
 from datetime import datetime
 
-from d2lib import cuserid, printfile
+from d2lib import printfile
 from mud.utils import getty, cls, crapup
 from mud.talker import talker
-from user.models import User
-from user.login import chknolog, login, authenticate
+# from user.models import User
+from user.login import chknolog, login  # , authenticate
 from getpass import getpass
 
 
@@ -35,7 +34,7 @@ FILES = dict()
 def time_created():
     try:
         created = os.path.getmtime(FILES["EXE"])
-        return datetime.fromtimestamp(space).strftime("%x %X")
+        return datetime.fromtimestamp(created).strftime("%x %X")
     except:
         return "<unknown>"
 
@@ -114,8 +113,13 @@ def main(*argv):
         # -n(name)
         key = arg[1]
         if key == 'N':
-            user = User.by_username(arg[2:])
-            authenticate(user)
+            username = arg[2:]
+            # user = User.by_username(username)
+            # print("USER is", user)
+            # if user:
+            #    # authenticate(user)
+            # else:
+            user = login(username)
             user.qnmrq = True
             user.ttyt = 0
         else:

@@ -38,20 +38,24 @@ def login(username=None, session=None):
     Does all the login stuff
     The whole login system is called from this
     '''
-    if username:
-        user = User.by_username(username)
-        authenticate(user, session)
-        return user
-
     # Check if banned first
     b = User.chkbnid(cuserid())
     # cuserid(NULL));
     print("BANNED", b)
 
+    if username:
+        username = username.lower()
+
+    user = User.by_username(username)
+    if user:
+        authenticate(user, session)
+        return user
+
     # Get the user name
     user = None
     while not user:
         user = input_username(username)
+        username = ''
 
     if user.id:
         # Password checking

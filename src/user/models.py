@@ -1,5 +1,5 @@
 from mud.utils import validname
-from config import CONFIG
+# from config import CONFIG
 # import yaml
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import validates
@@ -23,6 +23,7 @@ class User(Base):
             self.password = password
         self.namegiv = False
         self.qnmrq = False
+        self.isawiz = False
 
     def __repr__(self):
         return "<User '{}'\t[password: '{}']>".format(self.username, self.password)
@@ -83,6 +84,9 @@ class User(Base):
         '''
         Return block data for user or -1 if not exist
         '''
+        if username is None:
+            return None
+
         # users = User.load()
         if session is None:
             import db
@@ -94,6 +98,7 @@ class User(Base):
         user.namegiv = False
         user.qnmrq = False
         user.ttyt = 0
+        user.isawiz = user.id in [1, ]
         return user
 
     @staticmethod
