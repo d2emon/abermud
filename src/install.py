@@ -1,10 +1,9 @@
 #! /usr/bin/env python
 from dummysh import clear_file
 import os
-import run_mud
-import run_game
+import mud
+import game
 import d2make
-import d2make.exe
 import d2make.makeworld
 import d2make.ogenerate
 import d2make.makeuaf
@@ -48,10 +47,10 @@ def main():
     d2make.compile_h()
     print('-'*80, "\n")
 
-    run_game.compile()
+    game.compile()
     print('-'*80, "\n")
 
-    run_mud.compile()
+    mud.compile()
     print('-'*80, "\n")
 
     print('Done')

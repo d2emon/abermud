@@ -16,13 +16,6 @@ from user.login import chknolog, login  # , authenticate
 from getpass import getpass
 
 
-# include "files.h"
-# include <stdio.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include "System.h"
-
-
 # char lump[256];
 namegiv = False
 namegt = None

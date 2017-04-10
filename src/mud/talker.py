@@ -1,7 +1,6 @@
 # from d2lib import cuserid
 from mud.utils import cls, crapup
-from config import CONFIG
-from run_game import main
+from game import main
 from getpass import getpass
 from user.login import search, show, edit_field, change_password
 from user.models import User
@@ -25,14 +24,14 @@ def change_my_password(user, session=None):
 
 def test_game(user, session=None):
     if not user.isawiz:
-       return
+        return
     cls()
     print("Entering Test Version")
 
 
 def show_user(user, session=None):
     if not user.isawiz:
-       return
+        return
     cls()
     username = search()
     show(username)
@@ -41,7 +40,7 @@ def show_user(user, session=None):
 
 def edit_user(user, session=None):
     if not user.isawiz:
-       return
+        return
 
     cls()
     username = search()
@@ -61,7 +60,7 @@ def edit_user(user, session=None):
 
 def del_user(user, session=None):
     if not user.isawiz:
-       return
+        return
 
     cls()
     username = search()
