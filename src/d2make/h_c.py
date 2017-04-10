@@ -22,8 +22,8 @@ FSEG = {
     "LEVELS": os.path.join("..", "data", "levels.txt"),
     # "PFL": os.path.join("..", "data", "user_file"),
     "PFT": "user_file.b",
-    "EXE": "run_mud.py",  # "EXE": "mud.exe",
-    "EXE2": "mud.1",
+    "EXE": "run_game.py",  # "EXE": "mud.exe",
+    "EXE2": "run_mud.py",  # "EXE": "mud.1",
     "SNOOP": os.path.join("..", "data", "snoop"),
 }
 
