@@ -2,6 +2,7 @@
 from dummysh import clear_file
 import os
 import run_mud
+import run_game
 import d2make
 import d2make.exe
 import d2make.makeworld
@@ -24,11 +25,11 @@ def make_dirs():
             print("Making {}".format(path))
             os.mkdir(path)
         except FileExistsError as e:
-            print(e)
+            print("\t", e)
 
 
 def init_files():
-    print('initialising files')
+    print('Initialising files')
     clear_file("mud_syslog")
     clear_file("reset_t")
     clear_file("reset_n")
@@ -36,17 +37,35 @@ def init_files():
 
 
 def main():
+    print('='*80)
+
     make_dirs()
+    print('-'*80, "\n")
+
     init_files()
+    print('-'*80, "\n")
+
     d2make.compile_h()
-    d2make.exe.compile()
+    print('-'*80, "\n")
+
+    run_game.compile()
+    print('-'*80, "\n")
+
     run_mud.compile()
+    print('-'*80, "\n")
+
     print('Done')
+    print('='*80)
 
     d2make.makeworld.compile()
+    print('-'*80, "\n")
     d2make.ogenerate.compile()
+    print('-'*80, "\n")
     d2make.makeuaf.compile()
+    print('-'*80, "\n")
+
     print('Ok')
+    print('='*80)
 
     print('Now set up a password for arthur the archwizard')
 
