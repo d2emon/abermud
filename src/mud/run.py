@@ -142,13 +142,3 @@ def main(*argv):
 
     # Exit
     crapup("Bye Bye")
-
-
-# void getunm(name)
-# void showuser()
-# long shu(name,block)  /* for show user and edit user */
-# void deluser()
-# void edituser()
-# void ed_fld(name,string)
-# void delu2(name)   /* For delete and edit */
-# void chpwd(user)   /* Change your password */

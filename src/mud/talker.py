@@ -2,51 +2,75 @@
 from mud.utils import cls, crapup
 from config import CONFIG
 from run_game import main
+from getpass import getpass
+from user.login import search, show, edit_field, change_password
+from user.models import User
 
 
-def execl(filename, title, user, id):
-    print("CONFIG{EXE}", CONFIG['EXE'])
-    print("{}\n{}{}::{}".format(filename, title, user, id))
-    return -1
-
-
-def enter_game(user):
+def enter_game(user, session=None):
     cls()
     print("The Hallway")
     print("You stand in a long dark hallway, which echoes to the tread of your")
     print("booted feet. You stride on down the hall, choose your masque and enter the")
     print("worlds beyond the known......\n")
-    main("   --{----- ABERMUD -----}--    Playing as ", user, 0)
+    main("   --{----- ABERMUD -----}--    Playing as ", user)
     crapup("mud.exe: Not Found")
 
 
-def change_password(user):
-    print("--->\tchpwd({})".format(user))
+def change_my_password(user, session=None):
+    import db
+    engine, session = db.connect()
+    change_password(user)
 
 
-def test_game(user):
+def test_game(user, session=None):
     if not user.isawiz:
        return
     cls()
     print("Entering Test Version")
 
 
-def show_user(user):
+def show_user(user, session=None):
     if not user.isawiz:
        return
-    print("--->\tshowuser({})".format(user))
+    cls()
+    username = search()
+    show(username)
+    getpass("\nHit Return...")
 
 
-def edit_user(user):
+def edit_user(user, session=None):
     if not user.isawiz:
        return
-    print("--->\tedituser({})".format(user))
+
+    cls()
+    username = search()
+    shuser = show(username, session)
+    if shuser is None:
+        shuser = User(username)
+    print("\nEditing : {}\n".format(username))
+    try:
+        shuser.username = edit_field("Name: ", shuser.username)
+        shuser.password = edit_field("Password: ", shuser.password)
+        shuser.save(session)
+        print("{} saved".format(shuser.username))
+    except AssertionError as e:
+        print(e)
+        print("Changes not saved")
 
 
-def del_user(user):
+def del_user(user, session=None):
     if not user.isawiz:
        return
-    print("--->\tdeluser({})".format(user))
+
+    cls()
+    username = search()
+    shuser = show(username, session)
+    if shuser is None:
+        print("\nCannot delete non-existant user")
+        return
+    session.delete(shuser)
+    session.commit()
 
 
 def exit_mud(user):
@@ -57,7 +81,7 @@ def exit_mud(user):
 def talker(user):
     menu_items = {
         '1': enter_game,
-        '2': change_password,
+        '2': change_my_password,
         '0': exit_mud,
         '4': test_game,
         'a': show_user,
@@ -66,7 +90,7 @@ def talker(user):
     }
     print("QNMRQ", user.qnmrq)
     if user.qnmrq:
-        if main("   --}----- ABERMUD -----{--    Playing as ", user, 0) == -1:
+        if main("   --}----- ABERMUD -----{--    Playing as ", user) == -1:
             crapup("mud.exe : Not found")
     cls()
     while True:
@@ -83,7 +107,6 @@ def talker(user):
             print("B] Edit persona")
             print("C] Delete persona")
         print("\n\n")
-        # l2:
         answer = input("Select > ").lower()
         action = menu_items.get(answer)
         if action is None:

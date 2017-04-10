@@ -1,12 +1,15 @@
 from mud.utils import validname
 # from config import CONFIG
 # import yaml
+from db import connect
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
+session = None
+engine = None
 
 
 class User(Base):
@@ -52,12 +55,23 @@ class User(Base):
         assert password == self.password, "Wrong password"
         return True
 
-    def save(self, session=None):
+
+    @staticmethod
+    def session():
+        global engine, session
         if session is None:
-            import db
-            engine, session = db.connect()
-        session.add(self)
-        session.commit()
+            engine, session = connect()
+        return session
+
+
+    @staticmethod
+    def query():
+        return User.session().query(User)
+
+
+    def save(self):
+        User.session().add(self)
+        User.session().commit()
 
     @staticmethod
     def chkbnid(user):
@@ -80,7 +94,7 @@ class User(Base):
         return False
 
     @staticmethod
-    def by_username(username, session=None):
+    def by_username(username):
         '''
         Return block data for user or -1 if not exist
         '''
@@ -88,10 +102,7 @@ class User(Base):
             return None
 
         # users = User.load()
-        if session is None:
-            import db
-            engine, session = db.connect()
-        query = session.query(User)
+        query = User.query()
         user = query.filter_by(username=username.lower()).first()
         if user is None:
             return user
