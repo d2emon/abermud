@@ -1,4 +1,4 @@
-from d2lib import cuserid
+from config import CONFIG
 from mud.utils import cls
 from user.models import User
 from getpass import getpass
@@ -39,7 +39,7 @@ def login(username=None):
     The whole login system is called from this
     '''
     # Check if banned first
-    b = User.chkbnid(cuserid())
+    b = User.chkbnid(User.host())
     # cuserid(NULL));
     print("BANNED", b)
 
@@ -102,7 +102,7 @@ def register(user):
 
 def chknolog():
     try:
-        with open(FILES["NOLOGIN"]) as a:
+        with open(CONFIG["NOLOGIN"]) as a:
             s = a.read()
         print(s)
     except:
@@ -141,7 +141,7 @@ def edit_field(title, value):
 
 def change_password(user):
     try:
-        data =  input_password("\nOld Password\n*\t")
+        data = input_password("\nOld Password\n*\t")
         assert data == user.password, "Incorrect Password"
     except AssertionError as e:
         print(e)

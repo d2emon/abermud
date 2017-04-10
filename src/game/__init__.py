@@ -6,9 +6,17 @@ def compile():
     OBJ = [
         """
         tk.o parse.o objsys.o extra.o magic.o blood.o weather.o obdat.o new1.o
-        support.o zones.o mobile.o bprintf.o bbc.o blib.o opensys.o gamego.o ndebug.o
-        key.o packer.o newuaf.o frob.o flock.o
+        support.o zones.o mobile.o bprintf.o bbc.o
         """,
+        "blib",
+        """
+        opensys.o
+        """,
+        "gamego",
+        """
+        ndebug.o key.o packer.o newuaf.o frob.o
+        """,
+        "flock",
     ]
 
     INCL = [
@@ -27,15 +35,6 @@ def compile():
 
 
 def main(*argv):
-    from config import CONFIG
-    print(CONFIG['EXE'])
-    print(argv)
-    run_data = {
-        'title': argv[0],
-        # 'user': argv[1],
-    }
-    print(run_data)
-
     import game.run
     return game.run.main(*argv)
 

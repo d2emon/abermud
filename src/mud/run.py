@@ -11,7 +11,7 @@ from datetime import datetime
 from d2lib import printfile
 from mud.utils import getty, cls, crapup
 from mud.talker import talker
-# from user.models import User
+from user.models import User
 from user.login import chknolog, login  # , authenticate
 from getpass import getpass
 
@@ -46,14 +46,13 @@ def time_elapsed():
     return "Game time elapsed: {}".format(dt)
 
 
-def check_host(game_host):
+def check_host(host):
     '''
     Check we are running on the correct host
     see the notes about the use of flock();
     and the affects of lockf();
     '''
-    user_host = socket.gethostname()
-    assert user_host == game_host, "AberMUD is only available on {}, not on {}".format(game_host, user_host)
+    assert User.host() == host, "AberMUD is only available on {}, not on {}".format(host, User.host())
 
 
 def show_title():

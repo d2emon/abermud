@@ -1,6 +1,7 @@
 from mud.utils import validname
 # from config import CONFIG
 # import yaml
+import socket
 from db import connect
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import validates
@@ -55,7 +56,6 @@ class User(Base):
         assert password == self.password, "Wrong password"
         return True
 
-
     @staticmethod
     def session():
         global engine, session
@@ -63,11 +63,13 @@ class User(Base):
             engine, session = connect()
         return session
 
-
     @staticmethod
     def query():
         return User.session().query(User)
 
+    @staticmethod
+    def host():
+        return socket.gethostname()
 
     def save(self):
         User.session().add(self)

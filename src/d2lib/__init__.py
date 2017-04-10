@@ -49,8 +49,3 @@ def printfile(filename):
 
 # void sec_read(unit,block,pos,len)
 # void sec_write(unit,block,pos,len)
-
-
-def cuserid():
-    print("--->\tgetuid()")
-    return ""
