@@ -1,4 +1,5 @@
 # from game.utils import crapup
+from game.sigs import block_alarm, unblock_alarm
 
 buff = None
 
@@ -35,7 +36,7 @@ class D2Buffer:
         # 0 = not logging
 
     def pbfr(self):
-        # block_alarm()
+        block_alarm()
         # closeworld()
         if self.sysbuf:
             self.pr_due = True
@@ -57,7 +58,7 @@ class D2Buffer:
         # clear buffer
         # if self.snoopt != -1:
         #     # viewsnoop()
-        # unblock_alarm();
+        unblock_alarm()
 
 
 # void logcom()

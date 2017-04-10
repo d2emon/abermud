@@ -43,24 +43,15 @@ def main(*argv):
     if username == "Phantom":
         username = "The {}".format(username)
     print("Hello {}".format(username))
-    # syslog("GAME ENTRY: %s[%s]",globme,cuserid(NULL))
+
     import logging
     logging.info("GAME ENTRY: {}[{}]".format(username, user.id))
+
     # keysetup();
     talker(user)
 
 
 # char privs[4];
-
 # listfl(name)
 # char *getkbd(s,l)   /* Getstr() with length limit and filter ctrl */
-
-# unblock_alarm()
-# block_alarm()
-
-# long interrupt=0;
-
-# sig_alon()
-# sig_occur()
-
 # set_progname(n,text)

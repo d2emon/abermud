@@ -92,6 +92,9 @@ def talker(user):
     player.cms = -1
     # special(".g",name);
     i_setup = 1
+
+    import logging
+    logging.debug("Main loop")
     while True:
         buff.pbfr()
         # sendmsg(name)
@@ -101,6 +104,15 @@ def talker(user):
         player.rd_qd = False
         # closeworld()
         buff.pbfr()
+
+        logging.debug("Signals")
+        import game.sigs
+        print(game.sigs.active)
+        print(game.sigs.alarm)
+        print(game.sigs.SIGALRM)
+        print(game.sigs.SIGALRM())
+
+
         break
 
 # cleanup(inpbk)

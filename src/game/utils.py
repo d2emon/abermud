@@ -4,7 +4,8 @@ from bprintf import buff
 def crapup(s):
     dashes = ("-="*76) + '-'
     buff.pbfr()
-    pr_due = 0
+    buff.pr_due = False
+
     # So we dont get a prompt after the exit
     # keysetback();
 

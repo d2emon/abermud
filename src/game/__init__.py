@@ -7,7 +7,10 @@ def compile():
         "tk",
         """
         parse.o objsys.o extra.o magic.o blood.o weather.o obdat.o new1.o
-        support.o zones.o mobile.o
+        """,
+        "support",
+        """
+        zones.o mobile.o
         """,
         "bprintf",
         """
