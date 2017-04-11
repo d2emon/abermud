@@ -63,7 +63,6 @@ def talker(user):
     logging.debug('<!' + '-'*80)
     player = Player()
 
-    # FILE *fl;
     # char string[128];
     buff = makebfr()
 
@@ -130,8 +129,6 @@ def talker(user):
 # split(block,nam1,nam2,work,luser)
 # trapch(chan)
 # loseme(name)
-
-# long lasup=0;
 
 # update(name)
 # revise(cutoff)

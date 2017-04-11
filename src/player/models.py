@@ -31,6 +31,7 @@ class Player(Base):
         self.mynum = 0
         self.iamon = False
         self.curch = 0
+        self.lasup = 0
 
     def __repr__(self):
         return "<Player: '{}' {}>".format(self.name, {
@@ -51,6 +52,20 @@ class Player(Base):
         session().add(self)
         session().commit()
 
+    def update(self):
+        import logging
+        logging.debug("---> update()")
+        xp = self.cms - self.lasup
+        if xp < 0:
+            xp = -xp
+        logging.debug("xp=%s", xp)
+        if xp < 10:
+            return
+
+        w = World()
+        self.position = self.cms
+        self.lasup = self.cms
+
     def puton(self, user):
         import logging
         logging.debug("---> puton({})".format(user))
@@ -63,6 +78,7 @@ class Player(Base):
             self.rd_qd,
             self.mynum,
             self.iamon,
+            self.lasup,
         ])
         logging.debug("\t}}")
 
@@ -99,6 +115,7 @@ class Player(Base):
             self.rd_qd,
             self.mynum,
             self.iamon,
+            self.lasup,
         ])
         logging.debug("\t}}")
         logging.debug('-'*70 + '>')
@@ -118,11 +135,9 @@ class Player(Base):
             self.rd_qd,
             self.mynum,
             self.iamon,
+            self.lasup,
         ])
         logging.debug("\t}}")
-
-        # extern long vdes,tdes,rdes;
-        # extern long debug_mode;
 
         w = World()
         assert w.filrf is not None, "AberMUD: FILE_ACCESS : Access failed"
@@ -132,7 +147,8 @@ class Player(Base):
 
         ct = self.cms
         too = Message.findend()
-        logging.debug("%d - %d", self.cms, too)
+        logging.debug("%d : %d", self.cms, too)
+
         for ct in range(self.cms, too):
             block = Message.readmsg(ct)
             for m in block:
@@ -140,8 +156,12 @@ class Player(Base):
                 m.mstoout(user)
 
         self.cms = ct
-        # update(name)
+        self.update()
+
         # eorte()
+
+        # extern long vdes,tdes,rdes;
+        # extern long debug_mode;
         rdes = 0
         tdes = 0
         vdes = 0
@@ -154,6 +174,7 @@ class Player(Base):
             self.rd_qd,
             self.mynum,
             self.iamon,
+            self.lasup,
         ])
         logging.debug("\t}}")
         logging.debug('-'*70 + '>')

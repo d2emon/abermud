@@ -1,5 +1,5 @@
 from db import session
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import func, Column, Integer, String
 # from sqlalchemy.orm import validates
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -26,7 +26,10 @@ class Message(Base):
         logging.debug("--->\tfindstart()")
         # sec_read(unit,bk,0,1);
         # return(bk[0]);
-        return 0
+        message_id = session().query(func.min(Message.id)).scalar()
+        if message_id is None:
+            message_id = -1
+        return message_id
 
     @staticmethod
     def findend():
@@ -34,7 +37,10 @@ class Message(Base):
         logging.debug("--->\tfindend()")
         # sec_read(unit,bk,0,2);
         # return(bk[1]);
-        return Message.query().count()
+        message_id = session().query(func.max(Message.id)).scalar()
+        if message_id is None:
+            message_id = -1
+        return message_id
 
     @staticmethod
     def readmsg(num):
