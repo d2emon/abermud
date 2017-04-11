@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from world import World
 from message.models import Message
+from game.parse import eorte
 
 
 Base = declarative_base()
@@ -153,15 +154,13 @@ class Player(Base):
             block = Message.readmsg(ct)
             for m in block:
                 logging.debug(m)
-                m.mstoout(user)
+                m.mstoout(self)
 
         self.cms = ct
         self.update()
-
-        # eorte()
+        eorte()
 
         # extern long vdes,tdes,rdes;
-        # extern long debug_mode;
         rdes = 0
         tdes = 0
         vdes = 0
