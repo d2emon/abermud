@@ -16,7 +16,6 @@ from world import World
 from game.utils import crapup
 
 
-# long i_setup=0;
 # long oddcat=0;
 # long  talkfl=0;
 
@@ -54,16 +53,8 @@ from game.utils import crapup
 
 # sendmsg(name)
 # send2(block)
-# readmsg(channel,block,num)
 
-# FILE *fl_com;
-# extern long findstart();
-# extern long findend();
-
-# rte(name)
 # FILE *openlock(file,perm)
-# long findstart(unit)
-# long findend(unit)
 
 
 def talker(user):
@@ -84,7 +75,7 @@ def talker(user):
 
     w = World()
     assert w.filrf is not None, "Sorry AberMUD is currently unavailable"
-    assert player.mynum < MAX_PLAYERS, "Sorry AberMUD is full at the moment"
+    # assert player.mynum < MAX_PLAYERS, "Sorry AberMUD is full at the moment"
 
     player.name = user.username
     player.rte()

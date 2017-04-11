@@ -122,7 +122,6 @@ class Player(Base):
 
         # extern long vdes,tdes,rdes;
         # extern long debug_mode;
-        # long too,ct,block[128];
 
         w = World()
         assert w.filrf is not None, "AberMUD: FILE_ACCESS : Access failed"
@@ -132,9 +131,10 @@ class Player(Base):
 
         too = w.findend()
         for ct in range(self.cms, too):
-            # readmsg(unit, block, ct)
-            # mstoout(block, name)
-            pass
+            block = w.readmsg(ct)
+            for m in block:
+                logging.debug(m)
+                # mstoout(block, name)
 
         self.cms = ct
         # update(name)
