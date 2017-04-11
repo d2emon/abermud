@@ -3,6 +3,7 @@ from sqlalchemy import Column, Integer, String
 # from sqlalchemy.orm import validates
 from sqlalchemy.ext.declarative import declarative_base
 from world import World
+from message.models import Message
 
 
 Base = declarative_base()
@@ -127,14 +128,16 @@ class Player(Base):
         assert w.filrf is not None, "AberMUD: FILE_ACCESS : Access failed"
 
         if self.cms == -1:
-            cms = w.findend()
+            self.cms = Message.findend()
 
-        too = w.findend()
+        ct = self.cms
+        too = Message.findend()
+        logging.debug("%d - %d", self.cms, too)
         for ct in range(self.cms, too):
-            block = w.readmsg(ct)
+            block = Message.readmsg(ct)
             for m in block:
                 logging.debug(m)
-                # mstoout(block, name)
+                m.mstoout(user)
 
         self.cms = ct
         # update(name)

@@ -28,9 +28,11 @@ def combine_metadata(*args):
 
 import user.models
 import player.models
+import message.models
 target_metadata = combine_metadata(
     user.models.Base.metadata,
     player.models.Base.metadata,
+    message.models.Base.metadata,
 )
 
 # other values from the config, defined by the needs of env.py,
