@@ -3,49 +3,33 @@ from game.sigs import init
 from game.talker import talker
 
 
-def main(*argv):
+def main(title='<untitled>', user=None):
     run_data = {
         'filename': CONFIG['EXE'],
-        'title': '<untitled>',
-        'user': None,
+        'title': title,
+        'user': user,
     }
-
-    print("ARGS:", argv)
-    argv_p = argv
-    assert len(argv) == 2, "Args!"
-    if len(argv) > 0:
-        run_data['title'] = argv[0]
-    if len(argv) > 1:
-        run_data['user'] = argv[1]
-    print("RUN DATA: ", run_data)
+    import logging
+    logging.debug(run_data)
 
     print("="*80)
-    if run_data['user']:
-        username = run_data['user'].username
-    else:
-        username = '<UNNAMED>'
-    print(run_data['filename'])
-    print("{}{}".format(run_data['title'], username))
+    print(CONFIG['EXE'])
+    print("{}{}".format(title, user.username))
     print("="*80)
 
     init()
 
-    user = argv[1]
     assert user is not None, "User don't exists"
 
     print("Entering Game ....")
     tty = 0
     # if tty == 4:
-        # initbbc()
-        # initscr()
-        # topscr()
-    username = user.username.capitalize()
-    if username == "Phantom":
-        username = "The {}".format(username)
-    print("Hello {}".format(username))
+    #    # initbbc()
+    #    # initscr()
+    #    # topscr()
+    print("Hello {}".format(user.showname))
 
-    import logging
-    logging.info("GAME ENTRY: {}[{}]".format(username, user.id))
+    logging.info("GAME ENTRY: {}[{}]".format(user.showname, user.id))
 
     # keysetup();
     talker(user)

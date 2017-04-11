@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import engine_from_config, pool, MetaData
 from logging.config import fileConfig
 
 # this is the Alembic Config object, which provides
@@ -16,10 +16,22 @@ import os
 import sys
 sys.path.append(os.getcwd())
 
+
 # add your model's MetaData object here
 # for 'autogenerate' support
-from user.models import Base
-target_metadata = Base.metadata
+def combine_metadata(*args):
+    m = MetaData()
+    for metadata in args:
+        for t in metadata.tables.values():
+            t.tometadata(m)
+    return m
+
+import user.models
+import player.models
+target_metadata = combine_metadata(
+    user.models.Base.metadata,
+    player.models.Base.metadata,
+)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

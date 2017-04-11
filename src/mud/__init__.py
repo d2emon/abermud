@@ -7,14 +7,14 @@ all the initialising pieces
 
 
 def compile():
-    OBJ = [
-        "blib",
-        "gmain2",
-        "gmainstubs",
-        "gmlnk",
-        "obdat",
-        "flock",
-    ]
+    OBJ = {
+        "blib": "d2lib",
+        "gmain2": "mud",
+        "gmainstubs": "mud.utils",
+        "gmlnk": "mud.talker",
+        "obdat": None,
+        "flock": None,
+    }
 
     INCL = [
         "object.h",

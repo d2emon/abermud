@@ -2,15 +2,15 @@ from mud.utils import validname
 # from config import CONFIG
 # import yaml
 import socket
-from db import connect
+from db import session
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
-session = None
-engine = None
+# session = None
+# engine = None
 
 
 class User(Base):
@@ -57,23 +57,23 @@ class User(Base):
         return True
 
     @staticmethod
-    def session():
-        global engine, session
-        if session is None:
-            engine, session = connect()
-        return session
-
-    @staticmethod
     def query():
-        return User.session().query(User)
+        return session().query(User)
 
     @staticmethod
     def host():
         return socket.gethostname()
 
     def save(self):
-        User.session().add(self)
-        User.session().commit()
+        session().add(self)
+        session().commit()
+
+    @property
+    def showname(self):
+        username = self.username.capitalize()
+        if username == "Phantom":
+            return "The {}".format(username)
+        return username
 
     @staticmethod
     def chkbnid(user):

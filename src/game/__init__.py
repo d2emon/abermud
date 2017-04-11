@@ -3,29 +3,29 @@
 
 
 def compile():
-    OBJ = [
-        "tk",
+    OBJ = {
+        "tk": "game.talker",
         """
         parse.o objsys.o extra.o magic.o blood.o weather.o obdat.o new1.o
-        """,
-        "support",
+        """: None,
+        "support": None,
         """
         zones.o mobile.o
-        """,
-        "bprintf",
+        """: None,
+        "bprintf": "buffer",
         """
         bbc.o
-        """,
-        "blib",
+        """: None,
+        "blib": "d2lib",
         """
         opensys.o
-        """,
-        "gamego",
+        """: None,
+        "gamego": "game",
         """
         ndebug.o key.o packer.o newuaf.o frob.o
-        """,
-        "flock",
-    ]
+        """: None,
+        "flock": None,
+    }
 
     INCL = [
         "object.h",

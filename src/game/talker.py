@@ -10,8 +10,10 @@
         This file holds the basic communications routines
 
 '''
-from player import MAX_PLAYERS, Player
+from player.models import MAX_PLAYERS, Player
 from bprintf import makebfr
+from world import World
+from game.utils import crapup
 
 
 # long i_setup=0;
@@ -71,7 +73,8 @@ from bprintf import makebfr
 
 
 def talker(user):
-    print("--->\ttalker({})".format(user))
+    import logging
+    logging.debug("--->\ttalker({})".format(user))
     player = Player()
 
     # extern long curch
@@ -80,12 +83,18 @@ def talker(user):
     buff = makebfr()
 
     player.cms = -1
-    # putmeon(name);
-    # if openworld() is None:
-    #    crapup("Sorry AberMUD is currently unavailable")
+    player.puton(user)
+
+    w = World()
+    if w.openworld() is None:
+        crapup("Sorry AberMUD is currently unavailable")
+
+    logging.debug(player)
+    logging.debug("{} >= {}".format(player.mynum, MAX_PLAYERS))
     if player.mynum >= MAX_PLAYERS:
         print("\nSorry AberMUD is full at the moment")
         return(0)
+
     player.name = user.username
     # rte(name);
     # closeworld();
@@ -102,16 +111,15 @@ def talker(user):
             pass
             # rte(name)
         player.rd_qd = False
-        # closeworld()
+        w.closeworld()
         buff.pbfr()
 
-        logging.debug("Signals")
         import game.sigs
-        print(game.sigs.active)
-        print(game.sigs.alarm)
-        print(game.sigs.SIGALRM)
-        print(game.sigs.SIGALRM())
-
+        logging.debug("Signals")
+        logging.debug(game.sigs.active)
+        logging.debug(game.sigs.alarm)
+        logging.debug(game.sigs.SIGALRM)
+        logging.debug(game.sigs.SIGALRM())
 
         break
 
@@ -141,8 +149,6 @@ def talker(user):
 # revise(cutoff)
 # lookin(room)
 # loodrv()
-
-# long iamon=0;
 
 # userwrap()
 # fcloselock(file)
