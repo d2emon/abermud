@@ -177,3 +177,58 @@ class Player(Base):
         ])
         logging.debug("\t}}")
         logging.debug('-'*70 + '>')
+
+    def player_load(self):
+        import logging
+        logging.debug("---> special(\".g\", {})".format(self))
+        curmode = 1
+        self.curch = -5
+        # initme()
+
+        ufl = World()
+        # self.strength = my_str
+        # self.level = my_lev
+        # if my_lev < 10000:
+        #     self.visible = 0
+        # else:
+        #     self.visible = 10000
+        # self.weapon = -1
+        # self.sex = my_sex
+        # self.helping = -1
+        # us = cuserid()
+
+        xy = "\001s{}\001{}  has entered the game\n\001".format(self.name, self.name)
+        xx = "\001s{}\001[ {}  has entered the game ]\n\001".format(self.name, self.name)
+        # sendsys(self.name, self.name, -10113, self.curch, xx)
+        logging.debug(["sendsys", [self, self, -10113, self.curch, xx]])
+
+        self.rte()
+        # if randperc() > 50:
+        #     trapch(-5)
+        # else:
+        #     self.curch = -183
+        #     trapch(-183)
+        # sendsys(self.name, self.name, -10000, self.curch, xy)
+        logging.debug(["sendsys", [self, self, -10000, self.curch, xy]])
+
+    # ???
+    def special(self, cmd):
+        import logging
+        logging.debug("---> special({}, {})".format(cmd, self))
+        pass
+        # extern long curmode;
+        # char ch,bk[128];
+        # extern long curch,moni;
+        # extern long mynum;
+        # extern long my_str,my_lev,my_sco,my_sex;
+        bk = cmd.lower()
+        ch = bk[0]
+        if ch != '.':
+            return 0
+        ch = bk[1]
+
+        if ch == 'g':
+            self.player_load()
+        else:
+            print("\nUnknown . option")
+        return 1

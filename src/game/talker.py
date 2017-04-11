@@ -13,7 +13,7 @@
 from player.models import MAX_PLAYERS, Player
 from bprintf import makebfr
 from world import World
-from game.utils import crapup
+# from game.utils import crapup
 
 
 # long oddcat=0;
@@ -63,7 +63,6 @@ def talker(user):
     logging.debug('<!' + '-'*80)
     player = Player()
 
-    # char string[128];
     buff = makebfr()
 
     player.cms = -1
@@ -82,37 +81,38 @@ def talker(user):
     player.save()
 
     player.cms = -1
-    # special(".g",name);
+    # player.special(".g")
+    player.player_load()
     i_setup = 1
 
-    import logging
     logging.debug("Main loop")
     logging.debug('<!' + '-'*40)
-    while True:
+    # while True:
+    for t in range(5):
         logging.debug('<!' + '-'*20)
         buff.pbfr()
         # sendmsg(name)
         if player.rd_qd:
-            player.rte(name)
+            player.rte()
         player.rd_qd = False
         w.closeworld()
         player.save()
         buff.pbfr()
 
         import game.sigs
+        logging.debug('='*4)
         logging.debug("Signals")
-        logging.debug(game.sigs.active)
-        logging.debug(game.sigs.alarm)
-        logging.debug(game.sigs.SIGALRM)
+        logging.debug('-'*4)
+        logging.debug("Active:\t%s", game.sigs.active)
+        logging.debug("Alarm:\t%d", game.sigs.alarm)
+        logging.debug("Function:\t%s", game.sigs.SIGALRM)
         logging.debug(game.sigs.SIGALRM())
+        logging.debug('='*4)
         logging.debug('-'*20 + '>')
-
-        break
     logging.debug('-'*40 + '>')
     logging.debug('-'*80 + '>')
 
 # cleanup(inpbk)
-# special(string,name)
 
 # long dsdb=0;
 # long moni=0;
@@ -130,7 +130,6 @@ def talker(user):
 # trapch(chan)
 # loseme(name)
 
-# update(name)
 # revise(cutoff)
 # lookin(room)
 # loodrv()
