@@ -20,19 +20,13 @@ from game.utils import crapup
 # long oddcat=0;
 # long  talkfl=0;
 
-
-# extern FILE * openlock();
 # extern long my_str;
 # extern long my_sex;
 # extern long my_lev;
 # extern FILE * openroom();
-# extern FILE * openworld();
-# extern char * pname();
-# extern char * oname();
 # extern long ppos();
 # extern char key_buff[];
 
-# long curch=0;
 # long  curmode=0;
 # long  meall=0;
 
@@ -75,9 +69,9 @@ from game.utils import crapup
 def talker(user):
     import logging
     logging.debug("--->\ttalker({})".format(user))
+    logging.debug('<!' + '-'*80)
     player = Player()
 
-    # extern long curch
     # FILE *fl;
     # char string[128];
     buff = makebfr()
@@ -85,33 +79,34 @@ def talker(user):
     player.cms = -1
     player.puton(user)
 
-    w = World()
-    if w.openworld() is None:
-        crapup("Sorry AberMUD is currently unavailable")
-
     logging.debug(player)
     logging.debug("{} >= {}".format(player.mynum, MAX_PLAYERS))
-    if player.mynum >= MAX_PLAYERS:
-        print("\nSorry AberMUD is full at the moment")
-        return(0)
+
+    w = World()
+    assert w.filrf is not None, "Sorry AberMUD is currently unavailable"
+    assert player.mynum < MAX_PLAYERS, "Sorry AberMUD is full at the moment"
 
     player.name = user.username
-    # rte(name);
-    # closeworld();
+    player.rte()
+    w.closeworld()
+    player.save()
+
     player.cms = -1
     # special(".g",name);
     i_setup = 1
 
     import logging
     logging.debug("Main loop")
+    logging.debug('<!' + '-'*40)
     while True:
+        logging.debug('<!' + '-'*20)
         buff.pbfr()
         # sendmsg(name)
         if player.rd_qd:
-            pass
-            # rte(name)
+            player.rte(name)
         player.rd_qd = False
         w.closeworld()
+        player.save()
         buff.pbfr()
 
         import game.sigs
@@ -120,8 +115,11 @@ def talker(user):
         logging.debug(game.sigs.alarm)
         logging.debug(game.sigs.SIGALRM)
         logging.debug(game.sigs.SIGALRM())
+        logging.debug('-'*20 + '>')
 
         break
+    logging.debug('-'*40 + '>')
+    logging.debug('-'*80 + '>')
 
 # cleanup(inpbk)
 # special(string,name)
@@ -140,7 +138,6 @@ def talker(user):
 
 # split(block,nam1,nam2,work,luser)
 # trapch(chan)
-# putmeon(name)
 # loseme(name)
 
 # long lasup=0;

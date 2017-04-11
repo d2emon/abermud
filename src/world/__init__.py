@@ -1,37 +1,35 @@
 from game.utils import crapup
 
 
-filrf = None
-
-
 class World:
-    def openworld(self):
+    filrf = None
+
+    def __init__(self):
         import logging
         logging.debug("--->\topenworld()")
 
-        global filrf
         # extern long objinfo[],numobs,ublock[];
-        if filrf is not None:
-            return filrf
+        if self.filrf is None:
+            self.filrf = ["openlock", "/usr/tmp/-iy7AM", "r+"]
+            if self.filrf is None:
+                crapup("Cannot find World file")
 
-        filrf = ["openlock", "/usr/tmp/-iy7AM", "r+"]
-        if filrf is None:
-            crapup("Cannot find World file")
-
-        # sec_read(filrf,objinfo,400,4*numobs)
-        # sec_read(filrf,ublock,350,16*48)
-        return filrf
+            # sec_read(filrf,objinfo,400,4*numobs)
+            # sec_read(filrf,ublock,350,16*48)
 
     def closeworld(self):
         import logging
         logging.debug("--->\tcloseworld()")
 
-        global filrf
-        if filrf is None:
-            return
+        if self.filrf is not None:
+            # sec_write(filrf,objinfo,400,4*numobs)
+            # sec_write(filrf,ublock,350,16*48)
 
-        # sec_write(filrf,objinfo,400,4*numobs)
-        # sec_write(filrf,ublock,350,16*48)
+            # fcloselock(filrf)
+            self.filrf = None
 
-        # fcloselock(filrf)
-        filrf = None
+    def findend(self):
+        import logging
+        logging.debug("--->\tfindend({})".format(self))
+
+        return 10
