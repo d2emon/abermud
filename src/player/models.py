@@ -5,6 +5,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from world import World
 from message.models import Message
 from game.parse import eorte
+# from bprintf import buff
+# from game.sigs import alon, aloff
 
 
 Base = declarative_base()
@@ -232,3 +234,107 @@ class Player(Base):
         else:
             print("\nUnknown . option")
         return 1
+
+    def sendmsg(self):
+        import logging
+        logging.debug("---> sendmsg({})".format(self))
+
+        import bprintf
+        buff = bprintf.D2Buffer()
+
+        pass
+        # extern long debug_mode;
+        # extern char *sysbuf;
+        # extern long curch,moni,mynum;
+        # char prmpt[32];
+        # long a;
+        # extern long tty;
+        # char work[200];
+        # long w2[35];
+        # extern char key_buff[];
+        # extern long convflg;
+        convflg = ''
+        # extern long my_lev;
+        # extern long my_str;
+        # extern long in_fight;
+        # extern long fighting;
+        # extern long curmode;
+        # l:
+        while True:
+            buff.pbfr()
+            # if tty == 4:
+            #    btmscr()
+            prmpt = "\n"
+            if self.visible:
+                prmpt += "("
+            # if debug_mode:
+            #     prmpt += "#"
+            # if my_lev > 9:
+            #     prmpt += "----"
+
+            if convflg == 0:
+                prmpt += ">"
+            elif convflg == 1:
+                prmpt += "\""
+            elif convflg == 2:
+                prmpt += "*"
+            else:
+                prmpt += "?"
+            if self.visible:
+                prmpt += ")"
+            buff.pbfr()
+            # if self.visible > 9999:
+            #     set_progname(0,"-csh")
+            # else:
+            #     work = "   --}----- ABERMUD -----{--     Playing as {}".format(name)
+            # if self.visible == 0:
+            #     set_progname(0,work)
+
+            # alon()
+            # key_input(prmpt,80)
+            print("PROMPT", prmpt)
+            # aloff()
+
+            work = ''  # key_buff
+            # if tty==4:
+            #     topscr()
+            buff.sysbuf += "\001l"
+            buff.sysbuf += work
+            buff.sysbuf += "\n\001"
+
+            w = World()
+            self.rte()
+            w.closeworld()
+            if convflg and work != "**":
+                convflg = 0
+                continue
+            if not work:
+                break
+            if work != "*" and work[0] == '*':
+                work[0] = 32
+                break
+            if convflg:
+                w2 = work
+            if convflg == 1:
+                work = "say {}".format(w2)
+            else:
+                work = "tss {}".format(w2)
+            break
+        # nadj:
+        # if curmode==1:
+        #     gamecom(work)
+        # else:
+        #    if work != ".Q" and work != ".q" and work:
+        #         a = special(work, name)
+        # if fighting is not None:
+        #    if fighting.username:
+        #        in_fight = 0
+        #        fighting = -1
+        #    if fighting != self.curch:
+        #        in_fight=0;
+        #        fighting= -1;
+        #    if in_fight:
+        #        in_fight-=1
+        print("SYSBUF", buff.sysbuf)
+
+        return not work == ".Q" or not work == ".q"

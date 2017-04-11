@@ -14,7 +14,7 @@ from player.models import MAX_PLAYERS
 from bprintf import makebfr
 from world import World
 # from game.utils import crapup
-from game.share import player, load
+from game.share import player  # , load
 
 
 # long oddcat=0;
@@ -94,7 +94,7 @@ def talker(user):
     for t in range(5):
         logging.debug('<!' + '-'*20)
         buff.pbfr()
-        # sendmsg(name)
+        player.sendmsg()
         if player.rd_qd:
             player.rte()
         player.rd_qd = False
