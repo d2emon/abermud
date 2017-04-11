@@ -1,3 +1,6 @@
+from game.share import player
+from world import World
+
 active = False
 alarm = 2
 interrupt = False
@@ -65,6 +68,8 @@ def init():
 
 
 def oops():
+    import logging
+    logging.debug("SIGNAL_OOPS")
     aloff()
     # loseme();
     # keysetback();
@@ -74,6 +79,8 @@ def oops():
 
 
 def ctrlc():
+    import logging
+    logging.debug("SIGNAL_CTRLC")
     # extern in_fight;
     print("^C")
     # if in_fight:
@@ -86,16 +93,20 @@ def ctrlc():
 
 
 def occur():
+    import logging
+    logging.debug("SIGNAL_OCCUR")
+
     global active, interrupt
 
-    if active == 0:
+    if not active:
         return
     aloff()
-    # openworld();
+    w = World()
     interrupt = True
-    # rte(globme);
+    player.rte()
     interrupt = False
     # on_timing();
-    # closeworld();
+    w.closeworld()
+    player.save()
     # key_reprint();
     alon()

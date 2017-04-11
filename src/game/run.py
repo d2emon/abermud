@@ -28,7 +28,6 @@ def main(title='<untitled>', user=None):
     #    # initscr()
     #    # topscr()
     print("Hello {}".format(user.showname))
-
     logging.info("GAME ENTRY: {}[{}]".format(user.showname, user.id))
 
     # keysetup();

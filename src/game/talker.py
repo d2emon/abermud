@@ -10,10 +10,11 @@
         This file holds the basic communications routines
 
 '''
-from player.models import MAX_PLAYERS, Player
+from player.models import MAX_PLAYERS
 from bprintf import makebfr
 from world import World
 # from game.utils import crapup
+from game.share import player, load
 
 
 # long oddcat=0;
@@ -61,7 +62,9 @@ def talker(user):
     import logging
     logging.debug("--->\ttalker({})".format(user))
     logging.debug('<!' + '-'*80)
-    player = Player()
+
+    # player = Player()
+    # load(user)
 
     buff = makebfr()
 
@@ -99,18 +102,31 @@ def talker(user):
         player.save()
         buff.pbfr()
 
-        import game.sigs
-        logging.debug('='*4)
-        logging.debug("Signals")
-        logging.debug('-'*4)
-        logging.debug("Active:\t%s", game.sigs.active)
-        logging.debug("Alarm:\t%d", game.sigs.alarm)
-        logging.debug("Function:\t%s", game.sigs.SIGALRM)
-        logging.debug(game.sigs.SIGALRM())
-        logging.debug('='*4)
+        print_sigs()
         logging.debug('-'*20 + '>')
     logging.debug('-'*40 + '>')
     logging.debug('-'*80 + '>')
+
+
+def print_sigs():
+    import logging
+    import game.sigs
+    logging.debug('='*4)
+    logging.debug("Signals")
+    logging.debug("SIGALRM:\t%s", game.sigs.SIGALRM)
+    logging.debug("SIGHUP:\t%s", game.sigs.SIGHUP)
+    logging.debug("SIGINT:\t%s", game.sigs.SIGINT)
+    logging.debug("SIGTERM:\t%s", game.sigs.SIGTERM)
+    logging.debug("SIGTSTP:\t%s", game.sigs.SIGTSTP)
+    logging.debug("SIGQUIT:\t%s", game.sigs.SIGQUIT)
+    logging.debug("SIGCONT:\t%s", game.sigs.SIGCONT)
+    logging.debug('-'*4)
+    logging.debug("Active:\t%s", game.sigs.active)
+    logging.debug("Alarm:\t%d", game.sigs.alarm)
+    logging.debug("Function:\t%s", game.sigs.SIGALRM)
+    game.sigs.SIGALRM()
+    logging.debug('='*4)
+    pass
 
 # cleanup(inpbk)
 

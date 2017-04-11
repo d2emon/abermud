@@ -1,6 +1,3 @@
-from game.utils import crapup
-
-
 class World:
     filrf = None
 
@@ -11,8 +8,9 @@ class World:
         # extern long objinfo[],numobs,ublock[];
         if self.filrf is None:
             self.filrf = ["openlock", "/usr/tmp/-iy7AM", "r+"]
-            if self.filrf is None:
-                crapup("Cannot find World file")
+            assert self.filrf is not None, "Cannot find World file"
+            # if self.filrf is None:
+            #     crapup("Cannot find World file")
 
             # sec_read(filrf,objinfo,400,4*numobs)
             # sec_read(filrf,ublock,350,16*48)
