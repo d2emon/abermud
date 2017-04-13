@@ -2,6 +2,8 @@ from db import session
 from sqlalchemy import Column, Integer, String
 # from sqlalchemy.orm import validates
 from sqlalchemy.ext.declarative import declarative_base
+
+from d2log import logger
 from world import World
 from message.models import Message
 from game.parse import eorte
@@ -57,12 +59,11 @@ class Player(Base):
         session().commit()
 
     def update(self):
-        import logging
-        logging.debug("---> update()")
+        logger.debug("---> update()")
         xp = self.cms - self.lasup
         if xp < 0:
             xp = -xp
-        logging.debug("xp=%s", xp)
+        logger.debug("xp=%s", xp)
         if xp < 10:
             return
 
@@ -71,12 +72,11 @@ class Player(Base):
         self.lasup = self.cms
 
     def puton(self, user):
-        import logging
-        logging.debug("---> puton({})".format(user))
-        logging.debug('<!' + '-'*70)
-        logging.debug(self)
-        logging.debug("\t{{")
-        logging.debug([
+        logger.debug("---> puton({})".format(user))
+        logger.debug('<!' + '-'*70)
+        logger.debug(self)
+        logger.debug("\t{{")
+        logger.debug([
             self.cms,
             self.curch,
             self.rd_qd,
@@ -84,7 +84,7 @@ class Player(Base):
             self.iamon,
             self.lasup,
         ])
-        logging.debug("\t}}")
+        logger.debug("\t}}")
 
         self.iamon = False
         w = World()
@@ -92,7 +92,7 @@ class Player(Base):
         assert Player.fpbn(user.showname) is None, "You are already on the system - you may only be on once at a time"
 
         ct = Player.query().count()
-        logging.debug("ct = %s", ct)
+        logger.debug("ct = %s", ct)
         if ct >= MAX_PLAYERS:
             self.mynum = MAX_PLAYERS
             return
@@ -111,9 +111,9 @@ class Player(Base):
 
         self.iamon = True
 
-        logging.debug(self)
-        logging.debug("\t{{")
-        logging.debug([
+        logger.debug(self)
+        logger.debug("\t{{")
+        logger.debug([
             self.cms,
             self.curch,
             self.rd_qd,
@@ -121,19 +121,18 @@ class Player(Base):
             self.iamon,
             self.lasup,
         ])
-        logging.debug("\t}}")
-        logging.debug('-'*70 + '>')
+        logger.debug("\t}}")
+        logger.debug('-'*70 + '>')
 
     @staticmethod
     def fpbn(username):
         return None
 
     def rte(self):
-        import logging
-        logging.debug("---> rte({})".format(self))
-        logging.debug('<!' + '-'*70)
-        logging.debug("\t{{")
-        logging.debug([
+        logger.debug("---> rte({})".format(self))
+        logger.debug('<!' + '-'*70)
+        logger.debug("\t{{")
+        logger.debug([
             self.cms,
             self.curch,
             self.rd_qd,
@@ -141,7 +140,7 @@ class Player(Base):
             self.iamon,
             self.lasup,
         ])
-        logging.debug("\t}}")
+        logger.debug("\t}}")
 
         w = World()
         assert w.filrf is not None, "AberMUD: FILE_ACCESS : Access failed"
@@ -151,12 +150,12 @@ class Player(Base):
 
         ct = self.cms
         too = Message.findend()
-        logging.debug("%d : %d", self.cms, too)
+        logger.debug("%d : %d", self.cms, too)
 
         for ct in range(self.cms, too):
             block = Message.readmsg(ct)
             for m in block:
-                logging.debug(m)
+                logger.debug(m)
                 m.mstoout(self)
 
         self.cms = ct
@@ -168,9 +167,9 @@ class Player(Base):
         tdes = 0
         vdes = 0
 
-        logging.debug("\t{{")
-        logging.debug(self)
-        logging.debug([
+        logger.debug("\t{{")
+        logger.debug(self)
+        logger.debug([
             self.cms,
             self.curch,
             self.rd_qd,
@@ -178,12 +177,11 @@ class Player(Base):
             self.iamon,
             self.lasup,
         ])
-        logging.debug("\t}}")
-        logging.debug('-'*70 + '>')
+        logger.debug("\t}}")
+        logger.debug('-'*70 + '>')
 
     def player_load(self):
-        import logging
-        logging.debug("---> special(\".g\", {})".format(self))
+        logger.debug("---> special(\".g\", {})".format(self))
         curmode = 1
         self.curch = -5
         # initme()
@@ -203,7 +201,7 @@ class Player(Base):
         xy = "\001s{}\001{}  has entered the game\n\001".format(self.name, self.name)
         xx = "\001s{}\001[ {}  has entered the game ]\n\001".format(self.name, self.name)
         # sendsys(self.name, self.name, -10113, self.curch, xx)
-        logging.debug(["sendsys", [self, self, -10113, self.curch, xx]])
+        logger.debug(["sendsys", [self, self, -10113, self.curch, xx]])
 
         self.rte()
         # if randperc() > 50:
@@ -212,12 +210,11 @@ class Player(Base):
         #     self.curch = -183
         #     trapch(-183)
         # sendsys(self.name, self.name, -10000, self.curch, xy)
-        logging.debug(["sendsys", [self, self, -10000, self.curch, xy]])
+        logger.debug(["sendsys", [self, self, -10000, self.curch, xy]])
 
     # ???
     def special(self, cmd):
-        import logging
-        logging.debug("---> special({}, {})".format(cmd, self))
+        logger.debug("---> special({}, {})".format(cmd, self))
         pass
         # extern long curmode;
         # char ch,bk[128];
@@ -237,8 +234,7 @@ class Player(Base):
         return 1
 
     def sendmsg(self):
-        import logging
-        logging.debug("---> sendmsg({})".format(self))
+        logger.debug("---> sendmsg({})".format(self))
 
         from bprintf import buff
         # import bprintf

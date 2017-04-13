@@ -1,3 +1,4 @@
+from d2log import logger
 # from game.utils import crapup
 
 
@@ -35,6 +36,9 @@ class D2Buffer:
         self.log_fl = None
         # 0 = not logging
 
+    def __repr__(self):
+        return "<D2Buffer \"\n{}\n\">".format(self.sysbuf)
+
     def pbfr(self):
         from game.sigs import alarm
         from world import World
@@ -68,8 +72,9 @@ class D2Buffer:
         alarm.unblock()
 
     def dcprnt(self, output):
-        import logging
-        logging.debug("-->%s\t<--\n%s", output, self.sysbuf)
+        logger.debug("dcprnt() to %s", output)
+        print("-->{}<--".format(output))
+        print(self.sysbuf)
 
 # void logcom()
 

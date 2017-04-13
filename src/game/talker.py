@@ -105,13 +105,20 @@ def talker(user):
         buff.pbfr()
 
         player.sendmsg()
+        logger.debug("Player sendmsg %s", player)
+        logger.debug("Buffer sendmsg %s", buff)
+
         if player.rd_qd:
             player.rte()
         player.rd_qd = False
+        logger.debug("Player rte %s", player)
+        logger.debug("Buffer rte %s", buff)
 
         w.closeworld()
         player.save()
         buff.pbfr()
+        logger.debug("Player saved %s", player)
+        logger.debug("Buffer saved %s", buff)
 
         print_sigs()
         logger.debug('-'*20 + '>')

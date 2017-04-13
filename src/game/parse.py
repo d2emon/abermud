@@ -1,6 +1,8 @@
+from d2log import logger
+
+
 def eorte():
-    import logging
-    logging.debug("---> eorte()")
+    logger.debug("---> eorte()")
     # extern long mynum,me_ivct;
     # extern long me_drunk;
     # extern long ail_dumb;
