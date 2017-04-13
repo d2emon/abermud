@@ -5,7 +5,6 @@ from game.talker import talker
 
 
 def main(title='<untitled>', user=None):
-    import logging
     load_logger(logger)
 
     run_data = {
@@ -35,7 +34,7 @@ def main(title='<untitled>', user=None):
     #    # initscr()
     #    # topscr()
     print("Hello {}".format(user.showname))
-    logging.info("GAME ENTRY: {}[{}]".format(user.showname, user.id))
+    logger.info("GAME ENTRY: {}[{}]".format(user.showname, user.id))
 
     # keysetup();
     talker(user)

@@ -1,21 +1,18 @@
 import os
-import logging
-import socket
 import yaml
-
-import config
-
 
 from datetime import datetime
 from getpass import getpass
 
+import config
+
+from d2log import mud_logger as logger, load_logger
 from d2lib import printfile
 from mud.utils import getty, cls, crapup
 from mud.talker import talker
 from user.models import User
 from user.login import chknolog, login  # , authenticate
 
-from d2log import mud_logger, load_logger
 
 # char lump[256];
 namegiv = False
@@ -86,8 +83,7 @@ def main(*argv):
     '''
     The initial routine
     '''
-    load_logger(mud_logger)
-
+    load_logger(logger)
 
     global FILES
     FILES = config.load()
@@ -131,7 +127,7 @@ def main(*argv):
         show_motd()
 
     # Log entry
-    logging.info("Game entry by %s : UID %s", user, os.getuid())
+    logger.info("Game entry by %s : UID %s", user, os.getuid())
 
     # Run system
     talker(user)
