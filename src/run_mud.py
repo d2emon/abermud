@@ -4,7 +4,8 @@ import mud
 
 def main():
     import logging
-    logging.basicConfig(level=logging.DEBUG)
+    logformat = '%(levelname)s:%(name)s:%(message)s [in %(pathname)s:%(lineno)d]'
+    logging.basicConfig(level=logging.DEBUG, format=logformat)
 
     import sys
     mud.main(*sys.argv)

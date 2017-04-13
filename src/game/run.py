@@ -1,16 +1,19 @@
 from config import CONFIG
+from game.share import logger, load_logger
 from game.sigs import init
 from game.talker import talker
 
 
 def main(title='<untitled>', user=None):
+    import logging
+    load_logger(logger)
+
     run_data = {
         'filename': CONFIG['EXE'],
         'title': title,
         'user': user,
     }
-    import logging
-    logging.debug(run_data)
+    logger.debug(run_data)
 
     print("="*80)
     print(CONFIG['EXE'])
@@ -18,7 +21,7 @@ def main(title='<untitled>', user=None):
 
     from game.utils import PROGNAME
     PROGNAME = title
-    logging.debug(PROGNAME)
+    logger.debug(PROGNAME)
     print("="*80)
 
     init()

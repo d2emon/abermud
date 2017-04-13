@@ -12,8 +12,8 @@ def enter_game(user, session=None):
     print("You stand in a long dark hallway, which echoes to the tread of your")
     print("booted feet. You stride on down the hall, choose your masque and enter the")
     print("worlds beyond the known......\n")
-    if main("   --{----- ABERMUD -----}--    Playing as ", user) == -1:
-        crapup("mud.exe: Not Found")
+
+    main("   --{----- ABERMUD -----}--    Playing as ", user)
 
 
 def change_my_password(user, session=None):
@@ -89,8 +89,7 @@ def talker(user):
     }
     print("QNMRQ", user.qnmrq)
     if user.qnmrq:
-        if main("   --}----- ABERMUD -----{--    Playing as ", user) == -1:
-            crapup("mud.exe : Not found")
+        main("   --}----- ABERMUD -----{--    Playing as ", user)
     cls()
     while True:
         print("Welcome To AberMUD II [Unix]\n\n")
