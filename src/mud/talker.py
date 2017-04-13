@@ -1,9 +1,10 @@
 # from d2lib import cuserid
-from mud.utils import cls, crapup
+from mud.utils import cls  # , crapup
 from game import main
 from getpass import getpass
 from user.login import search, show, edit_field, change_password
 from user.models import User
+from d2log import mud_logger as logger
 
 
 def enter_game(user, session=None):
@@ -87,7 +88,7 @@ def talker(user):
         'b': edit_user,
         'c': del_user,
     }
-    print("QNMRQ", user.qnmrq)
+    logger.debug("QNMRQ: %d", user.qnmrq)
     if user.qnmrq:
         main("   --}----- ABERMUD -----{--    Playing as ", user)
     cls()

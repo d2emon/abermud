@@ -7,14 +7,15 @@ import config
 
 
 from datetime import datetime
+from getpass import getpass
 
 from d2lib import printfile
 from mud.utils import getty, cls, crapup
 from mud.talker import talker
 from user.models import User
 from user.login import chknolog, login  # , authenticate
-from getpass import getpass
 
+from d2log import mud_logger, load_logger
 
 # char lump[256];
 namegiv = False
@@ -85,6 +86,9 @@ def main(*argv):
     '''
     The initial routine
     '''
+    load_logger(mud_logger)
+
+
     global FILES
     FILES = config.load()
 

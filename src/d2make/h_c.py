@@ -5,7 +5,7 @@ import socket
 FSEG = {
     "UAF_RAND": "uaf.rand",
     "ROOMS": os.path.join("..", "data", "text", "ROOMS"),
-    "LOG_FILE": "mud_syslog",
+    "LOG_FILE": "mud_syslog.log",
     "BAN_FILE": "banned_file",
     "NOLOGIN": os.path.join("..", "data", "nologin"),
     "RESET_T": "reset_t",

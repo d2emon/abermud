@@ -1,4 +1,5 @@
 from getpass import getpass
+from d2log import mud_logger as logger
 
 
 # include <stdio.h>
@@ -21,11 +22,11 @@ ttyt = 0
 
 
 def getty():
-    print("--->\tgetty()")
+    logger.debug("--->\tgetty()")
 
 
 def cls():
-    print("--->\tcls()")
+    logger.debug("--->\tcls()")
     print("=-" * 40)
     print("\n" * 24)
 

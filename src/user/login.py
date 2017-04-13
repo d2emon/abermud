@@ -1,4 +1,5 @@
 from config import CONFIG
+from d2log import mud_logger as logger
 from mud.utils import cls
 from user.models import User
 from getpass import getpass
@@ -41,7 +42,7 @@ def login(username=None):
     # Check if banned first
     b = User.chkbnid(User.host())
     # cuserid(NULL));
-    print("BANNED", b)
+    logger.debug("BANNED %d", b)
 
     if username:
         username = username.lower()

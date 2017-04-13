@@ -1,3 +1,4 @@
+from d2log import mud_logger as logger
 from mud.utils import validname
 # from config import CONFIG
 # import yaml
@@ -34,7 +35,7 @@ class User(Base):
 
     @validates('username')
     def validate_username(self, key, username):
-        print("USERNAME", username)
+        logger.debug("USERNAME %s", username)
         assert username is not None
         username = username.strip()
         assert username, "Empty username"

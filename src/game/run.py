@@ -1,5 +1,5 @@
 from config import CONFIG
-from game.share import logger, load_logger
+from d2log import logger, load_logger
 from game.sigs import init
 from game.talker import talker
 
