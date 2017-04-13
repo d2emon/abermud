@@ -67,3 +67,7 @@ class Message(Base):
         # else:
         #     buff.add("{}".format(x))
         logger.debug('-'*60 + '>')
+
+    @staticmethod
+    def send(user_from, user_to, code, channel, text):
+        logger.debug(["sendsys", [user_from, user_to, code, channel, text]])

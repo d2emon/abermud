@@ -54,7 +54,9 @@ class Player(Base):
     def query():
         return session().query(Player)
 
-    def save(self):
+    def save(self, w):
+        w.closeworld()
+
         session().add(self)
         session().commit()
 
@@ -184,7 +186,7 @@ class Player(Base):
         logger.debug("---> special(\".g\", {})".format(self))
         curmode = 1
         self.curch = -5
-        # initme()
+        self.initme()
 
         ufl = World()
         # self.strength = my_str
@@ -193,15 +195,15 @@ class Player(Base):
         #     self.visible = 0
         # else:
         #     self.visible = 10000
-        # self.weapon = -1
+        self.weapon = -1
         # self.sex = my_sex
-        # self.helping = -1
+        self.helping = -1
         # us = cuserid()
 
         xy = "\001s{}\001{}  has entered the game\n\001".format(self.name, self.name)
         xx = "\001s{}\001[ {}  has entered the game ]\n\001".format(self.name, self.name)
         # sendsys(self.name, self.name, -10113, self.curch, xx)
-        logger.debug(["sendsys", [self, self, -10113, self.curch, xx]])
+        Message.send(self, self, -10113, self.curch, xx)
 
         self.rte()
         # if randperc() > 50:
@@ -210,7 +212,44 @@ class Player(Base):
         #     self.curch = -183
         #     trapch(-183)
         # sendsys(self.name, self.name, -10000, self.curch, xy)
-        logger.debug(["sendsys", [self, self, -10000, self.curch, xy]])
+        Message.send(self, self, -10000, self.curch, xx)
+
+    def initme(self):
+        from bprintf import buff
+        # PERSONA x;
+        # chaar s[32];
+        # extern char globme[];
+        errno = 0
+        # if findpers(self, x) !=-1:
+        #     s, my_str, my_sco, my_lev, my_sex = decpers(x)
+        #     return
+        if errno != 0:
+            crapup("Panic: Timeout event on user file")
+        # x.p_score = 0
+        buff.bprintf("Creating character....")
+        my_sco = 0
+        my_str = 40
+        my_lev = 1
+        # moan1:
+        buff.bprintf("\nSex (M/F) : ")
+        buff.pbfr()
+        # keysetback()
+        s = input()[:2]
+        # keysetup()
+        s = s.lower()
+        if s[0] == 'm':
+            my_sex = 0
+        elif s[0] == 'f':
+            my_sex = 1
+        else:
+            buff.bprintf("M or F")
+            # goto moan1
+        # x.p_name = self.name
+	# x.p_strength = my_str
+        # x.p_level = my_lev
+        # x.p_sex = my_sex
+        # x.p_score = my_sco
+        # putpers(self, x)
 
     # ???
     def special(self, cmd):
@@ -252,70 +291,3 @@ class Player(Base):
         if self.visible == 0:
             set_name(prog)
         return prmpt
-
-    def sendmsg(self):
-        logger.debug("---> sendmsg({})".format(self))
-
-        from bprintf import buff
-        # buff = bprintf.D2Buffer()
-
-        # extern long debug_mode;
-        # extern long curch,moni,mynum;
-        # extern long tty;
-        # extern long my_lev;
-        # extern long my_str;
-        # extern long in_fight;
-        # extern long fighting;
-        # extern long curmode;
-        # l:
-        while True:
-            buff.pbfr()
-            # if tty == 4:
-            #    btmscr()
-            prmpt = self.prompt()
-            buff.pbfr()
-
-            from game.sigs import alarm
-            print("="*80)
-            alarm.set_on()
-            work = buff.key_input(prmpt)
-            alarm.set_off()
-            print("="*80)
-
-            # if tty==4:
-            #     topscr()
-            buff.sysbuf += "<l>{}\n</l>".format(work)
-
-            w = World()
-            self.rte()
-            w.closeworld()
-            self.save()
-
-            if buff.convflg and work == "**":
-                buff.convflg = 0
-                continue
-            if not work:
-                break
-            if work != "*" and work[0] == '*':
-                work = work[1:]
-                break
-
-            work = buff.apply_conv(work)
-            break
-        # nadj:
-        # if curmode==1:
-        #     gamecom(work)
-        # else:
-        #    if work != ".Q" and work != ".q" and work:
-        #         a = special(work, name)
-        # if fighting is not None:
-        #    if fighting.username:
-        #        in_fight = 0
-        #        fighting = -1
-        #    if fighting != self.curch:
-        #        in_fight=0;
-        #        fighting= -1;
-        #    if in_fight:
-        #        in_fight-=1
-
-        return work.lower() == ".q"
