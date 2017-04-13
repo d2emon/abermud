@@ -23,6 +23,10 @@ from game.utils import set_name, PROGNAME
 MAX_PLAYERS = 16
 
 
+MALE = 0
+FEMALE = 1
+
+
 class Player(Base):
     __tablename__ = "player"
     id = Column(Integer, primary_key=True)
@@ -34,6 +38,11 @@ class Player(Base):
     strength = Column(Integer, default=-1)
     weapon = Column(Integer, default=-1)
     sex = Column(Integer, default=0)
+
+    sexes = {
+        'm': MALE,
+        'f': FEMALE,
+    }
 
     def __init__(self):
         Base.__init__(self)
@@ -61,12 +70,20 @@ class Player(Base):
         from db import sess
         return sess.query(Player)
 
+    def loadw(self):
+        w = World()
+        return w
+
     def save(self, w):
         from db import sess
         w.closeworld()
 
         sess.add(self)
         sess.commit()
+
+    @property
+    def person(self):
+        return self.user.person
 
     def update(self):
         logger.debug("---> update()")
@@ -77,7 +94,7 @@ class Player(Base):
         if xp < 10:
             return
 
-        w = World()
+        w = self.loadw()
         self.position = self.cms
         self.lasup = self.cms
 
@@ -98,7 +115,7 @@ class Player(Base):
 
         self.user = user
         self.iamon = False
-        w = World()
+        w = self.loadw()
 
         assert Player.fpbn(user.showname) is None, "You are already on the system - you may only be on once at a time"
 
@@ -141,6 +158,7 @@ class Player(Base):
 
     def rte(self):
         from db import findend
+        from message.models import Message
         logger.debug("---> rte({})".format(self))
         logger.debug('<!' + '-'*70)
         logger.debug("\t{{")
@@ -154,7 +172,7 @@ class Player(Base):
         ])
         logger.debug("\t}}")
 
-        w = World()
+        w = self.loadw()
         assert w.filrf is not None, "AberMUD: FILE_ACCESS : Access failed"
 
         if self.cms == -1:
@@ -199,15 +217,15 @@ class Player(Base):
         self.curch = -5
         self.initme()
 
-        ufl = World()
-        # self.strength = my_str
-        # self.level = my_lev
-        # if my_lev < 10000:
-        #     self.visible = 0
-        # else:
-        #     self.visible = 10000
+        ufl = self.loadw()
+        self.strength = self.person.strength
+        self.level = self.person.level
+        if self.person.level < 10000:
+            self.visible = 0
+        else:
+            self.visible = 10000
         self.weapon = -1
-        # self.sex = my_sex
+        self.sex = self.person.sex
         self.helping = -1
         # us = cuserid()
 
@@ -227,31 +245,20 @@ class Player(Base):
 
     def initme(self):
         from bprintf import buff
-        if self.user.person is not None:
+        if self.person is not None:
             return self.user.person
 
         buff.bprintf("Creating character....\n")
-        p = self.user.new_person()
-        # Person()
-        p.name = self.name
-        p.score = 0
-        p.strength = 40
-        p.sex = None
-        p.level = 1
-
+        p = self.user.new_person(self.name)
         while p.sex is None:
             buff.pbfr()
             # keysetback()
             s = input("\nSex (M/F) : ").lower()[0]
             # keysetup()
-            if s == 'm':
-                p.sex = 0
-            elif s[0] == 'f':
-                p.sex = 1
-            else:
+            p.sex = self.sexes.get(s)
+            if p.sex is None:
                 buff.bprintf("M or F")
-        # self.user.person = p
-        self.user.person.save()
+        self.person.save()
         self.user.save()
 
     # ???

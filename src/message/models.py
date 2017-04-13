@@ -8,6 +8,10 @@ class Message(Base):
     __tablename__ = "message"
     id = Column(Integer, primary_key=True)
     text = Column(String)
+    from_player_id = None
+    to_player_id = None
+    code = None
+    channel = None
 
     @staticmethod
     def query():
@@ -22,7 +26,7 @@ class Message(Base):
     @staticmethod
     def findstart():
         from db import sess
-        logger.debug("--->\tfindstart()")
+        logger.debug("findstart()")
         # sec_read(unit,bk,0,1);
         # return(bk[0]);
         message_id = sess.query(func.min(Message.id)).scalar()
@@ -33,7 +37,7 @@ class Message(Base):
     @staticmethod
     def findend():
         from db import sess
-        logger.debug("--->\tfindend()")
+        logger.debug("findend()")
         # sec_read(unit,bk,0,2);
         # return(bk[1]);
         message_id = sess.query(func.max(Message.id)).scalar()
@@ -64,7 +68,7 @@ class Message(Base):
         # if block[1] < -3:
         #     sysctrl(block, luser)
         # else:
-        #     buff.add("{}".format(x))
+        #     buff.bprintf(x)
         logger.debug('-'*60 + '>')
 
     @staticmethod

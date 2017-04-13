@@ -1,6 +1,4 @@
 from d2log import logger
-# from game.utils import crapup
-from world import World
 
 
 buff = None
@@ -99,7 +97,7 @@ class D2Buffer:
             #     topscr()
             self.sysbuf += "<l>{}\n</l>".format(work)
 
-            w = World()
+            w = player.loadw()
             player.rte()
             player.save(w)
 
@@ -147,11 +145,10 @@ class D2Buffer:
 
     def pbfr(self):
         from game.sigs import alarm
-        from world import World
         from game.share import player
 
         alarm.block()
-        w = World()
+        w = player.loadw()
         player.save(w)
 
         if self.sysbuf:
@@ -171,7 +168,7 @@ class D2Buffer:
             if fln > 0:
                 self.iskb = False
                 self.dcprnt(fln)
-        #        # fcloselock(fln)
+                # fcloselock(fln)
 
         self.iskb = True
         self.dcprnt("stdout")
@@ -179,7 +176,7 @@ class D2Buffer:
         self.sysbuf = ''
         if self.snoopt != -1:
             pass
-        #     # viewsnoop()
+            # viewsnoop()
         alarm.unblock()
 
     def dcprnt(self, output):

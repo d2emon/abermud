@@ -7,7 +7,7 @@ import socket
 from db.base import Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import validates, relationship
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
 # from models import Person
 
 
@@ -125,9 +125,17 @@ class User(Base):
         import re
         return re.match("^\w*$", username)
 
-    def new_person(self):
+    def new_person(self, name=None):
         from person.models import Person
+        if name is None:
+            name = self.showname
+
         self.person = Person()
+        self.person.name = name
+        self.person.score = 0
+        self.person.strength = 40
+        self.person.sex = None
+        self.person.level = 1
         return self.person
 
     # @staticmethod
