@@ -1,3 +1,4 @@
+from d2log import logger
 from game.share import player
 from world import World
 
@@ -18,38 +19,33 @@ class Alarm():
     active = False
 
     def block(self):
-        import logging
-        logging.debug("[[ ALARM blocked ]]")
+        logger.debug("[[ ALARM blocked ]]")
 
         self.sig = None
 
     def unblock(self):
-        import logging
-        logging.debug("[[ ALARM unblocked ]]")
+        logger.debug("[[ ALARM unblocked ]]")
 
         self.sig = self.occur
         if self.active:
             self.timer = 2
 
     def set_on(self):
-        import logging
-        logging.debug("[[ ALARM is on ]]")
+        logger.debug("[[ ALARM is on ]]")
 
         self.active = True
         self.sig = alarm.occur
         self.timer = 2
 
     def set_off(self):
-        import logging
-        logging.debug("[[ ALARM is off ]]")
+        logger.debug("[[ ALARM is off ]]")
 
         self.active = False
         self.sig = None
         self.timer = 2147487643
 
     def occur(self):
-        import logging
-        logging.debug("SIGNAL_OCCUR")
+        logger.debug("SIGNAL_OCCUR")
 
         global interrupt
 
@@ -87,8 +83,7 @@ def init():
 
 
 def oops():
-    import logging
-    logging.debug("SIGNAL_OOPS")
+    logger.debug("SIGNAL_OOPS")
 
     global alarm
     alarm.set_off()
@@ -100,8 +95,7 @@ def oops():
 
 
 def ctrlc():
-    import logging
-    logging.debug("SIGNAL_CTRLC")
+    logger.debug("SIGNAL_CTRLC")
 
     global alarm
     # extern in_fight;

@@ -10,6 +10,7 @@
         This file holds the basic communications routines
 
 '''
+from d2log import logger
 from player.models import MAX_PLAYERS
 from bprintf import makebfr
 from world import World
@@ -59,23 +60,26 @@ from game.share import player  # , load
 
 
 def talker(user):
-    import logging
-    logging.debug("--->\ttalker({})".format(user))
-    logging.debug('<!' + '-'*80)
+    logger.debug("--->\ttalker({})".format(user))
+    logger.debug('<!' + '-'*80)
 
     # player = Player()
     # load(user)
 
     buff = makebfr()
+    logger.debug("Player init %s", player)
+    logger.debug("Buffer init %s", buff)
 
     player.cms = -1
     player.puton(user)
 
-    logging.debug(player)
-    logging.debug("{} >= {}".format(player.mynum, MAX_PLAYERS))
+    logger.debug("Player puton %s", player)
+    logger.debug("Buffer puton %s", buff)
 
     w = World()
     assert w.filrf is not None, "Sorry AberMUD is currently unavailable"
+
+    logger.debug("{} >= {}".format(player.mynum, MAX_PLAYERS))
     # assert player.mynum < MAX_PLAYERS, "Sorry AberMUD is full at the moment"
 
     player.name = user.username
@@ -83,56 +87,62 @@ def talker(user):
     w.closeworld()
     player.save()
 
+    logger.debug("Player saved %s", player)
+    logger.debug("Buffer saved %s", buff)
+
     player.cms = -1
     # player.special(".g")
     player.player_load()
     i_setup = 1
 
-    logging.debug("Main loop")
-    logging.debug('<!' + '-'*40)
+    logger.debug("Player loaded %s", player)
+    logger.debug("Buffer loaded %s", buff)
+    logger.debug("Main loop")
+    logger.debug('<!' + '-'*40)
     # while True:
     for t in range(5):
-        logging.debug('<!' + '-'*20)
+        logger.debug('<!' + '-'*20)
         buff.pbfr()
+
         player.sendmsg()
         if player.rd_qd:
             player.rte()
         player.rd_qd = False
+
         w.closeworld()
         player.save()
         buff.pbfr()
 
         print_sigs()
-        logging.debug('-'*20 + '>')
-    logging.debug('-'*40 + '>')
-    logging.debug('-'*80 + '>')
+        logger.debug('-'*20 + '>')
+    logger.debug('-'*40 + '>')
+    logger.debug('-'*80 + '>')
 
 
 def print_sigs():
-    import logging
     import game.sigs
-    logging.debug('='*4)
-    logging.debug("Signals")
-    logging.debug("SIGALRM:\t%s", game.sigs.alarm.sig)
-    logging.debug("SIGHUP:\t%s", game.sigs.SIGHUP)
-    logging.debug("SIGINT:\t%s", game.sigs.SIGINT)
-    logging.debug("SIGTERM:\t%s", game.sigs.SIGTERM)
-    logging.debug("SIGTSTP:\t%s", game.sigs.SIGTSTP)
-    logging.debug("SIGQUIT:\t%s", game.sigs.SIGQUIT)
-    logging.debug("SIGCONT:\t%s", game.sigs.SIGCONT)
-    logging.debug('-'*4)
-    logging.debug("Active:\t%s", game.sigs.alarm.active)
-    logging.debug("Alarm:\t%d", game.sigs.alarm.timer)
-    logging.debug("Function:\t%s", game.sigs.alarm.sig)
-    logging.debug("Interrupt:\t%d", game.sigs.interrupt)
+    logger.debug('='*4)
+    logger.debug("Signals")
+    logger.debug("SIGALRM:\t%s", game.sigs.alarm.sig)
+    logger.debug("SIGHUP:\t%s", game.sigs.SIGHUP)
+    logger.debug("SIGINT:\t%s", game.sigs.SIGINT)
+    logger.debug("SIGTERM:\t%s", game.sigs.SIGTERM)
+    logger.debug("SIGTSTP:\t%s", game.sigs.SIGTSTP)
+    logger.debug("SIGQUIT:\t%s", game.sigs.SIGQUIT)
+    logger.debug("SIGCONT:\t%s", game.sigs.SIGCONT)
+    logger.debug('-'*4)
+    logger.debug("Active:\t%s", game.sigs.alarm.active)
+    logger.debug("Alarm:\t%d", game.sigs.alarm.timer)
+    logger.debug("Function:\t%s", game.sigs.alarm.sig)
+    logger.debug("Interrupt:\t%d", game.sigs.interrupt)
     a = game.sigs.alarm.sig
     if a is not None:
         a()
-    logging.debug('='*4)
+    logger.debug('='*4)
 
     from game.utils import PROGNAME
-    logging.debug("Progname:\t%s", PROGNAME)
-    logging.debug('='*4)
+    logger.debug("Progname:\t%s", PROGNAME)
+    logger.debug('='*4)
 
 # cleanup(inpbk)
 

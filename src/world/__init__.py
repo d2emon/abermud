@@ -1,9 +1,11 @@
+from d2log import logger
+
+
 class World:
     filrf = None
 
     def __init__(self):
-        import logging
-        logging.debug("--->\topenworld()")
+        logger.debug("--->\topenworld()")
 
         # extern long objinfo[],numobs,ublock[];
         if self.filrf is None:
@@ -16,8 +18,7 @@ class World:
             # sec_read(filrf,ublock,350,16*48)
 
     def closeworld(self):
-        import logging
-        logging.debug("--->\tcloseworld()")
+        logger.debug("--->\tcloseworld()")
 
         if self.filrf is not None:
             # sec_write(filrf,objinfo,400,4*numobs)
