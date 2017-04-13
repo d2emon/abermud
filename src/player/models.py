@@ -254,7 +254,7 @@ class Player(Base):
         # long w2[35];
         # extern char key_buff[];
         # extern long convflg;
-        convflg = ''
+        convflg = 0
         # extern long my_lev;
         # extern long my_str;
         # extern long in_fight;
@@ -299,11 +299,11 @@ class Player(Base):
             print("="*80)
             from game.utils import PROGNAME
             print("PROGNAME:\t", PROGNAME)
-            print("PROMPT:\t\t", prmpt)
+            key_buff = input(prmpt)
             print("="*80)
             alarm.set_off()
 
-            work = ''  # key_buff
+            work = key_buff
             # if tty==4:
             #     topscr()
             buff.sysbuf += "<l>{}\n</l>".format(work)
@@ -320,12 +320,12 @@ class Player(Base):
             if work != "*" and work[0] == '*':
                 work[0] = 32
                 break
+
             if convflg:
-                w2 = work
-            if convflg == 1:
-                work = "say {}".format(w2)
-            else:
-                work = "tss {}".format(w2)
+                if convflg == 1:
+                    work = "say {}".format(work)
+                else:
+                    work = "tss {}".format(work)
             break
         # nadj:
         # if curmode==1:

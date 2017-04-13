@@ -12,8 +12,8 @@ def enter_game(user, session=None):
     print("You stand in a long dark hallway, which echoes to the tread of your")
     print("booted feet. You stride on down the hall, choose your masque and enter the")
     print("worlds beyond the known......\n")
-    main("   --{----- ABERMUD -----}--    Playing as ", user)
-    crapup("mud.exe: Not Found")
+    if main("   --{----- ABERMUD -----}--    Playing as ", user) == -1:
+        crapup("mud.exe: Not Found")
 
 
 def change_my_password(user, session=None):
