@@ -7,6 +7,7 @@ from message.models import Message
 from game.parse import eorte
 # from bprintf import buff
 # from game.sigs import alon, aloff
+from game.utils import set_name, PROGNAME
 
 
 Base = declarative_base()
@@ -239,10 +240,10 @@ class Player(Base):
         import logging
         logging.debug("---> sendmsg({})".format(self))
 
-        import bprintf
-        buff = bprintf.D2Buffer()
+        from bprintf import buff
+        # import bprintf
+        # buff = bprintf.D2Buffer()
 
-        pass
         # extern long debug_mode;
         # extern char *sysbuf;
         # extern long curch,moni,mynum;
@@ -264,7 +265,7 @@ class Player(Base):
             buff.pbfr()
             # if tty == 4:
             #    btmscr()
-            prmpt = "\n"
+            prmpt = ""
             if self.visible:
                 prmpt += "("
             # if debug_mode:
@@ -283,28 +284,34 @@ class Player(Base):
             if self.visible:
                 prmpt += ")"
             buff.pbfr()
-            # if self.visible > 9999:
-            #     set_progname(0,"-csh")
-            # else:
-            #     work = "   --}----- ABERMUD -----{--     Playing as {}".format(name)
-            # if self.visible == 0:
-            #     set_progname(0,work)
 
-            # alon()
+            if self.visible > 9999:
+                set_name(PROGNAME + "-csh")
+            else:
+                work = "   --}----- ABERMUD -----{--     Playing as " + self.name.capitalize()
+
+            if self.visible == 0:
+                set_name(work)
+
+            from game.sigs import alarm
+            alarm.set_on()
             # key_input(prmpt,80)
-            print("PROMPT", prmpt)
-            # aloff()
+            print("="*80)
+            from game.utils import PROGNAME
+            print("PROGNAME:\t", PROGNAME)
+            print("PROMPT:\t\t", prmpt)
+            print("="*80)
+            alarm.set_off()
 
             work = ''  # key_buff
             # if tty==4:
             #     topscr()
-            buff.sysbuf += "\001l"
-            buff.sysbuf += work
-            buff.sysbuf += "\n\001"
+            buff.sysbuf += "<l>{}\n</l>".format(work)
 
             w = World()
             self.rte()
             w.closeworld()
+            self.save()
             if convflg and work != "**":
                 convflg = 0
                 continue
@@ -335,6 +342,5 @@ class Player(Base):
         #        fighting= -1;
         #    if in_fight:
         #        in_fight-=1
-        print("SYSBUF", buff.sysbuf)
 
         return not work == ".Q" or not work == ".q"

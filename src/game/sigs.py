@@ -1,12 +1,9 @@
 from game.share import player
 from world import World
 
-active = False
-alarm = 2
 interrupt = False
 
 
-SIGALRM = None
 SIGHUP = None
 SIGINT = None
 SIGTERM = None
@@ -15,40 +12,62 @@ SIGQUIT = None
 SIGCONT = None
 
 
-def unblock_alarm():
-    global active
-    global alarm
-    global SIGALRM
-
-    SIGALRM = occur
-    if active:
-        alarm = 2
-
-
-def block_alarm():
-    global SIGALRM
-
-    SIGALRM = None
-
-
-def alon():
-    global active
-    global alarm
-    global SIGALRM
-
-    active = True
-    SIGALRM = occur
-    alarm = 2
-
-
-def aloff():
-    global active
-    global alarm
-    global SIGALRM
-
+class Alarm():
+    timer = 2
+    sig = None
     active = False
-    SIGALRM = None
-    alarm = 2147487643
+
+    def block(self):
+        import logging
+        logging.debug("[[ ALARM blocked ]]")
+
+        self.sig = None
+
+    def unblock(self):
+        import logging
+        logging.debug("[[ ALARM unblocked ]]")
+
+        self.sig = self.occur
+        if self.active:
+            self.timer = 2
+
+    def set_on(self):
+        import logging
+        logging.debug("[[ ALARM is on ]]")
+
+        self.active = True
+        self.sig = alarm.occur
+        self.timer = 2
+
+    def set_off(self):
+        import logging
+        logging.debug("[[ ALARM is off ]]")
+
+        self.active = False
+        self.sig = None
+        self.timer = 2147487643
+
+    def occur(self):
+        import logging
+        logging.debug("SIGNAL_OCCUR")
+
+        global interrupt
+
+        if not self.active:
+            return
+        self.set_off()
+        w = World()
+        interrupt = True
+        player.rte()
+        interrupt = False
+        # on_timing();
+        w.closeworld()
+        player.save()
+        # key_reprint();
+        self.set_on()
+
+
+alarm = Alarm()
 
 
 def init():
@@ -70,7 +89,9 @@ def init():
 def oops():
     import logging
     logging.debug("SIGNAL_OOPS")
-    aloff()
+
+    global alarm
+    alarm.set_off()
     # loseme();
     # keysetback();
 
@@ -81,32 +102,14 @@ def oops():
 def ctrlc():
     import logging
     logging.debug("SIGNAL_CTRLC")
+
+    global alarm
     # extern in_fight;
     print("^C")
     # if in_fight:
     #    # return;
-    aloff()
+    alarm.set_off()
     # loseme();
 
     from game.utils import crapup
     crapup("Byeeeeeeeeee  ...........")
-
-
-def occur():
-    import logging
-    logging.debug("SIGNAL_OCCUR")
-
-    global active, interrupt
-
-    if not active:
-        return
-    aloff()
-    w = World()
-    interrupt = True
-    player.rte()
-    interrupt = False
-    # on_timing();
-    w.closeworld()
-    player.save()
-    # key_reprint();
-    alon()

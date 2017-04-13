@@ -15,6 +15,10 @@ def main(title='<untitled>', user=None):
     print("="*80)
     print(CONFIG['EXE'])
     print("{}{}".format(title, user.username))
+
+    from game.utils import PROGNAME
+    PROGNAME = title
+    logging.debug(PROGNAME)
     print("="*80)
 
     init()

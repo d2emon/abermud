@@ -1,6 +1,9 @@
 from bprintf import buff
 
 
+PROGNAME = ""
+
+
 def crapup(s):
     dashes = ("-="*76) + '-'
     buff.pbfr()
@@ -16,3 +19,8 @@ def crapup(s):
 
     import sys
     sys.exit(0)
+
+
+def set_name(newname):
+    global PROGNAME
+    PROGNAME = newname

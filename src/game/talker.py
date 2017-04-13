@@ -113,7 +113,7 @@ def print_sigs():
     import game.sigs
     logging.debug('='*4)
     logging.debug("Signals")
-    logging.debug("SIGALRM:\t%s", game.sigs.SIGALRM)
+    logging.debug("SIGALRM:\t%s", game.sigs.alarm.sig)
     logging.debug("SIGHUP:\t%s", game.sigs.SIGHUP)
     logging.debug("SIGINT:\t%s", game.sigs.SIGINT)
     logging.debug("SIGTERM:\t%s", game.sigs.SIGTERM)
@@ -121,12 +121,18 @@ def print_sigs():
     logging.debug("SIGQUIT:\t%s", game.sigs.SIGQUIT)
     logging.debug("SIGCONT:\t%s", game.sigs.SIGCONT)
     logging.debug('-'*4)
-    logging.debug("Active:\t%s", game.sigs.active)
-    logging.debug("Alarm:\t%d", game.sigs.alarm)
-    logging.debug("Function:\t%s", game.sigs.SIGALRM)
-    game.sigs.SIGALRM()
+    logging.debug("Active:\t%s", game.sigs.alarm.active)
+    logging.debug("Alarm:\t%d", game.sigs.alarm.timer)
+    logging.debug("Function:\t%s", game.sigs.alarm.sig)
+    logging.debug("Interrupt:\t%d", game.sigs.interrupt)
+    a = game.sigs.alarm.sig
+    if a is not None:
+        a()
     logging.debug('='*4)
-    pass
+
+    from game.utils import PROGNAME
+    logging.debug("Progname:\t%s", PROGNAME)
+    logging.debug('='*4)
 
 # cleanup(inpbk)
 

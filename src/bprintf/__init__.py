@@ -36,10 +36,14 @@ class D2Buffer:
         # 0 = not logging
 
     def pbfr(self):
-        from game.sigs import block_alarm, unblock_alarm
+        from game.sigs import alarm
+        from world import World
+        from game.share import player
 
-        block_alarm()
-        # closeworld()
+        alarm.block()
+        w = World()
+        w.closeworld()
+        player.save()
         if self.sysbuf:
             self.pr_due = True
         # if self.sysbuf and self.pr_qcr:
@@ -47,21 +51,25 @@ class D2Buffer:
         self.pr_qcr = 0
         if self.log_fl is not None:
             self.iskb = False
-            # dcprnt(self.sysbuf, self.log_fl)
+            self.dcprnt(self.log_fl)
         # if self.snoopd != -1:
         #    # fln = opensnoop(pname(snoopd),"a")
         #    # if fln > 0:
         #        # self.iskb = False
         #        # dcprnt(self.sysbuf, fln)
+        #        # self.dcprnt(self.log_fl)
         #        # fcloselock(fln)
         self.iskb = True
-        # dcprnt(self.sysbuf, stdout)
+        self.dcprnt("stdout")
         self.sysbuf = ''
         # clear buffer
         # if self.snoopt != -1:
         #     # viewsnoop()
-        unblock_alarm()
+        alarm.unblock()
 
+    def dcprnt(self, output):
+        import logging
+        logging.debug("-->%s\t<--\n%s", output, self.sysbuf)
 
 # void logcom()
 
