@@ -5,7 +5,7 @@ class World:
     filrf = None
 
     def __init__(self):
-        logger.debug("--->\topenworld()")
+        logger.debug("openworld()")
 
         # extern long objinfo[],numobs,ublock[];
         if self.filrf is None:
@@ -18,7 +18,7 @@ class World:
             # sec_read(filrf,ublock,350,16*48)
 
     def closeworld(self):
-        logger.debug("--->\tcloseworld()")
+        logger.debug("closeworld()")
 
         if self.filrf is not None:
             # sec_write(filrf,objinfo,400,4*numobs)

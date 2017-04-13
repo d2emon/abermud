@@ -6,6 +6,7 @@ from game.talker import talker
 
 def main(title='<untitled>', user=None):
     load_logger(logger)
+    logger.debug('='*80)
 
     run_data = {
         'filename': CONFIG['EXE'],
