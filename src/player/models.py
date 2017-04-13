@@ -233,24 +233,35 @@ class Player(Base):
             print("\nUnknown . option")
         return 1
 
+    def prompt(self):
+        from bprintf import buff
+        prmpt = buff.get_prompt()
+        # if debug_mode:
+        #     prmpt = "#" + prmpt
+        # if my_lev > 9:
+        #     prmpt = "----" + prmpt
+        if self.visible:
+            prmpt = "({})".format(prmpt)
+
+        prog = ''
+        if self.visible > 9999:
+            set_name(PROGNAME + "-csh")
+        else:
+            prog = "   --}----- ABERMUD -----{--     Playing as " + self.name.capitalize()
+
+        if self.visible == 0:
+            set_name(prog)
+        return prmpt
+
     def sendmsg(self):
         logger.debug("---> sendmsg({})".format(self))
 
         from bprintf import buff
-        # import bprintf
         # buff = bprintf.D2Buffer()
 
         # extern long debug_mode;
-        # extern char *sysbuf;
         # extern long curch,moni,mynum;
-        # char prmpt[32];
-        # long a;
         # extern long tty;
-        # char work[200];
-        # long w2[35];
-        # extern char key_buff[];
-        # extern long convflg;
-        convflg = 0
         # extern long my_lev;
         # extern long my_str;
         # extern long in_fight;
@@ -261,45 +272,16 @@ class Player(Base):
             buff.pbfr()
             # if tty == 4:
             #    btmscr()
-            prmpt = ""
-            if self.visible:
-                prmpt += "("
-            # if debug_mode:
-            #     prmpt += "#"
-            # if my_lev > 9:
-            #     prmpt += "----"
-
-            if convflg == 0:
-                prmpt += ">"
-            elif convflg == 1:
-                prmpt += "\""
-            elif convflg == 2:
-                prmpt += "*"
-            else:
-                prmpt += "?"
-            if self.visible:
-                prmpt += ")"
+            prmpt = self.prompt()
             buff.pbfr()
 
-            if self.visible > 9999:
-                set_name(PROGNAME + "-csh")
-            else:
-                work = "   --}----- ABERMUD -----{--     Playing as " + self.name.capitalize()
-
-            if self.visible == 0:
-                set_name(work)
-
             from game.sigs import alarm
+            print("="*80)
             alarm.set_on()
-            # key_input(prmpt,80)
-            print("="*80)
-            from game.utils import PROGNAME
-            print("PROGNAME:\t", PROGNAME)
-            key_buff = input(prmpt)
-            print("="*80)
+            work = buff.key_input(prmpt)
             alarm.set_off()
+            print("="*80)
 
-            work = key_buff
             # if tty==4:
             #     topscr()
             buff.sysbuf += "<l>{}\n</l>".format(work)
@@ -308,20 +290,17 @@ class Player(Base):
             self.rte()
             w.closeworld()
             self.save()
-            if convflg and work != "**":
-                convflg = 0
+
+            if buff.convflg and work == "**":
+                buff.convflg = 0
                 continue
             if not work:
                 break
             if work != "*" and work[0] == '*':
-                work[0] = 32
+                work = work[1:]
                 break
 
-            if convflg:
-                if convflg == 1:
-                    work = "say {}".format(work)
-                else:
-                    work = "tss {}".format(work)
+            work = buff.apply_conv(work)
             break
         # nadj:
         # if curmode==1:
@@ -339,4 +318,4 @@ class Player(Base):
         #    if in_fight:
         #        in_fight-=1
 
-        return not work == ".Q" or not work == ".q"
+        return work.lower() == ".q"
