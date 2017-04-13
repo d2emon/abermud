@@ -1,5 +1,6 @@
 from d2log import logger
 # from game.utils import crapup
+from world import World
 
 
 buff = None
@@ -68,6 +69,65 @@ class D2Buffer:
         print("PROGNAME:\t", PROGNAME)
         return input(prmpt)
 
+    def sendmsg(self, player):
+        logger.debug("---> sendmsg({})".format(self))
+
+        # extern long debug_mode;
+        # extern long curch,moni,mynum;
+        # extern long tty;
+        # extern long my_lev;
+        # extern long my_str;
+        # extern long in_fight;
+        # extern long fighting;
+        # extern long curmode;
+        # l:
+        while True:
+            self.pbfr()
+            # if tty == 4:
+            #    btmscr()
+            prmpt = player.prompt()
+            self.pbfr()
+
+            from game.sigs import alarm
+            print("="*80)
+            alarm.set_on()
+            work = self.key_input(prmpt)
+            alarm.set_off()
+            print("="*80)
+
+            # if tty==4:
+            #     topscr()
+            self.sysbuf += "<l>{}\n</l>".format(work)
+
+            w = World()
+            player.rte()
+            player.save(w)
+
+            if buff.convflg and work == "**":
+                buff.convflg = 0
+                continue
+
+            work = buff.apply_conv(work)
+            break
+        # nadj:
+        # if curmode==1:
+        #     gamecom(work)
+        # else:
+        #    if work != ".Q" and work != ".q" and work:
+        #         a = special(work, name)
+        # if fighting is not None:
+        #    if fighting.username:
+        #        in_fight = 0
+        #        fighting = -1
+        #    if fighting != self.curch:
+        #        in_fight=0;
+        #        fighting= -1;
+        #    if in_fight:
+        #        in_fight-=1
+
+        return work.lower() == ".q"
+        pass
+
     def bprintf(self, text):
         '''
         Max 240 chars/msg
@@ -92,8 +152,7 @@ class D2Buffer:
 
         alarm.block()
         w = World()
-        w.closeworld()
-        player.save()
+        player.save(w)
 
         if self.sysbuf:
             self.pr_due = True

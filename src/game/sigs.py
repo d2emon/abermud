@@ -57,8 +57,7 @@ class Alarm():
         player.rte()
         interrupt = False
         # on_timing();
-        w.closeworld()
-        player.save()
+        player.save(w)
         # key_reprint();
         self.set_on()
 

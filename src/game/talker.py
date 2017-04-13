@@ -84,8 +84,7 @@ def talker(user):
 
     player.name = user.username
     player.rte()
-    w.closeworld()
-    player.save()
+    player.save(w)
 
     logger.debug("Player saved %s", player)
     logger.debug("Buffer saved %s", buff)
@@ -104,7 +103,7 @@ def talker(user):
         logger.debug('<!' + '-'*20)
         buff.pbfr()
 
-        player.sendmsg()
+        buff.sendmsg(player)
         logger.debug("Player sendmsg %s", player)
         logger.debug("Buffer sendmsg %s", buff)
 
@@ -114,8 +113,7 @@ def talker(user):
         logger.debug("Player rte %s", player)
         logger.debug("Buffer rte %s", buff)
 
-        w.closeworld()
-        player.save()
+        player.save(w)
         buff.pbfr()
         logger.debug("Player saved %s", player)
         logger.debug("Buffer saved %s", buff)
