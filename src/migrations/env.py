@@ -28,10 +28,12 @@ def combine_metadata(*args):
 
 import user.models
 import player.models
+import person.models
 import message.models
 target_metadata = combine_metadata(
     user.models.Base.metadata,
     player.models.Base.metadata,
+    person.models.Base.metadata,
     message.models.Base.metadata,
 )
 

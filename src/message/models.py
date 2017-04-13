@@ -70,4 +70,4 @@ class Message(Base):
 
     @staticmethod
     def send(user_from, user_to, code, channel, text):
-        logger.debug(["sendsys", [user_from, user_to, code, channel, text]])
+        logger.debug(["sendsys", [user_from.name, user_to.name, code, channel, text]])

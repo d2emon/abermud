@@ -5,7 +5,7 @@ from mud.utils import validname
 import socket
 from db import session
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -19,6 +19,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(16), nullable=False)
     password = Column(String(16), nullable=False)
+    player = relationship("Person", uselist=False, back_populates="user")
 
     def __init__(self, username=None, password=None):
         Base.__init__(self)

@@ -6,6 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from d2log import logger
 from world import World
 from message.models import Message
+from person.models import Person
 from game.parse import eorte
 # from bprintf import buff
 # from game.sigs import alon, aloff
@@ -38,6 +39,7 @@ class Player(Base):
         self.iamon = False
         self.curch = 0
         self.lasup = 0
+        self.my = None
 
     def __repr__(self):
         return "<Player: '{}' {}>".format(self.name, {
@@ -216,40 +218,31 @@ class Player(Base):
 
     def initme(self):
         from bprintf import buff
-        # PERSONA x;
-        # chaar s[32];
-        # extern char globme[];
-        errno = 0
-        # if findpers(self, x) !=-1:
-        #     s, my_str, my_sco, my_lev, my_sex = decpers(x)
-        #     return
-        if errno != 0:
-            crapup("Panic: Timeout event on user file")
-        # x.p_score = 0
-        buff.bprintf("Creating character....")
-        my_sco = 0
-        my_str = 40
-        my_lev = 1
-        # moan1:
-        buff.bprintf("\nSex (M/F) : ")
-        buff.pbfr()
-        # keysetback()
-        s = input()[:2]
-        # keysetup()
-        s = s.lower()
-        if s[0] == 'm':
-            my_sex = 0
-        elif s[0] == 'f':
-            my_sex = 1
-        else:
-            buff.bprintf("M or F")
-            # goto moan1
-        # x.p_name = self.name
-	# x.p_strength = my_str
-        # x.p_level = my_lev
-        # x.p_sex = my_sex
-        # x.p_score = my_sco
-        # putpers(self, x)
+        self.my = Person.find(self)
+        if self.my is not None:
+            return self.my
+
+        buff.bprintf("Creating character....\n")
+        p = Person()
+        p.name = self.name
+        p.score = 0
+        p.strength = 40
+        p.sex = None
+        p.level = 1
+
+        while p.sex is None:
+            buff.pbfr()
+            # keysetback()
+            s = input("\nSex (M/F) : ").lower()[0]
+            # keysetup()
+            if s == 'm':
+                p.sex = 0
+            elif s[0] == 'f':
+                p.sex = 1
+            else:
+                buff.bprintf("M or F")
+        self.my = p
+        self.my.save()
 
     # ???
     def special(self, cmd):

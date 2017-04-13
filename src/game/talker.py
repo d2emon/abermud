@@ -61,7 +61,6 @@ from game.share import player  # , load
 
 def talker(user):
     logger.debug("--->\ttalker({})".format(user))
-    logger.debug('<!' + '-'*80)
 
     # player = Player()
     # load(user)
@@ -121,7 +120,6 @@ def talker(user):
         print_sigs()
         logger.debug('-'*20 + '>')
     logger.debug('-'*40 + '>')
-    logger.debug('-'*80 + '>')
 
 
 def print_sigs():
