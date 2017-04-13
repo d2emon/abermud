@@ -1,12 +1,7 @@
-from db import session
+from db.base import Base
 from sqlalchemy import func, Column, Integer, String
-# from sqlalchemy.orm import validates
-from sqlalchemy.ext.declarative import declarative_base
 
 from d2log import logger
-
-
-Base = declarative_base()
 
 
 class Message(Base):
@@ -16,28 +11,32 @@ class Message(Base):
 
     @staticmethod
     def query():
-        return session().query(Message)
+        from db import sess
+        return sess.query(Message)
 
     def save(self):
-        session().add(self)
-        session().commit()
+        from db import sess
+        sess.add(self)
+        sess.commit()
 
     @staticmethod
     def findstart():
+        from db import sess
         logger.debug("--->\tfindstart()")
         # sec_read(unit,bk,0,1);
         # return(bk[0]);
-        message_id = session().query(func.min(Message.id)).scalar()
+        message_id = sess.query(func.min(Message.id)).scalar()
         if message_id is None:
             message_id = -1
         return message_id
 
     @staticmethod
     def findend():
+        from db import sess
         logger.debug("--->\tfindend()")
         # sec_read(unit,bk,0,2);
         # return(bk[1]);
-        message_id = session().query(func.max(Message.id)).scalar()
+        message_id = sess.query(func.max(Message.id)).scalar()
         if message_id is None:
             message_id = -1
         return message_id

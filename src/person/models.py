@@ -1,19 +1,21 @@
-from db import session
+# from db import session
+from db.base import Base
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship  # validates
 from sqlalchemy.ext.declarative import declarative_base
+# from models import User
 
 # from d2log import logger
 
 
-Base = declarative_base()
+# Base = declarative_base()
 
 
 class Person(Base):
     __tablename__ = "person"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship("User", back_populates="user")
+    user = relationship("User", back_populates="person")
     name = Column(String(16), nullable=False)
     score = Column(Integer)
     strength = Column(Integer)
@@ -22,11 +24,13 @@ class Person(Base):
 
     @staticmethod
     def query():
-        return session().query(Person)
+        from db import sess
+        return sess.query(Person)
 
     def save(self):
-        session().add(self)
-        session().commit()
+        from db import sess
+        sess.add(self)
+        sess.commit()
 
     @staticmethod
     def find(player):

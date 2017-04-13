@@ -3,13 +3,15 @@ from mud.utils import validname
 # from config import CONFIG
 # import yaml
 import socket
-from db import session
+# from db import session
+from db.base import Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import validates, relationship
 from sqlalchemy.ext.declarative import declarative_base
+# from models import Person
 
 
-Base = declarative_base()
+# Base = declarative_base()
 # session = None
 # engine = None
 
@@ -19,7 +21,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(16), nullable=False)
     password = Column(String(16), nullable=False)
-    player = relationship("Person", uselist=False, back_populates="user")
+    person = relationship("Person", uselist=False, back_populates="user")
 
     def __init__(self, username=None, password=None):
         Base.__init__(self)
@@ -60,15 +62,17 @@ class User(Base):
 
     @staticmethod
     def query():
-        return session().query(User)
+        from db import sess
+        return sess.query(User)
 
     @staticmethod
     def host():
         return socket.gethostname()
 
     def save(self):
-        session().add(self)
-        session().commit()
+        from db import sess
+        sess.add(self)
+        sess.commit()
 
     @property
     def showname(self):
@@ -120,6 +124,11 @@ class User(Base):
     def chkname(username):
         import re
         return re.match("^\w*$", username)
+
+    def new_person(self):
+        from person.models import Person
+        self.person = Person()
+        return self.person
 
     # @staticmethod
     # def load():

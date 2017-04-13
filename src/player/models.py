@@ -1,19 +1,23 @@
-from db import session
+# from db import session
+from db.base import Base
 from sqlalchemy import Column, Integer, String
 # from sqlalchemy.orm import validates
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
 
 from d2log import logger
 from world import World
-from message.models import Message
-from person.models import Person
+# from message.models import Message
+# from person.models import Person
 from game.parse import eorte
 # from bprintf import buff
 # from game.sigs import alon, aloff
 from game.utils import set_name, PROGNAME
 
 
-Base = declarative_base()
+# from db import Message
+
+
+# Base = declarative_base()
 
 
 MAX_PLAYERS = 16
@@ -39,7 +43,7 @@ class Player(Base):
         self.iamon = False
         self.curch = 0
         self.lasup = 0
-        self.my = None
+        self.user = None
 
     def __repr__(self):
         return "<Player: '{}' {}>".format(self.name, {
@@ -54,13 +58,15 @@ class Player(Base):
 
     @staticmethod
     def query():
-        return session().query(Player)
+        from db import sess
+        return sess.query(Player)
 
     def save(self, w):
+        from db import sess
         w.closeworld()
 
-        session().add(self)
-        session().commit()
+        sess.add(self)
+        sess.commit()
 
     def update(self):
         logger.debug("---> update()")
@@ -90,6 +96,7 @@ class Player(Base):
         ])
         logger.debug("\t}}")
 
+        self.user = user
         self.iamon = False
         w = World()
 
@@ -133,6 +140,7 @@ class Player(Base):
         return None
 
     def rte(self):
+        from db import findend
         logger.debug("---> rte({})".format(self))
         logger.debug('<!' + '-'*70)
         logger.debug("\t{{")
@@ -150,10 +158,10 @@ class Player(Base):
         assert w.filrf is not None, "AberMUD: FILE_ACCESS : Access failed"
 
         if self.cms == -1:
-            self.cms = Message.findend()
+            self.cms = findend()
 
         ct = self.cms
-        too = Message.findend()
+        too = findend()
         logger.debug("%d : %d", self.cms, too)
 
         for ct in range(self.cms, too):
@@ -186,6 +194,7 @@ class Player(Base):
 
     def player_load(self):
         logger.debug("---> special(\".g\", {})".format(self))
+        from message.models import Message
         curmode = 1
         self.curch = -5
         self.initme()
@@ -218,12 +227,12 @@ class Player(Base):
 
     def initme(self):
         from bprintf import buff
-        self.my = Person.find(self)
-        if self.my is not None:
-            return self.my
+        if self.user.person is not None:
+            return self.user.person
 
         buff.bprintf("Creating character....\n")
-        p = Person()
+        p = self.user.new_person()
+        # Person()
         p.name = self.name
         p.score = 0
         p.strength = 40
@@ -241,8 +250,9 @@ class Player(Base):
                 p.sex = 1
             else:
                 buff.bprintf("M or F")
-        self.my = p
-        self.my.save()
+        # self.user.person = p
+        self.user.person.save()
+        self.user.save()
 
     # ???
     def special(self, cmd):
