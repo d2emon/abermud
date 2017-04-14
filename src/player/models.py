@@ -51,6 +51,7 @@ class Player(Base):
         self.curch = 0
         self.lasup = 0
         self.user = None
+        self.debug_mode = True
 
     def __repr__(self):
         return "<Player: '{}' {}>".format(self.name, {
@@ -99,17 +100,6 @@ class Player(Base):
     def puton(self, user):
         logger.debug("---> puton({})".format(user))
         logger.debug('<!' + '-'*70)
-        logger.debug(self)
-        logger.debug("\t{{")
-        logger.debug([
-            self.cms,
-            self.curch,
-            self.rd_qd,
-            self.mynum,
-            self.iamon,
-            self.lasup,
-        ])
-        logger.debug("\t}}")
 
         self.user = user
         self.iamon = False
@@ -136,18 +126,6 @@ class Player(Base):
         self.mynum = ct
 
         self.iamon = True
-
-        logger.debug(self)
-        logger.debug("\t{{")
-        logger.debug([
-            self.cms,
-            self.curch,
-            self.rd_qd,
-            self.mynum,
-            self.iamon,
-            self.lasup,
-        ])
-        logger.debug("\t}}")
         logger.debug('-'*70 + '>')
 
     @staticmethod
@@ -159,16 +137,6 @@ class Player(Base):
         from message.models import Message
         logger.debug("---> rte({})".format(self))
         logger.debug('<!' + '-'*70)
-        logger.debug("\t{{")
-        logger.debug([
-            self.cms,
-            self.curch,
-            self.rd_qd,
-            self.mynum,
-            self.iamon,
-            self.lasup,
-        ])
-        logger.debug("\t}}")
 
         w = self.loadw()
         assert w.filrf is not None, "AberMUD: FILE_ACCESS : Access failed"
@@ -195,17 +163,6 @@ class Player(Base):
         tdes = 0
         vdes = 0
 
-        logger.debug("\t{{")
-        logger.debug(self)
-        logger.debug([
-            self.cms,
-            self.curch,
-            self.rd_qd,
-            self.mynum,
-            self.iamon,
-            self.lasup,
-        ])
-        logger.debug("\t}}")
         logger.debug('-'*70 + '>')
 
     def player_load(self):
@@ -225,11 +182,9 @@ class Player(Base):
         self.weapon = -1
         self.sex = self.person.sex
         self.helping = -1
-        # us = cuserid()
 
         xy = "<s player=\"{}\">{}  has entered the game\n</s>".format(self.id, self.name)
         xx = "<s player=\"{}\">[ {}  has entered the game ]\n</s>".format(self.id, self.name)
-        # sendsys(self.name, self.name, -10113, self.curch, xx)
         Message.send(self, self, -10113, self.curch, xx)
 
         self.rte()
@@ -244,7 +199,7 @@ class Player(Base):
     def initme(self):
         from bprintf import buff
         if self.person is not None:
-            return self.user.person
+            return self.person
 
         buff.bprintf("Creating character....\n")
         p = self.user.new_person(self.name)
@@ -262,31 +217,20 @@ class Player(Base):
     # ???
     def special(self, cmd):
         logger.debug("---> special({}, {})".format(cmd, self))
-        pass
-        # extern long curmode;
-        # char ch,bk[128];
-        # extern long curch,moni;
-        # extern long mynum;
-        # extern long my_str,my_lev,my_sco,my_sex;
         bk = cmd.lower()
-        ch = bk[0]
-        if ch != '.':
+        if bk[0] != '.':
             return 0
-        ch = bk[1]
-
-        if ch == 'g':
+        if bk[1] == 'g':
             self.player_load()
         else:
             print("\nUnknown . option")
         return 1
 
-    def prompt(self):
-        from bprintf import buff
-        prmpt = buff.get_prompt()
-        # if debug_mode:
-        #     prmpt = "#" + prmpt
-        # if my_lev > 9:
-        #     prmpt = "----" + prmpt
+    def prompt(self, prmpt):
+        if self.debug_mode:
+            prmpt = "#" + prmpt
+        if self.person.level > 9:
+            prmpt = "----" + prmpt
         if self.visible:
             prmpt = "({})".format(prmpt)
 

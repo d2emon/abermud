@@ -19,26 +19,26 @@ class Alarm():
     active = False
 
     def block(self):
-        logger.debug("[[ ALARM blocked ]]")
+        # logger.debug("[[ ALARM blocked ]]")
 
         self.sig = None
 
     def unblock(self):
-        logger.debug("[[ ALARM unblocked ]]")
+        # logger.debug("[[ ALARM unblocked ]]")
 
         self.sig = self.occur
         if self.active:
             self.timer = 2
 
     def set_on(self):
-        logger.debug("[[ ALARM is on ]]")
+        # logger.debug("[[ ALARM is on ]]")
 
         self.active = True
         self.sig = alarm.occur
         self.timer = 2
 
     def set_off(self):
-        logger.debug("[[ ALARM is off ]]")
+        # logger.debug("[[ ALARM is off ]]")
 
         self.active = False
         self.sig = None

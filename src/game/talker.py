@@ -61,13 +61,12 @@ def talker(user):
 
     buff = makebfr()
     logger.debug("Player init %s", player)
-    logger.debug("Buffer init %s", buff)
 
     player.cms = -1
     player.puton(user)
 
     logger.debug("Player puton %s", player)
-    logger.debug("Buffer puton %s", buff)
+    # logger.debug("Buffer puton %s", buff)
 
     w = World()
     assert w.filrf is not None, "Sorry AberMUD is currently unavailable"
@@ -80,7 +79,7 @@ def talker(user):
     player.save(w)
 
     logger.debug("Player saved %s", player)
-    logger.debug("Buffer saved %s", buff)
+    # logger.debug("Buffer saved %s", buff)
 
     player.cms = -1
     # player.special(".g")
@@ -88,7 +87,7 @@ def talker(user):
     i_setup = 1
 
     logger.debug("Player loaded %s", player)
-    logger.debug("Buffer loaded %s", buff)
+    # logger.debug("Buffer loaded %s", buff)
     logger.debug("Main loop")
     logger.debug('<!' + '-'*40)
     # while True:
@@ -98,18 +97,18 @@ def talker(user):
 
         buff.sendmsg(player)
         logger.debug("Player sendmsg %s", player)
-        logger.debug("Buffer sendmsg %s", buff)
+        # logger.debug("Buffer sendmsg %s", buff)
 
         if player.rd_qd:
             player.rte()
         player.rd_qd = False
         logger.debug("Player rte %s", player)
-        logger.debug("Buffer rte %s", buff)
+        # logger.debug("Buffer rte %s", buff)
 
         player.save(w)
         buff.pbfr()
         logger.debug("Player saved %s", player)
-        logger.debug("Buffer saved %s", buff)
+        # logger.debug("Buffer saved %s", buff)
 
         print_sigs()
         logger.debug('-'*20 + '>')
@@ -119,15 +118,15 @@ def talker(user):
 def print_sigs():
     import game.sigs
     logger.debug('='*4)
-    logger.debug("Signals")
-    logger.debug("SIGALRM:\t%s", game.sigs.alarm.sig)
-    logger.debug("SIGHUP:\t%s", game.sigs.SIGHUP)
-    logger.debug("SIGINT:\t%s", game.sigs.SIGINT)
-    logger.debug("SIGTERM:\t%s", game.sigs.SIGTERM)
-    logger.debug("SIGTSTP:\t%s", game.sigs.SIGTSTP)
-    logger.debug("SIGQUIT:\t%s", game.sigs.SIGQUIT)
-    logger.debug("SIGCONT:\t%s", game.sigs.SIGCONT)
-    logger.debug('-'*4)
+    # logger.debug("Signals")
+    # logger.debug("SIGALRM:\t%s", game.sigs.alarm.sig)
+    # logger.debug("SIGHUP:\t%s", game.sigs.SIGHUP)
+    # logger.debug("SIGINT:\t%s", game.sigs.SIGINT)
+    # logger.debug("SIGTERM:\t%s", game.sigs.SIGTERM)
+    # logger.debug("SIGTSTP:\t%s", game.sigs.SIGTSTP)
+    # logger.debug("SIGQUIT:\t%s", game.sigs.SIGQUIT)
+    # logger.debug("SIGCONT:\t%s", game.sigs.SIGCONT)
+    # logger.debug('-'*4)
     logger.debug("Active:\t%s", game.sigs.alarm.active)
     logger.debug("Alarm:\t%d", game.sigs.alarm.timer)
     logger.debug("Function:\t%s", game.sigs.alarm.sig)

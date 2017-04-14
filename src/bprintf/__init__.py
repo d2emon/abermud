@@ -83,7 +83,7 @@ class D2Buffer:
             self.pbfr()
             # if tty == 4:
             #    btmscr()
-            prmpt = player.prompt()
+            prmpt = player.prompt(self.get_prompt())
             self.pbfr()
 
             from game.sigs import alarm
