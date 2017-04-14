@@ -187,19 +187,6 @@ if(in_fight) in_fight-=1;
  send2(block)
  long *block;
     {
-    FILE * unit;
-    long number;
-    long inpbk[128];
-    extern char globme[];
-    extern char *echoback;
-    	unit=openworld();
-    if (unit<0) {loseme();crapup("\nAberMUD: FILE_ACCESS : Access failed\n");}
-    sec_read(unit,inpbk,0,64);
-    number=2*inpbk[1]-inpbk[0];inpbk[1]++;
-    sec_write(unit,block,number,128);
-    sec_write(unit,inpbk,0,64);
-    if (number>=199) cleanup(inpbk);
-    if(number>=199) longwthr();
     }
  
  readmsg(channel,block,num)
@@ -321,19 +308,6 @@ long rd_qd=0;
  cleanup(inpbk)
  long *inpbk;
     {
-    FILE * unit;
-    long buff[128],ct,work,*bk;
-    unit=openworld();
-    bk=(long *)malloc(1280*sizeof(long));
-    sec_read(unit,bk,101,1280);sec_write(unit,bk,1,1280);
-    sec_read(unit,bk,121,1280);sec_write(unit,bk,21,1280);
-    sec_read(unit,bk,141,1280);sec_write(unit,bk,41,1280);
-    sec_read(unit,bk,161,1280);sec_write(unit,bk,61,1280);
-    sec_read(unit,bk,181,1280);sec_write(unit,bk,81,1280);
-    free(bk);
-    inpbk[0]=inpbk[0]+100;
-    sec_write(unit,inpbk,0,64);
-    revise(inpbk[0]);
     }
  
  
@@ -539,22 +513,6 @@ long lasup=0;
  revise(cutoff)
  long cutoff;
     {
-    char mess[128];
-    long ct;
-    FILE *unit;
-    unit=openworld();
-    ct=0;
-    while(ct<16)
-       {
-       if((pname(ct)[0]!=0)&&(ppos(ct)<cutoff/2)&&(ppos(ct)!=-2))
-          {
-          sprintf(mess,"%s%s",pname(ct)," has been timed out\n");
-          broad(mess);
-          dumpstuff(ct,ploc(ct));
-          pname(ct)[0]=0;
-          }
-       ct++;
-       }
     }
  
  lookin(room)

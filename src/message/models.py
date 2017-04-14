@@ -26,6 +26,20 @@ class Message(Base):
         sess.add(self)
         sess.commit()
 
+        c = Message.query().count()
+        if c >= 199:
+            Message.cleanup(self.id)
+            # longwthr()
+
+    @staticmethod
+    def cleanup(mid_id):
+        from db import sess
+        from player.models import Player
+        min_id = mid_id - 100
+        Message.query().filter(Message.c.id < min_id).delete()
+        sess.commit()
+        Player.revise(mid_id)
+
     @staticmethod
     def findstart():
         from db import sess
@@ -77,3 +91,18 @@ class Message(Base):
     @staticmethod
     def send(user_from, user_to, code, channel, text):
         logger.debug(["sendsys", [user_from.name, user_to.name, code, channel, text]])
+        m = Message()
+        m.user_from = user_from
+        m.user_to = user_to
+        m.code = code
+        m.channel = channel
+        # if code != -9900 and code != -10021:
+        #     m.text = text
+        # else:
+        #     m.text = [
+        #         i[0],
+        #         i[1],
+        #         i[2],
+        #     ]
+        m.text = text
+        m.save()

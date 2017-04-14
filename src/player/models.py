@@ -227,8 +227,8 @@ class Player(Base):
         self.helping = -1
         # us = cuserid()
 
-        xy = "\001s{}\001{}  has entered the game\n\001".format(self.name, self.name)
-        xx = "\001s{}\001[ {}  has entered the game ]\n\001".format(self.name, self.name)
+        xy = "<s player=\"{}\">{}  has entered the game\n</s>".format(self.id, self.name)
+        xx = "<s player=\"{}\">[ {}  has entered the game ]\n</s>".format(self.id, self.name)
         # sendsys(self.name, self.name, -10113, self.curch, xx)
         Message.send(self, self, -10113, self.curch, xx)
 
@@ -299,3 +299,16 @@ class Player(Base):
         if self.visible == 0:
             set_name(prog)
         return prmpt
+
+    @staticmethod
+    def revise(cutoff):
+        from db import sess
+        w = World()
+        players = Player.query().filter(Player.c.name == '').filter(Player.c.position < cutoff / 2).filter(Player.c.position > 0).all()
+        for p in players:
+            mess = "{} has timed out\n".format(p.name)
+            logger.debug(mess)
+            # broad(mess)
+            # dumpstuff(p.id, p.location)
+            sess.delete(p)
+        sess.commit()

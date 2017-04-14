@@ -53,12 +53,6 @@ from game.share import player  # , load
 # long gurum=0;
 # long convflg=0;
 
-# sendmsg(name)
-# send2(block)
-
-# FILE *openlock(file,perm)
-
-
 def talker(user):
     logger.debug("--->\ttalker({})".format(user))
 
@@ -147,8 +141,6 @@ def print_sigs():
     logger.debug("Progname:\t%s", PROGNAME)
     logger.debug('='*4)
 
-# cleanup(inpbk)
-
 # long dsdb=0;
 # long moni=0;
 
@@ -165,7 +157,6 @@ def print_sigs():
 # trapch(chan)
 # loseme(name)
 
-# revise(cutoff)
 # lookin(room)
 # loodrv()
 
