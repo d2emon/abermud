@@ -20,6 +20,7 @@ import user.models
 import player.models
 import person.models
 import message.models
+import room.models
 
 
 def connect(echo=False):
