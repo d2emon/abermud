@@ -6,12 +6,6 @@ from sqlalchemy.orm import sessionmaker
 import db.base
 
 
-import message.models
-import user.models
-import player.models
-import person.models
-
-
 # Base = declarative_base()
 # engine = None
 # sess = None
@@ -22,6 +16,12 @@ Session = sessionmaker(bind=engine)
 sess = Session()
 
 
+import user.models
+import player.models
+import person.models
+import message.models
+
+
 def connect(echo=False):
     # global Base, engine, db_url
     global sess, engine
@@ -29,7 +29,7 @@ def connect(echo=False):
     if engine is None:
         engine = create_engine(db_url, echo=echo)
 
-    Base.metadata.create_all(engine, checkfirst=True)
+    db.base.Base.metadata.create_all(engine, checkfirst=True)
 
     Session = sessionmaker(bind=engine)
     Session.configure(bind=engine)

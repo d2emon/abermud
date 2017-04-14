@@ -7,13 +7,7 @@ import socket
 from db.base import Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import validates, relationship
-# from sqlalchemy.ext.declarative import declarative_base
 # from models import Person
-
-
-# Base = declarative_base()
-# session = None
-# engine = None
 
 
 class User(Base):

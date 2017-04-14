@@ -26,16 +26,18 @@ def combine_metadata(*args):
             t.tometadata(m)
     return m
 
-import user.models
-import player.models
-import person.models
-import message.models
-target_metadata = combine_metadata(
-    user.models.Base.metadata,
-    player.models.Base.metadata,
-    person.models.Base.metadata,
-    message.models.Base.metadata,
-)
+# import user.models
+# import player.models
+# import person.models
+# import message.models
+# target_metadata = combine_metadata(
+    # user.models.Base.metadata,
+    # player.models.Base.metadata,
+    # person.models.Base.metadata,
+    # message.models.Base.metadata,
+# )
+import db.base
+target_metadata = db.base.Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

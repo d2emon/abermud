@@ -1,5 +1,6 @@
 from db.base import Base
-from sqlalchemy import func, Column, Integer, String
+from sqlalchemy import func, Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship  # validates
 
 from d2log import logger
 
@@ -7,11 +8,13 @@ from d2log import logger
 class Message(Base):
     __tablename__ = "message"
     id = Column(Integer, primary_key=True)
+    from_player_id = Column(Integer, ForeignKey('player.id'))
+    to_player_id = Column(Integer, ForeignKey('player.id'))
+    from_player = relationship("Player", foreign_keys=from_player_id, back_populates="from_messages")
+    to_player = relationship("Player", foreign_keys=to_player_id, back_populates="to_messages")
+    code = Column(Integer)
+    channel = Column(Integer)
     text = Column(String)
-    from_player_id = None
-    to_player_id = None
-    code = None
-    channel = None
 
     @staticmethod
     def query():

@@ -1,8 +1,7 @@
 # from db import session
 from db.base import Base
 from sqlalchemy import Column, Integer, String
-# from sqlalchemy.orm import validates
-# from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship  # validates
 
 from d2log import logger
 from world import World
@@ -15,9 +14,6 @@ from game.utils import set_name, PROGNAME
 
 
 # from db import Message
-
-
-# Base = declarative_base()
 
 
 MAX_PLAYERS = 16
@@ -38,6 +34,8 @@ class Player(Base):
     strength = Column(Integer, default=-1)
     weapon = Column(Integer, default=-1)
     sex = Column(Integer, default=0)
+    from_messages = relationship("Message", foreign_keys="Message.from_player_id", backref="Message.from_player")
+    to_messages = relationship("Message", foreign_keys="Message.to_player_id", backref="Message.to_player")
 
     sexes = {
         'm': MALE,

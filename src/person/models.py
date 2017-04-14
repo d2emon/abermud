@@ -2,13 +2,9 @@
 from db.base import Base
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship  # validates
-from sqlalchemy.ext.declarative import declarative_base
 # from models import User
 
 # from d2log import logger
-
-
-# Base = declarative_base()
 
 
 class Person(Base):
