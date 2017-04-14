@@ -121,6 +121,9 @@ class User(Base):
 
     def new_person(self, name=None):
         from person.models import Person
+        if self.person is not None:
+            return self.person
+
         if name is None:
             name = self.showname
 

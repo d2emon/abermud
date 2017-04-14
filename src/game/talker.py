@@ -24,22 +24,6 @@ from game.share import player  # , load
 # long  curmode=0;
 # long  meall=0;
 
-#
-# Data format for mud packets
-#
-# Sector 0
-# [64 words]
-# 0   Current first message pointer
-# 1   Control Word
-# Sectors 1-n  in pairs ie [128 words]
-#
-# [channel][controlword][text data]
-#
-# [controlword]
-# 0 = Text
-# - 1 = general request
-#
-
 # vcpy(dest,offd,source,offs,len)
 # mstoout(block,name)
 
@@ -141,10 +125,6 @@ def print_sigs():
 # char  *tmpwiz=".";/* Illegal name so natural immunes are ungettable! */
 
 # split(block,nam1,nam2,work,luser)
-# trapch(chan)
 # loseme(name)
-
-# lookin(room)
 # loodrv()
-
 # userwrap()

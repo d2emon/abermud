@@ -10,10 +10,7 @@ from world import World
 from game.parse import eorte
 # from bprintf import buff
 # from game.sigs import alon, aloff
-from game.utils import set_name, PROGNAME
-
-
-# from db import Message
+from game.utils import set_name, PROGNAME, randperc
 
 
 MAX_PLAYERS = 16
@@ -189,12 +186,10 @@ class Player(Base):
         Message.send(self, self, -10113, self.curch, xx)
 
         self.rte()
-        # if randperc() > 50:
-        #     trapch(-5)
-        # else:
-        #     self.curch = -183
-        #     trapch(-183)
-        # sendsys(self.name, self.name, -10000, self.curch, xy)
+        if randperc() < 50:
+            self.curch = -183
+        self.goto_channel(self.curch)
+
         Message.send(self, self, -10000, self.curch, xy)
 
     def initme(self):
@@ -214,6 +209,7 @@ class Player(Base):
                 buff.bprintf("M or F")
         self.person.save()
         self.user.save()
+        return self.person
 
     # ???
     def special(self, cmd):
@@ -257,3 +253,69 @@ class Player(Base):
             # dumpstuff(p.id, p.location)
             sess.delete(p)
         sess.commit()
+
+    def goto_channel(self, channel):
+        logger.debug("trapch(%d)", channel)
+        # FILE *unit;
+        w = self.loadw()
+        self.location = channel
+        self.look(channel)
+
+    def look(self, room):
+        from bprintf import buff
+        logger.debug("lookin(%d)", room)
+        # FILE *un1,un2;
+        # char str[128];
+        # long xxx;
+        # extern long brmode;
+        # extern long curmode;
+        ail_blind = False
+        # extern long ail_blind;
+        # long ct;
+        w = self.loadw()
+        self.save(w)
+        if ail_blind:
+            buff.bprintf("You are blind... you can't see a thing!\n")
+        if self.person.level > 9:
+            logger.debug("showname(%d)", room)
+        un1 = None
+        # un1 = openroom(room, "r")
+        if un1 is not None:
+            while True:
+                # xx1:
+                xxx = False
+                break
+                # lodex(un1)
+                # if isdark():
+                #     fclose(un1)
+                #     buff.bprintf("It is dark\n")
+                #     w = self.loadw()
+                #     onlook()
+                #     return
+                # while getstr(un1, s):
+                #    # if s == "#DIE":
+                #    #     if ail_blind:
+                #    #         rewind(un1)
+                #    #         ail_blind = False
+                #    #         continue
+                #    #     if self.person.level > 9:
+                #    #         buff.bprintf("<DEATH ROOM>\n")
+                #    #     else:
+                #    #         self.loseme()
+                #    #         crapup("bye bye.....\n")
+                #    # elif s == "#NOBR":
+                #    #     brmode = False
+                #    # else:
+                #    #     if not ail_blind and not xxx:
+                #    #         buff.bprintf("{}\n".format(s))
+                #    # xxx = brmode
+        else:
+            buff.bprintf("\nYou are on channel {}\n".format(room))
+        # fclose(un1)
+        # w = self.loadw()
+        # if not ail_blind:
+        #     lisobs()
+        #     if curmode == 1:
+        #         lispeople()
+        buff.bprintf("\n")
+        # onlook()

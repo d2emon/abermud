@@ -13,10 +13,10 @@ class Person(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship("User", back_populates="person")
     name = Column(String(16), nullable=False)
-    score = Column(Integer)
-    strength = Column(Integer)
+    score = Column(Integer, default=0)
+    strength = Column(Integer, default=40)
     sex = Column(Integer)
-    level = Column(Integer)
+    level = Column(Integer, default=1)
 
     @staticmethod
     def query():

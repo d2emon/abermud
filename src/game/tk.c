@@ -416,14 +416,6 @@ if(!strcmp(lowercase(nam1+4),lowercase(luser))) return(1);
  trapch(chan)
  long chan;
     {
-extern long curch;
-    extern long mynum;
-    FILE *unit;
-    extern long my_lev;
-    if(my_lev>9) goto ndie;
-    ndie:unit=openworld();
-    setploc(mynum,chan);
-    lookin(chan);
     }
  
 long mynum=0;
@@ -431,40 +423,6 @@ long mynum=0;
  putmeon(name)
  char *name;
     {
-    extern long mynum,curch;
-    extern long maxu;
-    long ct,f;
-    FILE *unit;
-    extern long iamon;
-    iamon=0;
-    unit=openworld();
-    ct=0;
-    f=0;
-    if(fpbn(name)!= -1)
-       {
-       crapup("You are already on the system - you may only be on once at a time");
-       }
-    while((f==0)&&(ct<maxu))
-       {
-       if (!strlen(pname(ct))) f=1;
-       else
-          ct++;
-       }
-    if(ct==maxu)
-       {
-       mynum=maxu;
-       return;
-       }
-    strcpy(pname(ct),name);
-    setploc(ct,curch);
-    setppos(ct,-1);
-    setplev(ct,1);
-    setpvis(ct,0);
-    setpstr(ct,-1);
-    setpwpn(ct,-1);
-    setpsex(ct,0);
-    mynum=ct;
-iamon=1;
     }
  
  loseme(name)
@@ -497,17 +455,6 @@ long lasup=0;
  update(name)
  char *name;
     {
-    extern long mynum,cms;
-    FILE *unit;
-    long xp;
-    extern long lasup;
-    xp=cms-lasup;
-    if(xp<0) xp= -xp;
-    if(xp<10) goto noup;
-    unit=openworld();
-    setppos(mynum,cms);
-    lasup=cms;
-    noup:;
     }
  
  revise(cutoff)
@@ -518,66 +465,6 @@ long lasup=0;
  lookin(room)
  long room; /* Lords ???? */
     {
-    extern char globme[];
-    FILE *un1,un2;
-    char str[128];
-    long xxx;
-    extern long brmode;
-    extern long curmode;
-    extern long ail_blind;
-    long ct;
-    extern long my_lev;
-    closeworld();
-    if(ail_blind)
-    {
-    	bprintf("You are blind... you can't see a thing!\n");
-    }
-    if(my_lev>9) showname(room);
-    un1=openroom(room,"r");
-    if (un1!=NULL)
-    {
-xx1:   xxx=0;
-       lodex(un1);
-       	if(isdark())
-       	{
-          		fclose(un1);
-          		bprintf("It is dark\n");
-                        openworld();
-          		onlook();
-          		return;
-          	}
-       while(getstr(un1,str)!=0)
-          {
-          if(!strcmp(str,"#DIE"))
-             {
-             if(ail_blind) {rewind(un1);ail_blind=0;goto xx1;}
-             if(my_lev>9)bprintf("<DEATH ROOM>\n");
-             else
-                {
-                loseme(globme);
-                crapup("bye bye.....\n");
-                }
-             }
-          else
-{
-if(!strcmp(str,"#NOBR")) brmode=0;
-else
-             if((!ail_blind)&&(!xxx))bprintf("%s\n",str);
-          xxx=brmode;
-}
-          }
-       }
-    else
-       bprintf("\nYou are on channel %d\n",room);
-    fclose(un1);
-    openworld();
-    if(!ail_blind)
-    {
-	    lisobs();
-	    if(curmode==1) lispeople();
-    }
-    bprintf("\n");
-    onlook();
     }
  loodrv()
     {
@@ -594,12 +481,3 @@ extern char globme[];
 extern long iamon;
 if(fpbns(globme)!= -1) {loseme();syslog("System Wrapup exorcised %s",globme);}
 }
-
-fcloselock(file)
-FILE *file;
-{
-	fflush(file);
-	flock(fileno(file),LOCK_UN);
-	fclose(file);
-}
-	

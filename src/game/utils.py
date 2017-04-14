@@ -1,10 +1,8 @@
-from bprintf import buff
-
-
 PROGNAME = ""
 
 
 def crapup(s):
+    from bprintf import buff
     dashes = ("-="*76) + '-'
     buff.pbfr()
     buff.pr_due = False
@@ -24,3 +22,8 @@ def crapup(s):
 def set_name(newname):
     global PROGNAME
     PROGNAME = newname
+
+
+def randperc():
+    import random
+    return random.randint(1, 100)
