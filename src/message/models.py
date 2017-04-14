@@ -64,7 +64,7 @@ class Message(Base):
     @staticmethod
     def readmsg(min_id):
         logger.debug("---> readmsg({})".format(min_id))
-        return Message.query().filter(Message.id >= min_id).all()
+        return Message.query().filter(Message.id > min_id).all()
 
     def mstoout(self, player):
         '''
@@ -72,15 +72,13 @@ class Message(Base):
         '''
         from bprintf import buff
         logger.debug("mstoout({}, {})".format(self, player.id))
-        # extern long debug_mode;
-        luser = player.name.lower()
         if player.debug_mode:
             buff.bprintf("\n<{}>".format(self))
         if self.code < -3:
-            # sysctrl(block, luser)
-            logger.debug("---> sysctrl({}, {})".format(self, luser))
+            # self.sysctrl(player)
+            logger.debug("---> sysctrl({}, {})".format(self, player.name))
         else:
-            buff.bprintf(self)
+            buff.bprintf(str(self))
 
     @staticmethod
     def send(user_from, user_to, code, channel, text):

@@ -109,8 +109,10 @@ class Player(Base):
 
         ct = Player.query().count()
         logger.debug("ct = %s", ct)
+        logger.debug("{} >= {}".format(ct, MAX_PLAYERS))
         if ct >= MAX_PLAYERS:
             self.mynum = MAX_PLAYERS
+            # assert player.mynum < MAX_PLAYERS, "Sorry AberMUD is full at the moment"
             return
 
         self.name = user.showname
@@ -139,20 +141,19 @@ class Player(Base):
         logger.debug('<!' + '-'*70)
 
         w = self.loadw()
-        assert w.filrf is not None, "AberMUD: FILE_ACCESS : Access failed"
 
         if self.cms == -1:
             self.cms = findend()
 
         ct = self.cms
-        too = findend()
-        logger.debug("%d : %d", self.cms, too)
-
-        for ct in range(self.cms, too):
-            block = Message.readmsg(ct)
-            for m in block:
-                logger.debug(m)
-                m.mstoout(self)
+        block = Message.readmsg(self.cms)
+        logger.debug(block)
+        for m in block:
+            ct = m.id
+            logger.debug("#%d", ct)
+            logger.debug(m)
+            m.mstoout(self)
+        logger.debug("%s:%s->%s", self.position, self.cms, ct)
 
         self.cms = ct
         self.update()
@@ -194,7 +195,7 @@ class Player(Base):
         #     self.curch = -183
         #     trapch(-183)
         # sendsys(self.name, self.name, -10000, self.curch, xy)
-        Message.send(self, self, -10000, self.curch, xx)
+        Message.send(self, self, -10000, self.curch, xy)
 
     def initme(self):
         from bprintf import buff

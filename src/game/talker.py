@@ -11,22 +11,15 @@
 
 '''
 from d2log import logger
-from player.models import MAX_PLAYERS
 from bprintf import makebfr
-from world import World
-# from game.utils import crapup
 from game.share import player  # , load
 
 
 # long oddcat=0;
 # long  talkfl=0;
 
-# extern long my_str;
-# extern long my_sex;
-# extern long my_lev;
 # extern FILE * openroom();
 # extern long ppos();
-# extern char key_buff[];
 
 # long  curmode=0;
 # long  meall=0;
@@ -51,7 +44,6 @@ from game.share import player  # , load
 # mstoout(block,name)
 
 # long gurum=0;
-# long convflg=0;
 
 def talker(user):
     logger.debug("--->\ttalker({})".format(user))
@@ -60,7 +52,6 @@ def talker(user):
     # load(user)
 
     buff = makebfr()
-    logger.debug("Player init %s", player)
 
     player.cms = -1
     player.puton(user)
@@ -68,11 +59,8 @@ def talker(user):
     logger.debug("Player puton %s", player)
     # logger.debug("Buffer puton %s", buff)
 
-    w = World()
+    w = player.loadw()
     assert w.filrf is not None, "Sorry AberMUD is currently unavailable"
-
-    logger.debug("{} >= {}".format(player.mynum, MAX_PLAYERS))
-    # assert player.mynum < MAX_PLAYERS, "Sorry AberMUD is full at the moment"
 
     player.name = user.username
     player.rte()
@@ -160,4 +148,3 @@ def print_sigs():
 # loodrv()
 
 # userwrap()
-# fcloselock(file)
