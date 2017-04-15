@@ -12,24 +12,7 @@ on_timing()
 
 onlook(  )
     {
-long a ;
-extern long mynum ;
-chkfight( fpbns( "shazareth" ) ) ;
-if( !iscarrby( 45, mynum ) )chkfight( fpbns( "wraith" ) ) ;
-chkfight( fpbns( "bomber" ) ) ;
-chkfight( fpbns( "owin" ) ) ;
-chkfight( fpbns( "glowin" ) ) ;
-chkfight( fpbns( "smythe" ) ) ;
-chkfight( fpbns( "dio" ) ) ;
-if( !iscarrby( 45, mynum ) ) chkfight( fpbns( "zombie" ) ) ;
-chkfight( fpbns( "rat" ) ) ;
-chkfight( fpbns( "ghoul" ) ) ;
-chkfight( fpbns( "ogre" ) ) ;
-chkfight( fpbns( "riatha" ) ) ;
-chkfight( fpbns( "yeti" ) ) ;
-chkfight( fpbns( "guardian"));
-if( iscarrby( 32, mynum ) ) dorune(  ) ;
-if(phelping(mynum)!=-1) helpchkr();
+
     }
  
  chkfight( x )

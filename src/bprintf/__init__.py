@@ -44,6 +44,7 @@ class D2Buffer:
         # 0 = not logging
 
         self.convflg = 0
+        self.brmode = 0
 
     def __repr__(self):
         return "<D2Buffer \"\n{}\n\">".format(self.sysbuf)
@@ -131,6 +132,7 @@ class D2Buffer:
         Max 240 chars/msg
         '''
         from game.utils import crapup
+        text = str(text)
         if len(text) > 235:
             logger.info("Bprintf Short Buffer overflow")
             crapup("Internal Error in BPRINTF")

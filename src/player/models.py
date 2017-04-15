@@ -124,7 +124,6 @@ class Player(Base):
         self.strength = -1
         self.weapon = -1
         self.sex = 0
-        # self.save()
 
         self.mynum = ct
 
@@ -263,63 +262,73 @@ class Player(Base):
         self.location = channel
         self.look(channel)
 
-    def look(self, room):
+    def look(self, room_id):
         from bprintf import buff
-        logger.debug("lookin(%d)", room)
-        # FILE *un1,un2;
-        # char str[128];
-        # long xxx;
-        brmode = False
-        # extern long brmode;
+        logger.debug("lookin(%d)", room_id)
         # extern long curmode;
-        # long ct;
         dead = False
         w = self.loadw()
         self.save(w)
-        if self.ail_blind:
+        if self.blind:
             buff.bprintf("You are blind... you can't see a thing!\n")
         if self.person.level > 9:
-            logger.debug("showname(%d)", room)
-        room = Room.open(room)
-        if room is not None:
-            # lodex(un1)
-            if self.is_dark(room):
-                buff.bprintf("It is dark\n")
-                w = self.loadw()
-                # fclose(un1)
-                # onlook()
-                return
-            if room.deathroom:
-                self.ail_blind = False
-                if self.person.level > 9:
-                    buff.bprintf("<DEATH ROOM>\n")
-                else:
-                    dead = True
-            # lodex(un1)
-            if room.nobr:
-                brmode = False
-            if not self.ail_blind and not xxx:
-                buff.bprintf(room.description)
-            if dead:
-                # self.loseme()
-                # crapup("bye bye.....\n")
-                pass
-        else:
-            buff.bprintf("\nYou are on channel {}\n".format(room))
-        # fclose(un1)
+            logger.debug("showname(%d)", room_id)
+        room = Room.open(room_id)
+        if self.is_dark(room):
+            buff.bprintf("It is dark\n")
+            w = self.loadw()
+            self.onlook()
+            return
+        if room.deathroom:
+            self.blind = False
+            if self.person.level > 9:
+                buff.bprintf("<DEATH ROOM>\n")
+            else:
+                dead = True
+        if room.nobr:
+            buff.brmode = 0
+        if not self.blind and buff.brmode == 0:
+            buff.bprintf(room.description)
+        if dead:
+            # self.loseme()
+            # crapup("bye bye.....\n")
+            pass
         w = self.loadw()
-        if not ail_blind:
+        if not self.blind:
             pass
         #     lisobs()
         #     if curmode == 1:
         #         lispeople()
         buff.bprintf("\n")
-        # onlook()
+        self.onlook()
+        
+    def onlook(self):
+        # fpbns("shazareth").chkfight()
+        # if not self.iscarrby(45):
+        #     fpbns("wraith").chkfight()
+        # fpbns("bomber").chkfight()
+        # fpbns("owin").chkfight()
+        # fpbns("glowin").chkfight()
+        # fpbns("smythe").chkfight()
+        # fpbns("dio").chkfight()
+        # if not self.iscarrby(45):
+        #     fpbns("zombie").chkfight()
+        # fpbns( "rat" ) ).chkfight()
+        # fpbns( "ghoul" ) ).chkfight()
+        # fpbns( "ogre" ) ).chkfight()
+        # fpbns( "riatha" ) ).chkfight()
+        # fpbns( "yeti" ) ).chkfight()
+        # fpbns( "guardian")).chkfight()
+        # if self.iscarrby(32):
+        #     dorune()
+        # if self.helping != -1:
+        #     helpchkr()
+        pass
 
     def is_dark(self, room):
         if self.person.level > 9:
             return False
-        if not room.dark():
+        if not room.dark:
             return False
         # for c in range(0, numobs):
         #    if c != 32 and otstbit(c, 13) == 0:
@@ -331,4 +340,4 @@ class Player(Base):
         #    if oloc(c).location != self.location:
         #        continue
         #    return False                
-        return True    
+        return False

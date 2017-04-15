@@ -82,14 +82,6 @@ char *dirns[  ]={"North", "East ", "South", "West ", "Up   ", "Down "} ;
  lodex( file )
  FILE *file;
     {
-    long a ;
-    extern long ex_dat[] ;
-    a=0 ;
-    while( a<6 )
-       {
-       fscanf(file," %ld ",&ex_dat[ a ]);
-       a++ ;
-       }
     }
  roomnum( str, offstr )
  char *str;
