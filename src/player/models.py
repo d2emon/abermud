@@ -3,6 +3,8 @@ from db.base import Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship  # validates
 
+from models import Room
+
 from d2log import logger
 from world import World
 # from message.models import Message
@@ -278,42 +280,45 @@ class Player(Base):
             buff.bprintf("You are blind... you can't see a thing!\n")
         if self.person.level > 9:
             logger.debug("showname(%d)", room)
-        un1 = None
+        room = Room()
         # un1 = openroom(room, "r")
-        if un1 is not None:
+        if room is not None:
             while True:
                 # xx1:
                 xxx = False
-                break
                 # lodex(un1)
                 # if isdark():
-                #     fclose(un1)
-                #     buff.bprintf("It is dark\n")
-                #     w = self.loadw()
-                #     onlook()
-                #     return
-                # while getstr(un1, s):
-                #    # if s == "#DIE":
-                #    #     if ail_blind:
-                #    #         rewind(un1)
-                #    #         ail_blind = False
-                #    #         continue
-                #    #     if self.person.level > 9:
-                #    #         buff.bprintf("<DEATH ROOM>\n")
-                #    #     else:
-                #    #         self.loseme()
-                #    #         crapup("bye bye.....\n")
-                #    # elif s == "#NOBR":
-                #    #     brmode = False
-                #    # else:
-                #    #     if not ail_blind and not xxx:
-                #    #         buff.bprintf("{}\n".format(s))
-                #    # xxx = brmode
+                if room.is_dark():
+                    # fclose(un1)
+                    buff.bprintf("It is dark\n")
+                    w = self.loadw()
+                    # onlook()
+                    return
+                if room.deathroom:
+                    if ail_blind:
+                        # rewind(un1)
+                        ail_blind = False
+                        continue
+                    if self.person.level > 9:
+                        buff.bprintf("<DEATH ROOM>\n")
+                    else:
+                        # self.loseme()
+                        # crapup("bye bye.....\n")
+                        pass
+                elif room.nobr:
+                    # brmode = False
+                    pass
+                else:
+                    if not ail_blind and not xxx:
+                        buff.bprintf(room.description)
+                # xxx = brmode
+                break
         else:
             buff.bprintf("\nYou are on channel {}\n".format(room))
         # fclose(un1)
-        # w = self.loadw()
-        # if not ail_blind:
+        w = self.loadw()
+        if not ail_blind:
+            pass
         #     lisobs()
         #     if curmode == 1:
         #         lispeople()

@@ -9,3 +9,6 @@ class Room(Base):
     description = Column(Unicode)
     deathroom = Column(Boolean)
     nobr = Column(Boolean)
+
+    def is_dark(self):
+        return True
