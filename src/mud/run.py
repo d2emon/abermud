@@ -127,7 +127,11 @@ def main(*argv):
         show_motd()
 
     # Log entry
-    logger.info("Game entry by %s : UID %s", user, os.getuid())
+    try:
+        uid = os.getuid()
+    except:
+        uid = '<UID>'
+    logger.info("Game entry by %s : UID %s", user.username, uid)
 
     # Run system
     talker(user)
