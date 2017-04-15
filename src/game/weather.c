@@ -450,23 +450,6 @@ setmobile:a=fpbn(wordbuf);
  
 isdark()
     {
-long c;
-extern long curch,my_lev;
-extern long numobs;
-if(my_lev>9) return(0);
-if((curch==-1100)||(curch==-1101)) return(0);
-if((curch<=-1113)&&(curch>=-1123)) goto idk;
-if((curch<-399)||(curch>-300)) return(0);
-idk:c=0;
-while(c<numobs)
-{
-if((c!=32)&&(otstbit(c,13)==0)) {c++;continue;}
-if(ishere(c)) return(0);
-if((ocarrf(c)==0)||(ocarrf(c)==3)) {c++;continue;}
-if(ploc(oloc(c))!=curch) {c++;continue;}
-return(0);
-}
-return(1);
 }
  
  

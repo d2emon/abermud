@@ -51,6 +51,8 @@ class Player(Base):
         self.lasup = 0
         self.user = None
         self.debug_mode = True
+        
+        self.blind = False
 
     def __repr__(self):
         return "<Player: '{}' {}>".format(self.name, {
@@ -257,8 +259,6 @@ class Player(Base):
         sess.commit()
 
     def goto_channel(self, channel):
-        logger.debug("trapch(%d)", channel)
-        # FILE *unit;
         w = self.loadw()
         self.location = channel
         self.look(channel)
@@ -269,50 +269,41 @@ class Player(Base):
         # FILE *un1,un2;
         # char str[128];
         # long xxx;
+        brmode = False
         # extern long brmode;
         # extern long curmode;
-        ail_blind = False
-        # extern long ail_blind;
         # long ct;
+        dead = False
         w = self.loadw()
         self.save(w)
-        if ail_blind:
+        if self.ail_blind:
             buff.bprintf("You are blind... you can't see a thing!\n")
         if self.person.level > 9:
             logger.debug("showname(%d)", room)
-        room = Room()
-        # un1 = openroom(room, "r")
+        room = Room.open(room)
         if room is not None:
-            while True:
-                # xx1:
-                xxx = False
-                # lodex(un1)
-                # if isdark():
-                if room.is_dark():
-                    # fclose(un1)
-                    buff.bprintf("It is dark\n")
-                    w = self.loadw()
-                    # onlook()
-                    return
-                if room.deathroom:
-                    if ail_blind:
-                        # rewind(un1)
-                        ail_blind = False
-                        continue
-                    if self.person.level > 9:
-                        buff.bprintf("<DEATH ROOM>\n")
-                    else:
-                        # self.loseme()
-                        # crapup("bye bye.....\n")
-                        pass
-                elif room.nobr:
-                    # brmode = False
-                    pass
+            # lodex(un1)
+            if self.is_dark(room):
+                buff.bprintf("It is dark\n")
+                w = self.loadw()
+                # fclose(un1)
+                # onlook()
+                return
+            if room.deathroom:
+                self.ail_blind = False
+                if self.person.level > 9:
+                    buff.bprintf("<DEATH ROOM>\n")
                 else:
-                    if not ail_blind and not xxx:
-                        buff.bprintf(room.description)
-                # xxx = brmode
-                break
+                    dead = True
+            # lodex(un1)
+            if room.nobr:
+                brmode = False
+            if not self.ail_blind and not xxx:
+                buff.bprintf(room.description)
+            if dead:
+                # self.loseme()
+                # crapup("bye bye.....\n")
+                pass
         else:
             buff.bprintf("\nYou are on channel {}\n".format(room))
         # fclose(un1)
@@ -324,3 +315,20 @@ class Player(Base):
         #         lispeople()
         buff.bprintf("\n")
         # onlook()
+
+    def is_dark(self, room):
+        if self.person.level > 9:
+            return False
+        if not room.dark():
+            return False
+        # for c in range(0, numobs):
+        #    if c != 32 and otstbit(c, 13) == 0:
+        #        continue
+        #    if ishere(c)
+        #        return False
+        #    if ocarrf(c) == 0 or ocarrf(c) == 3:
+        #        continue
+        #    if oloc(c).location != self.location:
+        #        continue
+        #    return False                
+        return True    
