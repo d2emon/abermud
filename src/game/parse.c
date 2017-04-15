@@ -73,28 +73,6 @@ char *str;
  
 int brkword()
     {
-    extern char wd_it[],wd_them[],wd_her[],wd_him[],globme[];
-    extern long stp;
-    extern char strbuf[],wordbuf[];
-    int  worp;
-    x1:worp=0;
-    while(strbuf[stp]==' ') stp++;
-    while((strbuf[stp])&&(strbuf[stp]!=' '))
-       {
-       wordbuf[worp++]=strbuf[stp++]; 
-       }
-    wordbuf[worp]=0;
-    lowercase(wordbuf);
-    if(!strcmp(wordbuf,"it"))strcpy(wordbuf,wd_it);
-    if(!strcmp(wordbuf,"them"))strcpy(wordbuf,wd_them);
-    if(!strcmp(wordbuf,"him"))strcpy(wordbuf,wd_him);
-    if(!strcmp(wordbuf,"her"))strcpy(wordbuf,wd_her);
-    if(!strcmp(wordbuf,"me")) strcpy(wordbuf,globme);
-    if(!strcmp(wordbuf,"myself")) strcpy(wordbuf,globme);
-    if(!strcmp(wordbuf,"there")) strcpy(wordbuf,wd_there);
-    if(worp)return(0);
-    else
-       return(-1);
     }
  
 

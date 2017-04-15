@@ -408,21 +408,26 @@ class Player(Base):
         from bprintf import buff
         logger.debug("GAMEGO")
         # extern long in_fight;
-        # extern long stp;
-        # extern char strbuf[];
         if cmd == ".q":
             cmd = ""
             # Otherwise drops out after command
         if not cmd:
             return 0
         if cmd == "!":
-            cmd = buff.cmdbuf
+            cmd = buff.cmdbuff
         else:
-            buff.cmdbuf = cmd
-        stp = 0
-        # if brkword() == -1:
-        #     buff.bprintf("Pardon ?\n")
-        #     return -1
+            buff.cmdbuff = cmd
+
+        buff.getcmd()
+        logger.debug(buff.words)
+
+        if buff.nextword({
+            "me": self.name,
+            "myself": self.name,
+        }) is None:
+            buff.bprintf("Pardon ?\n")
+            return -1
+        
         a = -1
         # a = chkverb()
         if a == -1:

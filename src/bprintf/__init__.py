@@ -46,6 +46,17 @@ class D2Buffer:
         self.convflg = 0
         self.brmode = 0
         self.cmdbuff = ""
+        self.words = []
+        self.wordbuff = ""
+        self.stp = 0
+        
+        self.repl = {
+            "it": "",
+            "them": "",
+            "him": "",
+            "her": "",
+            "there": "",
+        }
 
     def __repr__(self):
         return "<D2Buffer \"\n{}\n\">".format(self.sysbuf)
@@ -179,6 +190,26 @@ class D2Buffer:
         logger.debug("dcprnt() to %s", output)
         print("-->{}<--".format(output))
         print(self.sysbuf)
+        
+    def getcmd(self):
+        self.words = self.cmdbuff.split()
+        self.stp = 0
+
+    def nextword(self, repl):
+        repl.update(self.repl)
+        logger.debug([self.stp, len(self.words)])
+        if self.stp >= len(self.words):
+            return None
+        
+        self.wordbuff = self.words[self.stp]
+        self.stp += 1
+        
+        word = self.wordbuff.lower()
+        for k, v in repl.items():
+            if word == k:
+                word = v
+                break
+        return word
 
 # void logcom()
 

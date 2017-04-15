@@ -36,8 +36,7 @@ from d2log import logger
 # long  stp;
  
 # void pncom()
-# int gamecom(str)
-# int brkword()
+
 # chklist(word,lista,listb)
 # int Match(x,y)
 # chkverb()
