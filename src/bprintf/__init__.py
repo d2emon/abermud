@@ -45,6 +45,7 @@ class D2Buffer:
 
         self.convflg = 0
         self.brmode = 0
+        self.cmdbuff = ""
 
     def __repr__(self):
         return "<D2Buffer \"\n{}\n\">".format(self.sysbuf)
@@ -71,14 +72,8 @@ class D2Buffer:
     def sendmsg(self, player):
         logger.debug("---> sendmsg({})".format(self))
 
-        # extern long debug_mode;
-        # extern long curch,moni,mynum;
-        # extern long tty;
-        # extern long my_lev;
-        # extern long my_str;
         # extern long in_fight;
         # extern long fighting;
-        # extern long curmode;
         # l:
         while True:
             self.pbfr()
@@ -109,11 +104,11 @@ class D2Buffer:
             work = buff.apply_conv(work)
             break
         # nadj:
-        # if curmode==1:
-        #     gamecom(work)
-        # else:
-        #    if work != ".Q" and work != ".q" and work:
-        #         a = special(work, name)
+        if player.curmode == 1:
+            player.game(work)
+        else:
+            if work and work.lower() != ".q":
+                a = player.special(work)
         # if fighting is not None:
         #    if fighting.username:
         #        in_fight = 0
@@ -125,7 +120,6 @@ class D2Buffer:
         #        in_fight-=1
 
         return work.lower() == ".q"
-        pass
 
     def bprintf(self, text):
         '''

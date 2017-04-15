@@ -9,10 +9,10 @@ from d2log import logger
 from world import World
 # from message.models import Message
 # from person.models import Person
-from game.parse import eorte
 # from bprintf import buff
 # from game.sigs import alon, aloff
 from game.utils import set_name, PROGNAME, randperc
+import cmd
 
 
 MAX_PLAYERS = 16
@@ -51,8 +51,11 @@ class Player(Base):
         self.lasup = 0
         self.user = None
         self.debug_mode = True
+        self.curmode = 0
         
         self.blind = False
+        self.ivct = 0
+        self.cal = False
 
     def __repr__(self):
         return "<Player: '{}' {}>".format(self.name, {
@@ -157,7 +160,7 @@ class Player(Base):
 
         self.cms = ct
         self.update()
-        eorte()
+        self.eorte()
 
         # extern long vdes,tdes,rdes;
         rdes = 0
@@ -165,11 +168,70 @@ class Player(Base):
         vdes = 0
 
         logger.debug('-'*70 + '>')
+        
+    def eorte(self):
+        logger.debug("---> eorte()")
+        # extern long mynum,me_ivct;
+        # extern long me_drunk;
+        # extern long ail_dumb;
+        # extern long curch,tdes,rdes,vdes,ades;
+        # extern long me_cal;
+        # extern long wpnheld;
+        # extern long my_str;
+        # extern long i_setup;
+        # extern long interrupt;
+        # extern long fighting,in_fight;
+    
+        # ctm = time()
+        # if ctm - last_io_interrupt > 2:
+        #    interrupt = 1
+    
+        # if interrupt:
+        #     last_io_interrupt = ctm
+    
+        if self.ivct:
+            self.ivct -= 1
+        
+        if self.ivct == 1:
+            self.visible = 0
+    
+        if self.cal:
+            self.cal = False
+            # calibme()
+    
+        # if tdes:
+        #     dosumm(ades)
+    
+        # if in_fight:
+        #     if ploc(fighting) != curch:
+        #         fighting = -1
+        #         in_fight = 0
+        #     if not strlen(pname(fighting)):
+        #         fighting = -1
+        #         in_fight = 0
+        #     if in_fight:
+        #         if interrupt:
+        #             in_fight = 0
+        #             hitplayer(fighting, wpnheld)
+    
+        # if self.iswornby(18) or randperc() < 10:
+        #     my_str += 1
+        #     if i_setup:
+        #         calibme()
+    
+        # forchk()
+    
+        # if me_drunk > 0:
+        #     me_drunk -= 1
+        #     if not ail_dumb:
+        #         gamecom("hiccup")
+    
+        # interrupt = 0
 
     def player_load(self):
         logger.debug("---> special(\".g\", {})".format(self))
         from message.models import Message
-        curmode = 1
+        self.curmode = 1
         self.curch = -5
         self.initme()
 
@@ -265,7 +327,6 @@ class Player(Base):
     def look(self, room_id):
         from bprintf import buff
         logger.debug("lookin(%d)", room_id)
-        # extern long curmode;
         dead = False
         w = self.loadw()
         self.save(w)
@@ -297,8 +358,9 @@ class Player(Base):
         if not self.blind:
             pass
         #     lisobs()
-        #     if curmode == 1:
-        #         lispeople()
+            if self.curmode == 1:
+                pass
+                # lispeople()
         buff.bprintf("\n")
         self.onlook()
         
@@ -341,3 +403,30 @@ class Player(Base):
         #        continue
         #    return False                
         return False
+    
+    def game(self, cmd):
+        from bprintf import buff
+        logger.debug("GAMEGO")
+        # extern long in_fight;
+        # extern long stp;
+        # extern char strbuf[];
+        if cmd == ".q":
+            cmd = ""
+            # Otherwise drops out after command
+        if not cmd:
+            return 0
+        if cmd == "!":
+            cmd = buff.cmdbuf
+        else:
+            buff.cmdbuf = cmd
+        stp = 0
+        # if brkword() == -1:
+        #     buff.bprintf("Pardon ?\n")
+        #     return -1
+        a = -1
+        # a = chkverb()
+        if a == -1:
+            buff.bprintf("I don't know that verb\n")
+            return -1
+        # doaction(a)
+        return 0

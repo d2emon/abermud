@@ -68,27 +68,7 @@ void pncom()
 int gamecom(str)
 char *str;
     {
-    long  a;
-    extern long in_fight;
-    extern long stp;
-    extern char strbuf[];
-    if(strcmp(str,"!")) strcpy(strbuf,str);
-    if(!strcmp(str,".q")) strcpy(str,"");  /* Otherwise drops out after command */
-    stp=0;
-    if(!strlen(str)) return(0);
-    if(!strcmp(str,"!")) strcpy(str,strbuf);
-    if(brkword()== -1)
-       {
-       bprintf("Pardon ?\n");
-       return(-1);
-       }
-    if((a=chkverb())== -1)
-       {
-       bprintf("I don't know that verb\n");
-       return(-1);
-       }
-    doaction(a);
-    return(0);
+
     }
  
 int brkword()
