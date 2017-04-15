@@ -412,7 +412,7 @@ class Player(Base):
             cmd = ""
             # Otherwise drops out after command
         if not cmd:
-            return 0
+            return True
         if cmd == "!":
             cmd = buff.cmdbuff
         else:
@@ -426,12 +426,49 @@ class Player(Base):
             "myself": self.name,
         }) is None:
             buff.bprintf("Pardon ?\n")
-            return -1
+            return False
         
-        a = -1
-        # a = chkverb()
-        if a == -1:
+        a = buff.chkverb()
+        if a is None:
             buff.bprintf("I don't know that verb\n")
-            return -1
-        # doaction(a)
-        return 0
+            return False
+        self.doaction(a)
+        return True
+    
+    def doaction(self, a):
+        w = self.loadw()
+        if a > 1 and a < 8:
+            # dodirn(n)
+            return
+        if a == 1:
+            # dogocom()
+            pass
+        elif a == 139:
+            # if in_fight:
+            #     buff.bprintf("Not in a fight!\n");
+            # else:
+            #     gropecom()
+            pass
+        elif a == 8:
+            # if isforce:
+            #     buff.bprintf("You can't be forced to do that\n")
+            # else:
+            #     self.rte()
+            #     self.loadw()
+            #     if(in_fight)
+            #         buff.bprintf("Not in the middle of a fight!\n")
+            #     else:
+            #         xx = "{} has left the game\n".format(self.name)
+            #         buff.bprintf("Ok")
+            #         Message.send(self, self, -10000, self.curch, xx)
+            #         xx = "[ Quitting Game : {} ]\n".format(self.name)
+            #         Message.send(self, self, -10113, 0, xx)
+            #         dumpitems()
+            #         self.strength = -1
+            #         self.name = ''
+            #         self.save(w)
+            #         self.curmode = 0
+            #         self.curch = 0
+            #         saveme();
+            #         crapup("Goodbye")
+            pass            

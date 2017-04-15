@@ -197,7 +197,6 @@ class D2Buffer:
 
     def nextword(self, repl):
         repl.update(self.repl)
-        logger.debug([self.stp, len(self.words)])
         if self.stp >= len(self.words):
             return None
         
@@ -210,6 +209,10 @@ class D2Buffer:
                 word = v
                 break
         return word
+    
+    def chkverb(self):
+        return chklist(self.wordbuff, verbs)
+
 
 # void logcom()
 
@@ -223,8 +226,103 @@ class D2Buffer:
 # void chksnp()
 # void setname(x)  /* Assign Him her etc according to who it is */
 
+verbs = {
+    "go": 1,
+    "climb": 1,
+    "n": 2,
+    "e": 3,
+    "s": 4,
+    "w": 5,
+    "u": 6,
+    "d": 7,
+    "north": 2,
+    "east": 3,
+    "south": 4,
+    "west": 5,
+    "up": 6,
+    "down": 7,
+    "quit": 8,
+    # "get","take","drop","look","i","inv","inventory","who",
+    # 9,9,10,11,12,12,12,13,
+    # "reset","zap","eat","drink","play",
+    # 14,15,16,16,17,
+    # "shout","say","tell","save","score"
+    # 18,19,20,21,22,
+    # ,"exorcise","give","steal","pinch","levels","help","value"
+    # 23,24,25,25,26,27,28,
+    # ,"stats","examine","read","delete","pass","password",
+    # 29,30,30,31,32,32,
+    # "summon","weapon","shoot","kill","hit","fire","launch","smash","break",
+    # 33,34,35,35,35,35,35,35,35,
+    # "laugh","cry","burp","fart","hiccup","grin","smile","wink","snigger"
+    # 50,51,52,53,54,55,56,57,58,
+    # ,"pose","set","pray","storm","rain","sun","snow","goto",
+    # 59,60,61,62,63,64,65,66
+    # "wear","remove","put","wave","blizzard","open","close",
+    # ,100,101,102,103,104,105,106,    
+    # "shut","lock","unlock","force","light","extinguish","where","turn",
+    # 106,107,108,109,110,111,112,117,
+    # "invisible","visible","pull","press","push","cripple","cure","dumb",
+    # 114,115,117,117,117,118,119,120,
+    # "change","missile","shock","fireball","translocate","blow",
+    # 121,122,123,124,125,126,
+    # "sigh","kiss","hug","slap","tickle","scream","bounce","wiz"
+    # 127,128,129,130,131,132,133,134,
+    # ,"stare","exits","crash","sing","grope","spray"
+    # 135,136,137,138,139,140,
+    # ,"groan","moan","directory","yawn","wizlist","in","smoke"
+    # 141,142,143,144,145,146,147,
+    # ,"deafen","resurrect","log","tss","rmedit","loc","squeeze","users"
+    # 148,149,150,151,152,153,154,155,
+    # ,"honeyboard","inumber","update","become","systat","converse"
+    # 156,157,158,159,160,161,
+    # ,"snoop","shell","raw","purr","cuddle","sulk","roll","credits"
+    # 162,163,164,165,166,167,168,169,
+    # ,"brief","debug","jump","wield","map","flee","bug","typo","pn"
+    # 170,171,172,34,173,174,175,176,177,
+    # ,"blind","patch","debugmode","pflags","frobnicate","strike"
+    # 178,179,180,181,182,35,
+    # ,"setin","setout","setmin","setmout","emote","dig","empty"
+    # 183,184,185,186,187,188,189
+}
+
 
 def makebfr():
     global buff
     buff = D2Buffer()
     return buff
+
+
+def chklist(word, verb):
+    word = word.lower()
+    # matches = [match(word, a) for a in keys]
+    matches = dict()
+    for a in verb.keys():
+        matches[match(word, a)] = a
+    max_match = max(matches.keys())
+    if max_match < 5:
+        return None
+        # No good matches
+    k = matches[max_match]
+    return verb[k]
+
+
+def match(word, verb):
+    if not word:
+        return 0
+    if word == verb:
+        return 10000
+    if verb == "reset":
+        return -1
+
+    # c=0
+    # for n in range(len(word)):
+    #     if n >= len(verb):
+    #         break
+    #     if n == 0:
+    #         c += 2
+    #     if n == 1:
+    #         c += 1
+    #    c += 1
+    # return c
+    return 0
