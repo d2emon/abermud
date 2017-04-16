@@ -62,8 +62,7 @@ def talker(user):
     # logger.debug("Buffer loaded %s", buff)
     logger.debug("Main loop")
     logger.debug('<!' + '-'*40)
-    # while True:
-    for t in range(5):
+    while player.alive:
         logger.debug('<!' + '-'*20)
         buff.pbfr()
 

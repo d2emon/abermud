@@ -12,7 +12,7 @@ from world import World
 # from bprintf import buff
 # from game.sigs import alon, aloff
 from game.utils import set_name, PROGNAME, randperc
-import cmd
+# import cmd
 
 
 MAX_PLAYERS = 16
@@ -36,6 +36,8 @@ class Player(Base):
     from_messages = relationship("Message", foreign_keys="Message.from_player_id", backref="Message.from_player")
     to_messages = relationship("Message", foreign_keys="Message.to_player_id", backref="Message.to_player")
 
+    alive = True
+
     sexes = {
         'm': MALE,
         'f': FEMALE,
@@ -52,7 +54,7 @@ class Player(Base):
         self.user = None
         self.debug_mode = True
         self.curmode = 0
-        
+
         self.blind = False
         self.ivct = 0
         self.cal = False
@@ -168,7 +170,7 @@ class Player(Base):
         vdes = 0
 
         logger.debug('-'*70 + '>')
-        
+
     def eorte(self):
         logger.debug("---> eorte()")
         # extern long mynum,me_ivct;
@@ -181,27 +183,27 @@ class Player(Base):
         # extern long i_setup;
         # extern long interrupt;
         # extern long fighting,in_fight;
-    
+
         # ctm = time()
         # if ctm - last_io_interrupt > 2:
         #    interrupt = 1
-    
+
         # if interrupt:
         #     last_io_interrupt = ctm
-    
+
         if self.ivct:
             self.ivct -= 1
-        
+
         if self.ivct == 1:
             self.visible = 0
-    
+
         if self.cal:
             self.cal = False
             # calibme()
-    
+
         # if tdes:
         #     dosumm(ades)
-    
+
         # if in_fight:
         #     if ploc(fighting) != curch:
         #         fighting = -1
@@ -213,19 +215,19 @@ class Player(Base):
         #         if interrupt:
         #             in_fight = 0
         #             hitplayer(fighting, wpnheld)
-    
+
         # if self.iswornby(18) or randperc() < 10:
         #     my_str += 1
         #     if i_setup:
         #         calibme()
-    
+
         # forchk()
-    
+
         # if me_drunk > 0:
         #     me_drunk -= 1
         #     if not ail_dumb:
         #         gamecom("hiccup")
-    
+
         # interrupt = 0
 
     def player_load(self):
@@ -363,7 +365,7 @@ class Player(Base):
                 # lispeople()
         buff.bprintf("\n")
         self.onlook()
-        
+
     def onlook(self):
         # fpbns("shazareth").chkfight()
         # if not self.iscarrby(45):
@@ -401,9 +403,9 @@ class Player(Base):
         #        continue
         #    if oloc(c).location != self.location:
         #        continue
-        #    return False                
+        #    return False
         return False
-    
+
     def game(self, cmd):
         from bprintf import buff
         logger.debug("GAMEGO")
@@ -427,48 +429,82 @@ class Player(Base):
         }) is None:
             buff.bprintf("Pardon ?\n")
             return False
-        
+
         a = buff.chkverb()
         if a is None:
             buff.bprintf("I don't know that verb\n")
             return False
         self.doaction(a)
         return True
-    
+
     def doaction(self, a):
         w = self.loadw()
+        actions = {
+            1: dogocom,
+            2: dodirn,
+            3: dodirn,
+            4: dodirn,
+            5: dodirn,
+            6: dodirn,
+            7: dodirn,
+            8: doquit,
+            139: dogrope,
+        }
+        act = actions.get(a)
+        if act is not None:
+            act(self, a)
         if a > 1 and a < 8:
-            # dodirn(n)
             return
         if a == 1:
-            # dogocom()
             pass
         elif a == 139:
-            # if in_fight:
-            #     buff.bprintf("Not in a fight!\n");
-            # else:
-            #     gropecom()
             pass
         elif a == 8:
-            # if isforce:
-            #     buff.bprintf("You can't be forced to do that\n")
-            # else:
-            #     self.rte()
-            #     self.loadw()
-            #     if(in_fight)
-            #         buff.bprintf("Not in the middle of a fight!\n")
-            #     else:
-            #         xx = "{} has left the game\n".format(self.name)
-            #         buff.bprintf("Ok")
-            #         Message.send(self, self, -10000, self.curch, xx)
-            #         xx = "[ Quitting Game : {} ]\n".format(self.name)
-            #         Message.send(self, self, -10113, 0, xx)
-            #         dumpitems()
-            #         self.strength = -1
-            #         self.name = ''
-            #         self.save(w)
-            #         self.curmode = 0
-            #         self.curch = 0
-            #         saveme();
-            #         crapup("Goodbye")
-            pass            
+            pass
+
+
+def dogocom(player, actiion_id):
+    # dogocom()
+    pass
+
+
+def dodirn(player, actiion_id):
+    # dodirn(n)
+    pass
+
+
+def dogrope(player, actiion_id):
+    # if in_fight:
+    #     buff.bprintf("Not in a fight!\n");
+    # else:
+    #     gropecom()
+    pass
+
+
+def doquit(player, actiion_id):
+    from bprintf import buff
+    from models import Message
+    # if isforce:
+    #     buff.bprintf("You can't be forced to do that\n")
+    #     return
+    player.rte()
+    w = player.loadw()
+    # if(in_fight)
+    #   buff.bprintf("Not in the middle of a fight!\n")
+    #   return
+    xx = "{} has left the game\n".format(player.name)
+    buff.bprintf("Ok")
+    Message.send(player, player, -10000, player.curch, xx)
+
+    xx = "[ Quitting Game : {} ]\n".format(player.name)
+    Message.send(player, player, -10113, 0, xx)
+    # dumpitems()
+    player.strength = -1
+    player.name = ''
+    player.save(w)
+    player.curmode = 0
+    player.curch = 0
+    player.save(w)
+    player.alive = False
+    # crapup("Goodbye")
+    pass
