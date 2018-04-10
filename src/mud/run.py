@@ -6,12 +6,13 @@ from getpass import getpass
 
 import config
 
-from d2log import mud_logger as logger, load_logger
 from d2lib import printfile
 from mud.utils import getty, cls, crapup
 from mud.talker import talker
 from user.models import User
 from user.login import chknolog, login  # , authenticate
+
+from server import check_host
 
 
 # char lump[256];
@@ -44,15 +45,6 @@ def time_elapsed():
     return "Game time elapsed: {}".format(dt)
 
 
-def check_host(host):
-    '''
-    Check we are running on the correct host
-    see the notes about the use of flock();
-    and the affects of lockf();
-    '''
-    assert User.host() == host, "AberMUD is only available on {}, not on {}".format(host, User.host())
-
-
 def show_title():
     '''
     Check for all the created at stuff
@@ -83,12 +75,12 @@ def main(*argv):
     '''
     The initial routine
     '''
-    load_logger(logger)
+    CONFIG = config.load()
 
     global FILES
-    FILES = config.load()
+    FILES = CONFIG
 
-    check_host(FILES['HOST_MACHINE'])
+    check_host(CONFIG.get('HOST_MACHINE'))
 
     # Check if there is a no logins file active
     print("\n\n\n\n")

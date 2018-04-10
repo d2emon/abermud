@@ -1,5 +1,7 @@
 #! /usr/bin/env python
-import mud
+from mud import run
+from d2log import mud_logger as logger, load_logger
+
 
 
 def main():
@@ -7,10 +9,11 @@ def main():
     # logformat = '\t%(levelname)s:%(name)s:%(message)s [in %(pathname)s:%(lineno)d]'
     # logging.basicConfig(format=logformat)
     # logging.basicConfig(level=logging.DEBUG, format=logformat)
-
-    import sys
-    mud.main(*sys.argv)
+    pass
 
 
 if __name__ == "__main__":
-    main()
+    load_logger(logger)
+
+    import sys
+    run.main(*sys.argv)
