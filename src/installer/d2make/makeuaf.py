@@ -1,4 +1,4 @@
-import d2make
+from .compiler import gcc
 
 
 def main():
@@ -19,4 +19,4 @@ def main():
 
 def compile():
     print('Compiling uaf generator')
-    d2make.gcc_compiler(main())
+    gcc(main())

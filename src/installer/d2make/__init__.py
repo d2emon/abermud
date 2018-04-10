@@ -1,9 +1,4 @@
-from d2make import h_c
-
-
-def gcc_compiler(res):
-    print(res)
-    pass
+from . import h_c
 
 
 def compile_h():

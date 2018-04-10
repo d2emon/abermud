@@ -1,4 +1,4 @@
-import d2make
+from .compiler import gcc
 
 
 def main():
@@ -19,6 +19,6 @@ def main():
 
 def compile():
     print('Compiling world maker')
-    d2make.gcc_compiler(main())
+    gcc(main())
     print("--->\tmakeworld.util")
     print('Game universe intialised')

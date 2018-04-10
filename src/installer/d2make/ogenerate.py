@@ -1,4 +1,4 @@
-import d2make
+from .compiler import gcc
 from dummysh import cp
 
 
@@ -21,7 +21,7 @@ def main():
 
 def compile():
     print('Compiling reset data compiler')
-    d2make.gcc_compiler(main())
+    gcc(main())
     cp("ob.out", "reset_data")
     print("--->\togenerate")
     print('Reset data generated')
