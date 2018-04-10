@@ -1,74 +1,56 @@
 import os
-import yaml
-
-from datetime import datetime
-from getpass import getpass
-
 import config
 
-from d2lib import printfile
-from mud.utils import getty, cls, crapup
-from mud.talker import talker
-from user.models import User
-from user.login import chknolog, login  # , authenticate
+from d2log import mud_logger as logger
+from .views import start, motd
+from .utils import getty, crapup
+from .talker import talker
+from user.login import login  # , authenticate
 
-from server import check_host
+from server import test_login
 
 
 # char lump[256];
-namegiv = False
-namegt = None
-qnmrq = False
-FILES = dict()
 # char usrnam[44];
 
 
-def time_created():
+def parse_args(args):
+    '''
+    Now check the option entries
+    '''
+    if len(args) < 2:
+        return None
+
+    arg = args[1].upper()
+
+    if len(arg) < 2:
+        return None
+
+    # -n(name)
+    if arg[0] == '-' and arg[1] == 'N':
+        username = arg[2:]
+        # user = User.by_username(username)
+        # print("USER is", user)
+        # if user:
+        #    # authenticate(user)
+        # else:
+        return username
+    return None
+
+
+def login_vars(username=None):
+    user = login(username)
+    if username is not None:
+        user.ttyt = 0
+    return user
+
+
+def uid():
     try:
-        created = os.path.getmtime(FILES["EXE"])
-        return datetime.fromtimestamp(created).strftime("%x %X")
+        id = os.getuid()
     except:
-        return "<unknown>"
-
-
-def time_elapsed():
-    import humanize
-    a = FILES["RESET_N"]
-    try:
-        with open(a) as f:
-            d = yaml.load(f)
-            r = d['started']
-    except:
-        return "AberMUD has yet to ever start!!!"
-
-    dt = humanize.naturaltime(datetime.now() - r)
-    return "Game time elapsed: {}".format(dt)
-
-
-def show_title():
-    '''
-    Check for all the created at stuff
-    We use stats for this which is a UN*X system call
-    '''
-    cls()
-    print("""
-                     A B E R  M U D
-
-              By Alan Cox, Richard Acott Jim Finnis
-
-    This AberMUD was created: {}
-    {}
-    """.format(time_created(), time_elapsed()))
-
-
-def show_motd():
-    '''
-    list the message of the day
-    '''
-    cls()
-    printfile(FILES['MOTD'])
-    getpass("")
-    print("\n\n")
+        id = '<UID>'
+    return id
 
 
 def main(*argv):
@@ -77,53 +59,24 @@ def main(*argv):
     '''
     CONFIG = config.load()
 
-    global FILES
-    FILES = CONFIG
-
-    check_host(CONFIG.get('HOST_MACHINE'))
-
-    # Check if there is a no logins file active
     print("\n\n\n\n")
-    chknolog()
+    test_login()
 
-    user = None
-    if len(argv) > 1:
-        arg = argv[1].upper()
+    username = parse_args(argv)
+
+    if username is None:
+        username = getty()
+        showSplash = True
     else:
-        arg = ' '
+        showSplash = False
 
-    if arg[0] == '-':
-        # Now check the option entries
-        # -n(name)
-        key = arg[1]
-        if key == 'N':
-            username = arg[2:]
-            # user = User.by_username(username)
-            # print("USER is", user)
-            # if user:
-            #    # authenticate(user)
-            # else:
-            user = login(username)
-            user.qnmrq = True
-            user.ttyt = 0
-        else:
-            getty()
-    else:
-        getty()
-
-    if user is None:
-        show_title()
-        user = login()
-
-    if not user.qnmrq:
-        show_motd()
+    start(showSplash)
+    user = login_vars(username)
+    if showSplash:
+        motd(showSplash)
 
     # Log entry
-    try:
-        uid = os.getuid()
-    except:
-        uid = '<UID>'
-    logger.info("Game entry by %s : UID %s", user.username, uid)
+    logger.info("Game entry by %s : UID %s", user.username, uid())
 
     # Run system
     talker(user)

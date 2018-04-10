@@ -1,6 +1,6 @@
 from config import CONFIG
 from d2log import mud_logger as logger
-from mud.utils import cls
+from mud.views import cls
 # from user.models import User
 from user.models import User
 from getpass import getpass
@@ -100,18 +100,6 @@ def register(user):
             print(e)
     user.save()
     return True
-
-
-def chknolog():
-    try:
-        with open(CONFIG["NOLOGIN"]) as a:
-            s = a.read()
-        print(s)
-    except:
-        return
-
-    import sys
-    sys.exit(0)
 
 
 def search():

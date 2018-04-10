@@ -1,6 +1,8 @@
 from getpass import getpass
 from d2log import mud_logger as logger
 
+import sys
+
 
 # include <stdio.h>
 # include <sys/errno.h>
@@ -23,12 +25,7 @@ ttyt = 0
 
 def getty():
     logger.debug("--->\tgetty()")
-
-
-def cls():
-    logger.debug("--->\tcls()")
-    print("=-" * 40)
-    print("\n" * 24)
+    return "TTY"
 
 
 # FILE *openlock(file,perm)
@@ -48,6 +45,4 @@ def validname(name):
 
 def crapup(ptr):
     getpass("\n{}\n\nHit Return to Continue...\n".format(ptr))
-
-    import sys
     sys.exit(0)

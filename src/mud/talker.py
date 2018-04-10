@@ -1,5 +1,5 @@
 # from d2lib import cuserid
-from mud.utils import cls  # , crapup
+from .views import cls
 from game import main
 from getpass import getpass
 from user.login import search, show, edit_field, change_password
