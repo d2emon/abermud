@@ -2,6 +2,7 @@ import os
 import config
 
 from d2log import mud_logger as logger
+from .gmain2 import main as game
 from .views import start, motd
 from .utils import getty, crapup
 from .talker import talker
@@ -65,9 +66,11 @@ def main(*argv):
     username = parse_args(argv)
 
     if username is None:
+        game()
         username = getty()
         showSplash = True
     else:
+        game(n=username)
         showSplash = False
 
     start(showSplash)
