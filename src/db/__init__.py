@@ -9,7 +9,7 @@ import db.base
 # Base = declarative_base()
 # engine = None
 # sess = None
-db_url = "sqlite:///../db/mud.db"
+db_url = "sqlite:///db/mud.db"
 engine = create_engine(db_url)
 db.base.Base.metadata.create_all(engine, checkfirst=True)
 Session = sessionmaker(bind=engine)
