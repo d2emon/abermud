@@ -1,7 +1,6 @@
 from config import CONFIG
 from d2log import mud_logger as logger
 from mud.views import cls
-# from user.models import User
 from user.models import User
 from getpass import getpass
 

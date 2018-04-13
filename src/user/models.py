@@ -1,5 +1,5 @@
 from d2log import mud_logger as logger
-from mud.utils import validname
+# from mud.utils import validname
 # from config import CONFIG
 # import yaml
 import socket
@@ -8,6 +8,10 @@ from db.base import Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import validates, relationship
 # from models import Person
+
+
+def validname():
+    return True
 
 
 class User(Base):

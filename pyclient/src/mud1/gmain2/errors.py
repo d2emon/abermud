@@ -1,11 +1,3 @@
-class ArgsError(Exception):
-    """
-    Args parsing errors
-    """
-    def __init__(self, message):
-        self.message = message
-
-
 class LoginError(Exception):
     """
     Login errors

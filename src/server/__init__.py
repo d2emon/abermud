@@ -1,5 +1,5 @@
 from config import CONFIG
-from user.models import User
+# from .user.models import User
 from datetime import datetime
 
 import os
@@ -15,7 +15,7 @@ def check_host(host=None):
     '''
     if host is None:
         host = CONFIG.get('HOST_MACHINE')
-    assert User.host() == host, "AberMUD is only available on {}, not on {}".format(host, User.host())
+    # assert User.host() == host, "AberMUD is only available on {}, not on {}".format(host, User.host())
 
 
 def check_nologin():

@@ -16,8 +16,12 @@ def start(show=True):
     Check for all the created at stuff
     We use stats for this which is a UN*X system call
     '''
+    cls()
+    print("\n" * 4)
     if not show:
         return
+
+    # splash()
 
     time = stats()
     created = time.get('created')
@@ -57,7 +61,9 @@ def motd(show=True):
     if not show:
         return
 
+    print('MOTD')
     cls()
     printfile(CONFIG.get('MOTD'))
     getpass("")
     print("\n\n")
+    # return showMotd()

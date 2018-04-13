@@ -23,6 +23,14 @@ def dcrypt(s):
 ttyt = 0
 
 
+def uid():
+    try:
+        id = os.getuid()
+    except:
+        id = '<UID>'
+    return id
+
+
 def getty():
     logger.debug("--->\tgetty()")
     return "TTY"
