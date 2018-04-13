@@ -3,10 +3,10 @@ from db.base import Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship  # validates
 
-from models import Room
+from models.room.models import Room
 
 from d2log import logger
-from world import World
+from models.world import World
 # from message.models import Message
 # from person.models import Person
 # from bprintf import buff

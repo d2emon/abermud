@@ -16,11 +16,11 @@ Session = sessionmaker(bind=engine)
 sess = Session()
 
 
-import user.models
-import player.models
-import person.models
-import message.models
-import room.models
+import models.user.models
+import models.player.models
+import models.person.models
+import models.message.models
+import models.room.models
 
 
 def connect(echo=False):

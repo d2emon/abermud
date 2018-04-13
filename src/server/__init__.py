@@ -1,6 +1,7 @@
 from config import CONFIG
 # from .user.models import User
 from datetime import datetime
+from humanize import naturaltime
 
 import os
 import sys
@@ -62,3 +63,32 @@ def stats():
         'created': time_created(),
         'elapsed': time_elapsed(),
     }
+
+
+def mudStats():
+    def prepareCreated(created):
+        if not created:
+            return "<unknown>"
+
+        # dateformat = '%Y-%m-%dT%H:%M:%S.%fZ'
+        # created_date = datetime.strptime(created, dateformat)
+        # return naturaltime(datetime.now() - created_date)
+        return created.strftime("%x %X")
+
+    def prepareStarted(started):
+        if started:
+            return "Game time elapsed: {}".format(
+                humanize.naturaltime(started)
+            )
+        return "AberMUD has yet to ever start!!!"
+
+    # try:
+    #     data, errors = sendWithErrors(requests.get(SERVER + '/stats'))
+    # except requests.exceptions.ConnectionError as err:
+    #     print(err)
+    #     data = dict()
+
+    data = stats()
+    created = data.get('created')
+    started = data.get('elapsed')
+    return prepareCreated(created), prepareStarted(started)

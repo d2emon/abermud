@@ -1,9 +1,5 @@
-from .login import findUser, addUser, login, mudStats
-from .errors import LoginError
-
-
-def cls():
-    print("\n" * 24)
+from .login import findUser, addUser, login
+from mud.errors import LoginError
 
 
 def askYN(prompt):
@@ -45,23 +41,6 @@ def inputPassword(
             tries -= 1
             continue
     raise LoginError
-
-
-def splash():
-    print("SPLASH")
-    created, started = mudStats()
-    print(created, started)
-
-    cls()
-    print("""
-
-                         A B E R  M U D
-
-                  By Alan Cox, Richard Acott Jim Finnis
-
-    """)
-    print("This AberMUD was created: %s" % (created))
-    print("Game time elapsed: %s" % (started))
 
 
 def testUsername(username):

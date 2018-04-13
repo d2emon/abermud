@@ -3,7 +3,7 @@ import config
 
 from .utils import getty, crapup
 from .gmain2 import main as game
-from .gmain2.errors import ArgsError
+from .errors import ArgsError
 from server import test_login
 
 

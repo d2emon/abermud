@@ -10,7 +10,7 @@ from sqlalchemy.orm import validates, relationship
 # from models import Person
 
 
-def validname():
+def validname(name):
     return True
 
 
@@ -106,6 +106,8 @@ class User(Base):
         '''
         if username is None:
             return None
+        else:
+            username = username.lower()
 
         # users = User.load()
         query = User.query()

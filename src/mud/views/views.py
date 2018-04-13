@@ -1,14 +1,8 @@
 from config import CONFIG
 from d2lib import printfile
 from getpass import getpass
-from server import stats
-
-import humanize
-
-
-def cls():
-    print("=-" * 40)
-    print("\n" * 24)
+from server import mudStats
+from .utils import cls
 
 
 def start(show=True):
@@ -21,26 +15,10 @@ def start(show=True):
     if not show:
         return
 
-    # splash()
+    print("SPLASH")
+    created, started = mudStats()
+    print(created, started)
 
-    time = stats()
-    created = time.get('created')
-    elapsed = time.get('elapsed')
-    print(created, elapsed)
-
-    if created is None:
-        created = "<unknown>"
-    else:
-        created = created.strftime("%x %X")
-
-    if elapsed is None:
-        elapsed = "AberMUD has yet to ever start!!!"
-    else:
-        elapsed = "Game time elapsed: {}".format(
-            humanize.naturaltime(elapsed)
-        )
-
-    cls()
     print("""
                      A B E R  M U D
 
@@ -52,6 +30,7 @@ def start(show=True):
         created = created,
         elapsed = elapsed,
     ))
+
 
 
 def motd(show=True):
