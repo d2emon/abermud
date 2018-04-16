@@ -2,10 +2,9 @@ import os
 import yaml
 
 
-basedir = os.path.join(os.getcwd(), '..')
+basedir = os.path.join(os.getcwd())
 config_file = os.path.join(basedir, 'config', 'files.yml')
 CONFIG = dict()
-SERVER = "http://localhost:2000/abernode-server"
 
 
 def load():
@@ -16,7 +15,6 @@ def load():
             data = yaml.load(f)
     except:
         data = dict()
-    # print(data)
     CONFIG = data
     return data
 

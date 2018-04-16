@@ -19,8 +19,8 @@ def start(show=True, server=None):
         server = Server()
 
     if server:
-        created, started = server.mudStats()
-    print(created, started)
+        created, elapsed = server.mudStats()
+    print(created, elapsed)
 
     print("""
                      A B E R  M U D

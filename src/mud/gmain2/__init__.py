@@ -1,5 +1,5 @@
 from d2log import mud_logger as logger
-from config import CONFIG
+from config import CONFIG, load
 
 from .cli import inputUser, loadUser, newUser
 from server import NoServer
@@ -40,7 +40,9 @@ def main(username=None, args=dict(), **kwargs):
     '''
     The initial routine
     '''
+    load()
     print("GMAIN2.PY MAIN()", args, kwargs, username)
+    print(CONFIG)
     show = username is None
     start(show, server=NoServer(CONFIG))
 

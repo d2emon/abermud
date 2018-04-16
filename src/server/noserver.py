@@ -1,7 +1,7 @@
 from config import CONFIG
+from .base import BaseServer
 # from .user.models import User
 from datetime import datetime
-from humanize import naturaltime
 
 import os
 import sys
@@ -24,79 +24,44 @@ def check_host(host=None):
     return host_decorator
 
 
-class NoServer:
-    def __init__(self, config=dict()):
-        self.config = config
-
-
-    def check_nologin(self):
-        '''
-        Check if there is a no logins file active
-        '''
+def check_nologin(func):
+    '''
+    Check if there is a no logins file active
+    '''
+    def func_wrapper(*args, **kwargs):
         try:
-            with open(self.config.get("NOLOGIN")) as a:
+            with open(CONFIG.get("NOLOGIN")) as a:
                 s = a.read()
-            print(s)
+                print(s)
+            sys.exit(0)
         except:
-            return
-        sys.exit(0)
-
-    @check_host
-    def can_login(self):
-        self.check_nologin()
+            func_wrapper(*args, **kwargs)
+        print(func)
+    return func
 
 
-    def time_created():
-        try:
-            created = os.path.getmtime(self.config.get("EXE"))
-            return datetime.fromtimestamp(created)
-        except:
-            return None
+class NoServer(BaseServer):
+    @check_host()
+    @check_nologin
+    def stats(self):
+        def created():
+            try:
+                created = os.path.getmtime(self.config.get("EXE"))
+                return datetime.fromtimestamp(created)
+            except:
+                return None
 
+        def elapsed():
+            a = self.config.get("RESET_N")
+            try:
+                with open(a) as f:
+                    d = yaml.load(f)
+                    r = d['started']
+            except:
+                return None
+            return datetime.now() - r
 
-    def time_elapsed():
-        a = self.config.get("RESET_N")
-        try:
-            with open(a) as f:
-                d = yaml.load(f)
-                r = d['started']
-        except:
-            return None
-
-        return datetime.now() - r
-
-
-    def stats():
-        can_login()
         return {
-            'created': time_created(),
-            'elapsed': time_elapsed(),
-            }
-
-
-    def mudStats(self):
-        # try:
-        #     data, errors = sendWithErrors(requests.get(SERVER + '/stats'))
-        # except requests.exceptions.ConnectionError as err:
-        #     print(err)
-        #     data = dict()
-
-        data = stats()
-        return self.prepareCreated(data.get('created')), self.prepareStarted(data.get('elapsed'))
-
-
-    def prepareCreated(created):
-        if not created:
-            return "<unknown>"
-
-        # dateformat = '%Y-%m-%dT%H:%M:%S.%fZ'
-        # created_date = datetime.strptime(created, dateformat)
-        # return naturaltime(datetime.now() - created_date)
-        return created.strftime("%x %X")
-
-    def prepareStarted(started):
-        if started:
-            return "Game time elapsed: {}".format(
-                humanize.naturaltime(started)
-            )
-        return "AberMUD has yet to ever start!!!"
+            'created': created(),
+            'elapsed': elapsed(),
+        }

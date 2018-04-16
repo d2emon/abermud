@@ -33,7 +33,7 @@ def uid():
 
 def getty():
     logger.debug("--->\tgetty()")
-    return "TTY"
+    return None
 
 
 # FILE *openlock(file,perm)
