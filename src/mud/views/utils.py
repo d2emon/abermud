@@ -13,6 +13,7 @@ def input_username(username, prompt="By what name shall I call you?\n*\t"):
         username = input(prompt)[:15]
 
     user = load_user(username)
+    print("LOADED", user)
     if not user:
         user = new_user(username)
     return user
@@ -27,7 +28,7 @@ def load_user(username):
     Check for legality of names
     '''
     try:
-        return User(username.lower())
+        return User.by_username(username)
     except AssertionError as e:
         print(e)
         return None

@@ -47,6 +47,7 @@ def login(username=None):
     User.test_banned()
 
     user = User.by_username(username)
+    print(user)
     if user:
         authenticate(user)
         return user
@@ -56,6 +57,7 @@ def login(username=None):
         user = input_username(username)
         username = ''
 
+    print(user)
     if user.id:
         # Password checking
         authenticate(user)
