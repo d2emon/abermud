@@ -8,15 +8,20 @@ def cls():
     print("\n" * 24)
 
 
+def askYN(prompt="(Y/N)?"):
+    answer = input(prompt).lower()
+    return answer[0] == 'y'
+
+
 def input_username(username, prompt="By what name shall I call you?\n*\t"):
     if not username:
         username = input(prompt)[:15]
 
-    user = load_user(username)
-    print("LOADED", user)
-    if not user:
-        user = new_user(username)
-    return user
+    # user = load_user(username)
+    # if not user:
+    #     user = new_user(username)
+    # return user
+    return load_user(username) or new_user(username)
 
 
 def input_password(prompt='Password: '):
@@ -38,8 +43,6 @@ def new_user(username):
     '''
     If he/she doesnt exist
     '''
-    answer = input("Did I get the name right {}? ".format(username)).lower()
-    if answer[0] == 'y':
-        user = User(username=username)
-    user = None
-    return User.by_username(username)
+    if askYN("Did I get the name right {}? ".format(username)):
+        return User(username=username)
+    return None
