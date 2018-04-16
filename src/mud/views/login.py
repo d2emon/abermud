@@ -1,18 +1,8 @@
-from d2log import mud_logger as logger
 from .utils import cls, input_username, input_password
 from models.user.models import User
 
 
 TRIES = 3
-
-
-def is_banned():
-    '''
-    Check if banned first
-    '''
-    b = User.chkbnid(User.host())
-    # cuserid(NULL));
-    logger.debug("BANNED %d", b)
 
 
 def authenticate(user):
@@ -54,7 +44,7 @@ def login(username=None):
     Does all the login stuff
     The whole login system is called from this
     '''
-    is_banned()
+    User.test_banned()
 
     user = User.by_username(username)
     if user:
@@ -63,7 +53,8 @@ def login(username=None):
 
     # Get the user name
     while not user:
-        user, username = input_username(username)
+        user = input_username(username)
+        username = ''
 
     if user.id:
         # Password checking

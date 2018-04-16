@@ -1,11 +1,12 @@
 from d2log import mud_logger as logger
+from config import CONFIG
 
 from .cli import inputUser, loadUser, newUser
+from server import NoServer
 from mud.errors import ArgsError
 from mud.utils import uid
-from mud.views import cls, start, motd
+from mud.views import cls, start, motd, login  # , authenticate
 # from ..talker import talker
-from models.user.login import login  # , authenticate
 
 
 def login_vars(username=None):
@@ -41,7 +42,7 @@ def main(username=None, args=dict(), **kwargs):
     '''
     print("GMAIN2.PY MAIN()", args, kwargs, username)
     show = username is None
-    start(show)
+    start(show, server=NoServer(CONFIG))
 
     user = login_vars(username)
     # user = login(username)

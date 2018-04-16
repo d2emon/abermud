@@ -1,11 +1,11 @@
 from config import CONFIG
 from d2lib import printfile
 from getpass import getpass
-from server import mudStats
 from .utils import cls
+from server import Server
 
 
-def start(show=True):
+def start(show=True, server=None):
     '''
     Check for all the created at stuff
     We use stats for this which is a UN*X system call
@@ -15,8 +15,11 @@ def start(show=True):
     if not show:
         return
 
-    print("SPLASH")
-    created, started = mudStats()
+    if not server:
+        server = Server()
+
+    if server:
+        created, started = server.mudStats()
     print(created, started)
 
     print("""

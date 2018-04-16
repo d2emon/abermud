@@ -100,6 +100,15 @@ class User(Base):
         return False
 
     @staticmethod
+    def test_banned():
+        '''
+        Check if banned first
+        '''
+        b = User.chkbnid(User.host())
+        # cuserid(NULL));
+        logger.debug("BANNED %d", b)
+
+    @staticmethod
     def by_username(username):
         '''
         Return block data for user or -1 if not exist

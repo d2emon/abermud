@@ -4,15 +4,12 @@ import config
 from .utils import getty, crapup
 from .gmain2 import main as game
 from .errors import ArgsError
-from server import test_login
 
 
 def parse_args(args):
     '''
     Now check the option entries
     '''
-    test_login()
-
     print(args)
     if len(args) < 2:
         return getty()
