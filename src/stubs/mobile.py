@@ -1,3 +1,6 @@
+from .errors import PlayerIsDead
+
+
 def on_timing():
     raise NotImplementedError()
 
@@ -34,6 +37,9 @@ def dircom():
 
 
 def sys_reset():
+    #
+    RESET_N.connect('ruf').lock()
+    #
     raise NotImplementedError()
 
 
@@ -43,6 +49,7 @@ def dorune():
 
 def pepdrop():
     raise NotImplementedError()
+    raise PlayerIsDead("Whoops.....   Frying tonight")
 
 
 def dragget():

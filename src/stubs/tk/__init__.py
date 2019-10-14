@@ -6,6 +6,10 @@ are (C) 1987/88  Alan Cox,Jim Finnis,Richard Acott
 
 This file holds the basic communications routines
 """
+from ..errors import PlayerIsDead, WorldError
+from ..gamego.signals import set_alarm
+
+
 state = {
     'i_setup': 0,
     'oddcat': 0,
@@ -64,11 +68,16 @@ def mstoout(block, name):
     raise NotImplementedError()
 
 
-def sendmsg(name):
+def sendmsg(state, name):
+    state['program'] = "-csh"
+    state['program'] = "   --}----- ABERMUD -----{--     Playing as {}".format(name)
+    set_alarm(state, True)
+    set_alarm(state, False)
     raise NotImplementedError()
 
 
 def send2(block):
+    raise WorldError("AberMUD: FILE_ACCESS : Access failed")
     raise NotImplementedError()
 
 
@@ -77,10 +86,7 @@ def readmsg(channel, block, num):
 
 
 def rte(name):
-    raise NotImplementedError()
-
-
-def openlock(file, perm):
+    raise WorldError("AberMUD: FILE_ACCESS : Access failed")
     raise NotImplementedError()
 
 
@@ -93,6 +99,7 @@ def findend(unit):
 
 
 def talker(name):
+    raise WorldError("Sorry AberMUD is currently unavailable")
     raise NotImplementedError()
 
 
@@ -125,10 +132,7 @@ def trapch(chan):
 
 
 def putmeon(name):
-    raise NotImplementedError()
-
-
-def loseme(name):
+    raise WorldError("You are already on the system - you may only be on once at a time")
     raise NotImplementedError()
 
 
@@ -141,6 +145,7 @@ def revise(cutoff):
 
 
 def lookin(room):
+    raise PlayerIsDead("bye bye.....")
     raise NotImplementedError()
 
 
@@ -148,7 +153,10 @@ def loodrv(room):
     raise NotImplementedError()
 
 
-def userwrap():
+def userwrap(state):
+    #
+    syslog(state, "System Wrapup exorcised {}".format(state['globme']))
+    #
     raise NotImplementedError()
 
 

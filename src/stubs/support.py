@@ -9,6 +9,10 @@ destroy(obj)
 
 are elsewhere
 """
+from datetime import datetime
+from .errors import SysLogError
+from .tk.lock import loseme
+from .files import LOG_FILE
 
 
 def ocarrf(ob):
@@ -139,8 +143,14 @@ def ocreate(ob):
     raise NotImplementedError()
 
 
-def syslog(args):
-    raise NotImplementedError()
+def syslog(state, message):
+    try:
+        service = LOG_FILE.connect('a').lock()
+        service.push("{}:\t{}".format(datetime.utcnow(), message))
+        service.disconnect()
+    except Exception:
+        loseme(state)
+        raise SysLogError("Log fault : Access Failure")
 
 
 def osetbit(ob, x):
