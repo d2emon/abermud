@@ -1,6 +1,6 @@
 from .errors import PlayerIsDead
 from .opensys import close_world, open_world
-from .support import syslog
+from .sys_log import logger
 
 
 def ohereandget(state):
@@ -30,7 +30,7 @@ def vicbase(state):
 def wounded(state, n):
     #
     close_world(state)
-    syslog(state, "{} slain magically".format(state['name']))
+    logger.debug("%s slain magically", state['name'])
     #
     state = open_world(state)
     #

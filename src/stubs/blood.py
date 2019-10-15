@@ -1,11 +1,12 @@
 from .errors import PlayerIsDead
 from .opensys import close_world, open_world
-from .support import pname, syslog
+from .support import pname
+from .sys_log import logger
 
 
 def bloodrcv(state, array, isme):
     #
-    syslog(state, "{} slain by {}".format(state['name'], pname(array[0])))
+    logger.debug("%s slain by %s", state['name'], pname(array[0]))
     #
     close_world(state)
     #

@@ -11,7 +11,7 @@ from ..gamego.signals import set_alarm
 from ..key import key_input
 from ..opensys import close_world, open_world
 from ..parse import eorte, gamrcv
-from ..support import syslog
+from ..sys_log import logger
 
 
 global_state = {
@@ -165,7 +165,7 @@ def __loodrv(room):
 
 def __userwrap(state):
     #
-    syslog(state, "System Wrapup exorcised {}".format(state['name']))
+    logger.debug("System Wrapup exorcised %s", state['name'])
     #
     raise NotImplementedError()
 

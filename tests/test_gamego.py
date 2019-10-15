@@ -15,10 +15,10 @@ class MainTestCase(unittest.TestCase):
 
     def test_main(self):
         self.state = initialize_state(self.state, 'Phantom')
-        self.assertEqual('The Phantom', self.state['globme'])
+        self.assertEqual('The Phantom', self.state['name'])
 
         self.state = initialize_state(self.state, 'username')
-        self.assertEqual('username', self.state['globme'])
+        self.assertEqual('username', self.state['name'])
 
         old_state = {**self.state}
         self.assertEqual(old_state, self.state['onStop'](self.state))
@@ -31,13 +31,13 @@ class MainTestCase(unittest.TestCase):
 
     def test_sig_alon(self):
         self.state = set_alarm(self.state, True)
-        self.assertTrue(self.state['sig_active'])
+        self.assertTrue(self.state['timer_active'])
         self.assertFalse(self.state['__ignore'])
         self.assertEqual(2, self.state['__time'])
 
     def test_sig_aloff(self):
         self.state = set_alarm(self.state, False)
-        self.assertFalse(self.state['sig_active'])
+        self.assertFalse(self.state['timer_active'])
         self.assertTrue(self.state['__ignore'])
         self.assertFalse(self.state['__time'])
 

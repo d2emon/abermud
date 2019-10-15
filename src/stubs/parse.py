@@ -1,7 +1,8 @@
 from datetime import datetime
 from .errors import PlayerIsDead
 from .opensys import close_world, open_world
-from .support import syslog, pname
+from .support import pname
+from .sys_log import logger
 
 
 def doaction(state, n):
@@ -177,19 +178,19 @@ def rescom():
 
 def lightning(state):
     #
-    syslog(state, "{} zapped {}".format(state['nabme'], pname(vic)))
+    logger.debug("%s zapped %s", state['name'], pname(vic))
     #
 
 
 def calibme(state):
     #
-    syslog(state, "{} to level {}".format(state['name'], b))
+    logger.debug("%s to level %s", state['name'], b)
     #
 
 
 def exorcom(state):
     #
-    syslog(state, "{} exorcised {}".format(state['name'], pname(x)))
+    logger.debug("%s exorcised %s", state['name'], pname(x))
     #
 
 
@@ -241,12 +242,12 @@ def becom():
 
 def bugcom(state):
     #
-    syslog(state, "Bug by {} : {}".format(state['name'], x))
+    logger.debug("Bug by %s : %s", state['name'], x)
 
 
 def typocom(state):
     #
-    syslog(state, "Typo by {} : {}".format(y, x))
+    logger.debug("Typo by %s : %s", y, x)
 
 
 def emptycom(state):

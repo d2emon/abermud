@@ -1,6 +1,6 @@
 from .errors import OutputBufferError
 from .opensys import close_world
-from .support import syslog
+from .sys_log import logger
 
 
 def __lock_alarm(state):
@@ -21,7 +21,7 @@ def __unlock_alarm(state):
 
 def bprintf(state, *args):
     #
-    syslog(state, "Bprintf Short Buffer overflow")
+    logger.debug("Bprintf Short Buffer overflow")
     raise OutputBufferError("Internal Error in BPRINTF")
     #
 
@@ -34,7 +34,7 @@ def dcprnt(__str, __file):
 
 def tocontinue(state, __str, ct, x, mx):
     #
-    syslog(state, "Bprintf Short Buffer overflow")
+    logger.debug("Bprintf Short Buffer overflow")
     #
     raise OutputBufferError("Buffer OverRun in IO_TOcontinue")
     #
@@ -58,7 +58,7 @@ def pbfr(state):
 
 def quprnt(state, x):
     #
-    syslog(state, "Buffer overflow on user {}".format(state['name']))
+    logger.debug("Buffer overflow on user %s", state['name'])
     raise OutputBufferError("PANIC - Buffer overflow")
     #
 

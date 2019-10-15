@@ -4,12 +4,13 @@ Two Phase Game System
 import sys
 from ..errors import PlayerIsDead, LockError, OutputBufferError, SysLogError, UserDataError, WorldError
 from ..bprintf import bprintf, pbfr
-from ..support import syslog
+from ..sys_log import logger
 from ..tk import rte
 from ..tk.talker import talker, next_turn
 from .signals import set_alarm, global_state as signals_state
 
 
+# State
 global_state = {
     **signals_state,
     'interrupt': 0,
@@ -22,17 +23,20 @@ global_state = {
 }
 
 
+# Mutations
+def set_name(state, name):
+    state['name'] = "The {}".format(name) if name == 'Phantom' else name
+    return state
+
+
 __dashes = "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 
 
 def initialize_state(state, username):
-    state = {
-        **state,
-        'name': "The {}".format(username) if username == 'Phantom' else username,
-    }
+    state = set_name(state, username)
     print("Entering Game ....")
     print("Hello {}".format(state['name']))
-    syslog(state, "GAME ENTRY: {}[{}".format(state['name'], state['user_id']))
+    logger.debug("GAME ENTRY: %s[%s]", state['name'], state['user_id'])
     return state
 
 
