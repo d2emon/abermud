@@ -1,8 +1,7 @@
 import sys
 from ..errors import PlayerIsDead
 from ..key import key_reprint
-from ..opensys import openworld
-# from ..tk import rte
+from ..opensys import close_world, open_world
 # from ..tk.lock import loseme
 
 
@@ -11,19 +10,19 @@ def __ignore(state):
 
 
 def __on_time(state):
-    if not sig_active or state['__ignore']:
+    if not state['timer_active'] or state['__ignore']:
         return
 
-    set_alarm(state, False)
-    openworld()
+    state = set_alarm(state, False)
+    state = open_world(state)
 
     state['interrupt'] = True
-    rte(state['globme'])
+    state = state['rte'](state)
     state['interrupt'] = False
 
     on_timing()
 
-    closeworld()
+    close_world(state)
     state = key_reprint(state)
     return set_alarm(state, True)
 
@@ -48,7 +47,7 @@ def __on_quit(state):
 global_state = {
     '__ignore': True,
     '__time': None,
-    'sig_active': False,
+    'timer_active': False,
     # Events
     'onClose': __on_error,
     'onQuit': __on_quit,
@@ -62,7 +61,7 @@ global_state = {
 def set_alarm(state, alarm):
     return {
         **state,
-        'sig_active': alarm,
+        'timer_active': alarm,
         '__time': alarm and 2,
         '__ignore': not alarm,
     }

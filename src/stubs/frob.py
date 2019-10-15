@@ -1,4 +1,7 @@
-def frobnicate():
+from .opensys import open_world
+
+
+def frobnicate(state):
     #
     keysetback()
     #
@@ -10,4 +13,5 @@ def frobnicate():
     #
     keysetup()
     #
-    raise NotImplementedError()
+    state = open_world(state)
+    #

@@ -7,26 +7,28 @@ are (C) 1987/88  Alan Cox,Jim Finnis,Richard Acott
 This file holds the basic communications routines
 """
 from ..errors import PlayerIsDead, WorldError
-from ..bprintf import makebfr
 from ..gamego.signals import set_alarm
 from ..key import key_input
+from ..opensys import close_world, open_world
+from ..parse import eorte, gamrcv
+from ..support import syslog
 
 
 global_state = {
+    '__first_message': 0,
+    '__last_message': 0,
+    '__messages': [],
+
     'i_setup': 0,
-    'oddcat': 0,
-    'talkfl': 0,
 
     'cms': -1,
     'curch': 0,
-    'globme': '',
+    'name': '',
     'curmode': 0,
     'meall': 0,
 
     'gurum': 0,
     'convflg': 0,
-
-    'fl_com': None,
 
     'rd_qd': 0,
 
@@ -39,11 +41,9 @@ global_state = {
     'tmpwiz': '.',
 
     'mynum': 0,
-
-    'lasup': 0,
-
-    'iamon': 0,
 }
+
+__last_update = 0
 
 """
 Data format for mud packets
@@ -66,80 +66,51 @@ def __vcpy(dest, offd, source, offs, __len):
     raise NotImplementedError()
 
 
-def __mstoout(block, name):
-    raise NotImplementedError()
+def __process_message(state, message):
+    code = message[1]
+    text = message[2]
+    if state['debug_mode']:
+        state = state['bprintf'](state, "\n<{}>".format(code))
+    if code < -3:
+        return gamrcv(state, message)
+    return state['bprintf'](state, text)
 
 
-def __sendmsg(state, name):
-    state['program'] = "-csh"
-    state['program'] = "   --}----- ABERMUD -----{--     Playing as {}".format(name)
-
-    state = set_alarm(state, True)
-    state = key_input(state, prmpt, 80)
-    state = set_alarm(state, False)
-
-    raise NotImplementedError()
+def __read_messages(state, first_message, last_message):
+    for message_id in range(first_message, last_message + 1):
+        yield state['__messages'][message_id - state['__first_message']]
 
 
-def __send2(block):
+def __send2(state, block):
     raise WorldError("AberMUD: FILE_ACCESS : Access failed")
+    state = open_world(state)
     raise NotImplementedError()
 
 
-def __readmsg(channel, block, num):
-    raise NotImplementedError()
+def rte(state):
+    try:
+        state = open_world(state)
+    except WorldError:
+        raise WorldError("AberMUD: FILE_ACCESS : Access failed")
 
+    last_message_id = state['__last_message']
+    first_message_id = state['cms'] if state['cms'] != -1 else last_message_id
+    for message in __read_messages(state, first_message_id, last_message_id):
+        state = __process_message(state, message)
+    state['cms'] = last_message_id
 
-def rte(name):
-    raise WorldError("AberMUD: FILE_ACCESS : Access failed")
-    raise NotImplementedError()
-
-
-def __findstart(unit):
-    raise NotImplementedError()
-
-
-def __findend(unit):
-    raise NotImplementedError()
-
-
-def talker(state, name):
-    makebfr()
-    state = {
-        **state,
-        'cms': -1,
-        'globme': name,
+    state = update(state)
+    return {
+        **eorte(state),
+        'rdes': 0,
+        'tdes': 0,
+        'vdes': 0,
     }
-    __putmeon(name)
-    if openworld() is None:
-        raise WorldError("Sorry AberMUD is currently unavailable")
-    if state['mynum'] >= state['maxu']:
-        raise Exception("Sorry AberMUD is full at the moment")
-    state['globme'] = name
-    rte(name)
-    closeworld()
-    state['cms'] = -1
-    __special('.g', name)
-    state['i_setup'] = True
-    """
-    while(1)
-       {
-       pbfr();
-       sendmsg(name);
-       if(rd_qd) rte(name);
-       rd_qd=0;
-       closeworld();
-       pbfr();
-       }
-    """
-    return state
 
 
-def __cleanup(inpbk):
-    raise NotImplementedError()
+def __cleanup(state, inpbk):
+    state = open_world(state)
 
-
-def __special(string, name):
     raise NotImplementedError()
 
 
@@ -151,32 +122,39 @@ def __tbroad(message):
     raise NotImplementedError()
 
 
-def __sysctrl(block, luser):
-    raise NotImplementedError()
-
-
 def split(block, nam1, nam2, work, luser):
     raise NotImplementedError()
 
 
-def trapch(chan):
+def trapch(state, chan):
+    state = open_world(state)
+
     raise NotImplementedError()
 
 
-def __putmeon(name):
-    raise WorldError("You are already on the system - you may only be on once at a time")
+def update(state):
+    global __last_update
+
+    messages = state['cms'] - __last_update
+    if abs(messages) < 10:
+        return state
+
+    __last_update = state['cms']
+    state = open_world(state)
+    setppos(state['mynum'], state['cms'])
+    return state
+
+
+def __revise(state, cutoff):
+    state = open_world(state)
+
     raise NotImplementedError()
 
 
-def update(name):
-    raise NotImplementedError()
-
-
-def __revise(cutoff):
-    raise NotImplementedError()
-
-
-def lookin(room):
+def lookin(state, room):
+    close_world(state)
+    state = open_world(state)
+    state = open_world(state)
     raise PlayerIsDead("bye bye.....")
     raise NotImplementedError()
 
@@ -187,7 +165,7 @@ def __loodrv(room):
 
 def __userwrap(state):
     #
-    syslog(state, "System Wrapup exorcised {}".format(state['globme']))
+    syslog(state, "System Wrapup exorcised {}".format(state['name']))
     #
     raise NotImplementedError()
 

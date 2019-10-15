@@ -1,4 +1,5 @@
 from .errors import OutputBufferError
+from .opensys import close_world
 from .support import syslog
 
 
@@ -10,7 +11,7 @@ def __lock_alarm(state):
 
 
 def __unlock_alarm(state):
-    if state['sig_active']:
+    if state['timer_active']:
         state['time'] = 2
     return {
         **state,
@@ -39,22 +40,25 @@ def tocontinue(state, __str, ct, x, mx):
     #
 
 
-def makebfr():
-    #
-    raise OutputBufferError("Out Of Memory")
-    #
+def make_buffer(state):
+    try:
+        state['sysbuf'] = ''
+        return state
+    except Exception:
+        raise OutputBufferError("Out Of Memory")
 
 
 def pbfr(state):
-    __lock_alarm(state)
+    state = __lock_alarm(state)
+    close_world(state)
     #
-    __unlock_alarm(state)
+    state = __unlock_alarm(state)
     return state
 
 
 def quprnt(state, x):
     #
-    syslog(state, "Buffer overflow on user {}".format(state['globme']))
+    syslog(state, "Buffer overflow on user {}".format(state['name']))
     raise OutputBufferError("PANIC - Buffer overflow")
     #
 

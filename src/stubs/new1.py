@@ -1,5 +1,12 @@
 from .errors import PlayerIsDead
+from .opensys import close_world, open_world
 from .support import syslog
+
+
+def ohereandget(state):
+    #
+    state = open_world(state)
+    #
 
 
 def pushcom():
@@ -14,9 +21,18 @@ def gropecom():
     #
 
 
+def vicbase(state):
+    #
+    state = open_world(state)
+    #
+
+
 def wounded(state, n):
     #
-    syslog(state, "{} slain magically".format(state['globme']))
+    close_world(state)
+    syslog(state, "{} slain magically".format(state['name']))
+    #
+    state = open_world(state)
     #
     raise PlayerIsDead("Oh dear you just died")
     #
