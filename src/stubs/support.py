@@ -9,10 +9,6 @@ destroy(obj)
 
 are elsewhere
 """
-from datetime import datetime
-from .errors import SysLogError
-from .tk.lock import loseme
-from .files import LOG_FILE
 
 
 def ocarrf(ob):

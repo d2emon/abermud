@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  signals.py
+#  events.py
 #  
 #  Copyright 2014 МихалычЪ <МихалычЪ@PC>
 #  

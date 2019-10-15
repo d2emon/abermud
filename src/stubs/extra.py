@@ -1,4 +1,4 @@
-from .errors import PlayerIsDead
+from .errors import PlayerIsDead, PlayerLoose
 from .opensys import close_world, open_world
 
 
@@ -32,7 +32,7 @@ def incom(state):
 
 def jumpcom():
     #
-    raise PlayerIsDead("I suppose you could be scraped up - with a spatula")
+    raise PlayerLoose("I suppose you could be scraped up - with a spatula")
     #
 
 

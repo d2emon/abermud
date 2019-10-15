@@ -17,11 +17,11 @@ def doaction(state, n):
     #
 
 
-def gamrcv(state, message):
-    name = state['name'].lower()
-    is_me, name1, name2, text = split(message, name)
-    location = message[0]
-    code = message[1]
+def gamrcv(state, is_me, message):
+    location = message['location']
+    code = message['code']
+    name1, name2 = message['players']
+    text = message['text']
     if code == -20000 and fpbns(name1) == state['fighting']:
         state['in_fight'] = 0
         state['fighting'] = -1
@@ -44,7 +44,7 @@ def gamrcv(state, message):
         state.update({'snoopd', -1})
     elif code == -750 and is_me:
         if fpbns(name2) != -1:
-            loseme()
+            raise PlayerIsDead("***HALT")
         close_world(state)
         raise SystemExit("***HALT")
     elif code == -9900:
@@ -227,17 +227,35 @@ def u_system(state):
 
 
 def updcom(state):
-    #
-    close_world(state)
-    #
+    try:
+        pass
+    except PlayerIsDead as e:
+        sendsys(
+            state['name'],
+            state['name'],
+            -10113,
+            state['curch'],
+            "[ {} has updated ]\n".format(state['name']),
+        )
+        close_world(state)
+
+    try:
+        execl(EXE, "   --{----- ABERMUD -----}--   ", state['name'])
+    except FileNotFoundError:
+        state['bprintf'](state, "Eeek! someones pinched the executable!\n")
 
 
-def becom():
-    #
-    keysetback()
-    #
-    close_world(state)
-    #
+def becom(state):
+    try:
+        #
+        keysetback()
+    except PlayerIsDead:
+        close_world(state)
+
+    try:
+        execl(EXE2, "   --}----- ABERMUD ------   ", x)
+    except FileNotFoundError:
+        state['bprintf'](state, "Eek! someone's just run off with mud!!!!\n")
 
 
 def bugcom(state):

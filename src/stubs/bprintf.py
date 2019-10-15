@@ -1,8 +1,22 @@
-from .errors import OutputBufferError
+from .errors import OutputBufferError  # PlayerLoose
 from .opensys import close_world
 from .sys_log import logger
 
 
+# State
+global_state = {
+    'is_clean': True,
+    'sysbuf': '',
+}
+
+
+# Mutations
+def set_clean(state, is_clean):
+    state['is_clean'] = is_clean
+    return state
+
+
+# Actions
 def __lock_alarm(state):
     return {
         **state,
@@ -51,6 +65,8 @@ def make_buffer(state):
 def pbfr(state):
     state = __lock_alarm(state)
     close_world(state)
+    if state['sysbuf']:
+        state = set_clean(state, False)
     #
     state = __unlock_alarm(state)
     return state
@@ -60,7 +76,7 @@ def quprnt(state, x):
     #
     logger.debug("Buffer overflow on user %s", state['name'])
     raise OutputBufferError("PANIC - Buffer overflow")
-    #
+
 
 def opensnoop(user, per):
     #

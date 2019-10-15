@@ -3,17 +3,17 @@ Two Phase Game System
 """
 import sys
 from ..errors import PlayerIsDead, LockError, OutputBufferError, SysLogError, UserDataError, WorldError
-from ..bprintf import bprintf, pbfr
+from ..bprintf import bprintf, pbfr, set_clean
+from ..key import set_key_buff
 from ..sys_log import logger
 from ..tk import rte
 from ..tk.talker import talker, next_turn
-from .signals import set_alarm, global_state as signals_state
+from .events import events, global_state as signals_state
 
 
 # State
 global_state = {
     **signals_state,
-    'interrupt': 0,
     #
     'in_fight': None,
     # Helpers
@@ -23,15 +23,20 @@ global_state = {
 }
 
 
+__dashes = "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+
+
 # Mutations
 def set_name(state, name):
     state['name'] = "The {}".format(name) if name == 'Phantom' else name
     return state
 
 
-__dashes = "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+def show_buffer(state):
+    return state['pbfr'](state)
 
 
+# Actions
 def initialize_state(state, username):
     state = set_name(state, username)
     print("Entering Game ....")
@@ -41,10 +46,8 @@ def initialize_state(state, username):
 
 
 def finalize_state(state):
-    return {
-        **state['pbfr'](state),
-        'pr_due': 0,  # So we dont get a prompt after the exit
-    }
+    state = show_buffer(state)
+    return set_key_buff(state, '')
 
 
 def main(state, username):
@@ -58,4 +61,4 @@ def main(state, username):
         print("\n{}\n\n{}\n\n{}".format(__dashes, e, __dashes))
         sys.exit(0)
     except Exception:
-        state['onError'](state)
+        events['onError'](state)

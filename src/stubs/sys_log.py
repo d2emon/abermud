@@ -13,5 +13,4 @@ def syslog(message):
         # service.disconnect()
         logger.debug(message)
     except Exception:
-        # loseme(state)
         raise SysLogError("Log fault : Access Failure")

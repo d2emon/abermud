@@ -34,5 +34,19 @@ def wounded(state, n):
     #
     state = open_world(state)
     #
+    sendsys(
+        state['name'],
+        state['name'],
+        -10000,
+        state['curch'],
+        "{} has just died\n".format(state['name']),
+    )
+    sendsys(
+        state['name'],
+        state['name'],
+        -10113,
+        state['curch'],
+        "[ {} has just died ]\n".format(state['name']),
+    )
     raise PlayerIsDead("Oh dear you just died")
     #

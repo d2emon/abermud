@@ -1,3 +1,7 @@
+class PlayerLoose(Exception):
+    pass
+
+
 class PlayerIsDead(Exception):
     pass
 

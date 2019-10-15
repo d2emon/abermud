@@ -7,8 +7,6 @@ are (C) 1987/88  Alan Cox,Jim Finnis,Richard Acott
 This file holds the basic communications routines
 """
 from ..errors import PlayerIsDead, WorldError
-from ..gamego.signals import set_alarm
-from ..key import key_input
 from ..opensys import close_world, open_world
 from ..parse import eorte, gamrcv
 from ..sys_log import logger
@@ -62,18 +60,29 @@ Sectors 1-n  in pairs ie [128 words]
 """
 
 
-def __vcpy(dest, offd, source, offs, __len):
-    raise NotImplementedError()
+def __parse_message(block, receiver):
+    name1, name2 = block[2].split('.')
+    names = [name1.lower()]
+    if name1[:4].lower() == "the ":
+        names.append(name1[4:].lower())
+    is_me = any(name for name in names if name == receiver)
+    message = {
+        'location': block[0],
+        'code': block[1],
+        'players': (name1, name2),
+        'text': block[3],
+    }
+    return is_me, message
 
 
-def __process_message(state, message):
-    code = message[1]
-    text = message[2]
+def __process_message(state, data):
+    receiver = state['name'].lower()
+    is_me, message = __parse_message(data, receiver)
     if state['debug_mode']:
-        state = state['bprintf'](state, "\n<{}>".format(code))
-    if code < -3:
-        return gamrcv(state, message)
-    return state['bprintf'](state, text)
+        state = state['bprintf'](state, "\n<{}>".format(message['code']))
+    if message['code'] < -3:
+        return gamrcv(state, is_me, message)
+    return state['bprintf'](state, message['text'])
 
 
 def __read_messages(state, first_message, last_message):
@@ -114,15 +123,19 @@ def __cleanup(state, inpbk):
     raise NotImplementedError()
 
 
-def broad(mesg):
-    raise NotImplementedError()
+def broad(state, message):
+    state['rd_qd'] = True
+    return send2(
+        state,
+        [
+            None,
+            -1,
+            message[:126],
+        ]
+    )
 
 
 def __tbroad(message):
-    raise NotImplementedError()
-
-
-def split(block, nam1, nam2, work, luser):
     raise NotImplementedError()
 
 
