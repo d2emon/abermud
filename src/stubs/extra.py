@@ -14,6 +14,10 @@ def levcom(state):
     #
 
 
+def examcom(state):
+    state = set_channel(state, -114)
+
+
 def statplyr(state):
     #
     close_world(state)
@@ -34,6 +38,7 @@ def jumpcom():
     #
     raise PlayerLoose("I suppose you could be scraped up - with a spatula")
     #
+    return set_channel(state, b)
 
 
 def wherecom(state):

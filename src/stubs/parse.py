@@ -30,6 +30,10 @@ def doaction(state, n):
     #
 
 
+def dodirn(state, n):
+    state = set_channel(state, newch)
+
+
 def gamrcv(state, is_me, message):
     channel = message['channel']
     code = message['code']
@@ -208,6 +212,10 @@ def exorcom(state):
     #
     logger.debug("%s exorcised %s", state['name'], pname(x))
     #
+
+
+def dosummcom(state):
+    state = set_channel(state, loc)
 
 
 def tsscom(state):

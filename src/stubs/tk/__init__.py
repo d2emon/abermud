@@ -84,12 +84,23 @@ def __read_messages(state, first_message, last_message):
         yield state['__messages'][message_id - state['__first_message']]
 
 
+def __revise(state, cutoff):
+    state = open_world(state)
+    player_ids = (i for i in range(16) if pname(i) and ppos(i) < cutoff / 2 and ppos(i) != -2)
+    for player_id in player_ids:
+        state = broad(state, "{} has been timed out\n".format(pname(player_id)))
+        dumpstuff(player_id, ploc(player_id))
+        setpname(player_id, '')
+    return state
+
+
 def send2(state, message):
     try:
         state = open_world(state)
         state = add_message(state, message)
         if state['__last_message'] - state['__first_message'] >= 199:
             state = cleanup(state)
+            state = __revise(state, state['__last_message'])
             longwthr()
         return state
     except WorldError:
@@ -131,10 +142,10 @@ def rte(state):
     }
 
 
-def trapch(state, chan):
+def set_channel(state, channel):
     state = open_world(state)
-
-    raise NotImplementedError()
+    setploc(state['mynum'], channel)
+    return lookin(state, channel)
 
 
 def update(state):
@@ -148,12 +159,6 @@ def update(state):
     state = open_world(state)
     setppos(state['mynum'], state['cms'])
     return state
-
-
-def __revise(state, cutoff):
-    state = open_world(state)
-    broad(state, mess)
-    raise NotImplementedError()
 
 
 def lookin(state, room):

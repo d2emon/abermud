@@ -17,6 +17,7 @@ def pushcom():
     #
     raise PlayerIsDead("             S   P    L      A         T           !")
     #
+    state = set_channel(state, -140)
 
 
 def gropecom():
@@ -54,3 +55,7 @@ def wounded(state, n):
     )
     raise PlayerIsDead("Oh dear you just died")
     #
+
+
+def teletrap(state):
+    state = set_channel(state, newch)

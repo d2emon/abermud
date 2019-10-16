@@ -1,6 +1,7 @@
 from ..errors import WorldError
 from ..bprintf import make_buffer
 from ..opensys import close_world, open_world
+from . import set_channel
 
 
 def __putmeon(state):
@@ -45,6 +46,8 @@ def __special(state, string):
         setpsexall(state['mynum'], state['my_sex'])
         setphelping(state['mynum'], -1)
 
+        state = set_channel(state, -5 if randperc() > 50 else -183)
+
         sendsys(
             state['name'],
             state['name'],
@@ -54,12 +57,6 @@ def __special(state, string):
         )
 
         state = state['rte'](state)
-
-        if randperc() > 50:
-            trapch(-5)
-        else:
-            state['curch'] = -183
-            trapch(-183)
 
         sendsys(
             state['name'],
