@@ -11,6 +11,10 @@ def ohereandget(state):
 
 def pushcom():
     #
+    broad("[d]You hear a thud and a squelch in the distance.\n[/d]")
+    #
+    broad("[d]Church bells ring out around you\n[/d]")
+    #
     raise PlayerIsDead("             S   P    L      A         T           !")
     #
 

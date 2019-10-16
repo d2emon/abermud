@@ -7,7 +7,7 @@ are (C) 1987/88  Alan Cox,Jim Finnis,Richard Acott
 This file holds the basic communications routines
 """
 from ..errors import PlayerIsDead, WorldError
-from ..opensys import close_world, open_world
+from ..opensys import close_world, open_world, add_message, cleanup
 from ..parse import eorte, gamrcv
 from ..sys_log import logger
 
@@ -60,18 +60,12 @@ Sectors 1-n  in pairs ie [128 words]
 """
 
 
-def __parse_message(block, receiver):
-    name1, name2 = block[2].split('.')
-    names = [name1.lower()]
-    if name1[:4].lower() == "the ":
-        names.append(name1[4:].lower())
+def __parse_message(message, receiver):
+    name_to = message['to'].lower()
+    names = [name_to]
+    if name_to[:4] == "the ":
+        names.append(name_to[4:])
     is_me = any(name for name in names if name == receiver)
-    message = {
-        'location': block[0],
-        'code': block[1],
-        'players': (name1, name2),
-        'text': block[3],
-    }
     return is_me, message
 
 
@@ -90,10 +84,30 @@ def __read_messages(state, first_message, last_message):
         yield state['__messages'][message_id - state['__first_message']]
 
 
-def __send2(state, block):
-    raise WorldError("AberMUD: FILE_ACCESS : Access failed")
-    state = open_world(state)
-    raise NotImplementedError()
+def send2(state, message):
+    try:
+        state = open_world(state)
+        state = add_message(state, message)
+        if state['__last_message'] - state['__first_message'] >= 199:
+            state = cleanup(state)
+            longwthr()
+        return state
+    except WorldError:
+        raise PlayerIsDead("AberMUD: FILE_ACCESS : Access failed")
+
+
+def broad(state, text):
+    state['rd_qd'] = True
+    return send2(
+        state,
+        {
+            'channel': None,
+            'code': -1,
+            'to': None,
+            'from': None,
+            'text': text,
+        },
+    )
 
 
 def rte(state):
@@ -117,28 +131,6 @@ def rte(state):
     }
 
 
-def __cleanup(state, inpbk):
-    state = open_world(state)
-
-    raise NotImplementedError()
-
-
-def broad(state, message):
-    state['rd_qd'] = True
-    return send2(
-        state,
-        [
-            None,
-            -1,
-            message[:126],
-        ]
-    )
-
-
-def __tbroad(message):
-    raise NotImplementedError()
-
-
 def trapch(state, chan):
     state = open_world(state)
 
@@ -160,7 +152,7 @@ def update(state):
 
 def __revise(state, cutoff):
     state = open_world(state)
-
+    broad(state, mess)
     raise NotImplementedError()
 
 
