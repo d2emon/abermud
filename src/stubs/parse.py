@@ -218,7 +218,52 @@ def exorcom(state):
     #
 
 
-def dosummcom(state):
+def stealcom(state):
+    if brkword() == -1:
+        return state['bprintf'](state, "Steal what from who?\n")
+    x = state['wordbuf']
+    if brkword() == -1:
+        return state['bprintf'](state, "From who?\n")
+    if state['wordbuf'] == 'from' and brkword() == -1:
+        return state['bprintf'](state, "From who?\n")
+    player = Player(state, fpbn(state['wordbuf']))
+    if player.player_id == -1:
+        return state['bprintf'](state, "Who is that?\n")
+    item = Item(state, fobncb(x, player.player_id))
+    if item.item_id == -1:
+        return state['bprintf'](state, "They are not carrying that\n")
+    if state['my_lev'] < 10 and ploc(player.player_id) != state['curch']:
+        return state['bprintf'](state, "But they aren't here\n")
+    if item.carry_flag == Item.WORN_BY:
+        return state['bprintf'](state, "They are wearing that\n")
+    if pwpn(player.player_id) == item.item_id:
+        return state['bprintf'](state, "They have that firmly to hand .. for KILLING people with\n")
+    if not cancarry(state['mynum']):
+        return state['bprintf'](state, "You can't carry any more\n")
+
+    f = randperc()
+    e = 10 + state['my_lev'] - plev(player.player_id)
+    e *= 5
+    if f < e:
+        if f & 1:
+            sendsys(
+                state,
+                pname(player.player_id),
+                state['name'],
+                -10011,
+                state['curch'],
+                "[p]{}[/p] steals the {} from you !\n".format(state['name'], oname(item.item_id)),
+            )
+            if player.player_id > 15:
+                woundmn(player.player_id, 0)
+
+        setoloc(item.item_id, state['mynum'], 0)
+        return state
+    else:
+        return state['bprintf'](state, "Your attempt fails\n")
+
+
+def dosumm(state):
     state = change_channel(state, loc)
 
 

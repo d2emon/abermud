@@ -147,8 +147,30 @@ def setcom():
     raise NotImplementedError()
 
 
-def isdark():
-    raise NotImplementedError()
+def isdark(state):
+    def idk(new_state):
+        for item_id in new_state['numobs']:
+            item = Item(new_state, item_id)
+            if item_id != 32 and otstbit(item.item_id, 13):
+                continue
+            if ishere(item.item_id):
+                return False
+            if item.carry_flag in (Item.CONTAINED_IN, Item.WORN_BY):
+                continue
+            if ploc(oloc(item.item_id)) != state['curch']:
+                continue
+            return False
+        return True
+
+    if state['my_lev'] > 9:
+        return False
+    if state['curch'] == -1100 or state['curch'] == -1101:
+        return False
+    if -1113 >= state['curch'] >= -1123:
+        return idk(state)
+    if state['curch'] < -399 or state['curch'] > -300:
+        return False
+    return idk(state)
 
 
 def modifwthr(n):

@@ -11,27 +11,75 @@ are elsewhere
 """
 
 
-def ocarrf(ob):
+class Item:
+    LOCATED_AT = 0
+    CARRIED_BY = 1
+    WORN_BY = 2
+    CONTAINED_IN = 3
+
+    def __init__(self, state, item_id):
+        self.state = state
+        self.item_id = item_id
+
+    @property
+    def __items(self):
+        return self.state['objinfo']
+
+    @property
+    def location(self):
+        return self.__items[4 * self.item_id]
+
+    @property
+    def located_at(self):
+        return self.location if self.carry_flag == self.LOCATED_AT else None
+
+    @located_at.setter
+    def located_at(self, value):
+        self.__items[4 * self.item_id] = value
+        self.__items[4 * self.item_id + 3] = self.LOCATED_AT
+
+    @property
+    def carried_by(self):
+        return self.location if self.carry_flag == self.CARRIED_BY else None
+
+    @carried_by.setter
+    def carried_by(self, value):
+        self.__items[4 * self.item_id] = value
+        self.__items[4 * self.item_id + 3] = self.CARRIED_BY
+
+    @property
+    def contained_in(self):
+        return self.location if self.carry_flag == self.CONTAINED_IN else None
+
+    @contained_in.setter
+    def contained_in(self, value):
+        self.__items[4 * self.item_id] = value
+        self.__items[4 * self.item_id + 3] = self.CONTAINED_IN
+
+    @property
+    def carry_flag(self):
+        return self.__items[4 * self.item_id + 3]
+
+    # @carry_flag.setter
+    # def carry_flag(self, value):
+    #     self.__items[4 * self.item_id + 3] = value
+
+
+class Player:
+    def __init__(self, state, item_id):
+        self.state = state
+        self.item_id = item_id
+
+    @property
+    def __players(self):
+        return self.state['objinfo']
+
+
+def ploc(state, chr):
     raise NotImplementedError()
 
 
-def setocarrf(ob, v):
-    raise NotImplementedError()
-
-
-def oloc(ob):
-    raise NotImplementedError()
-
-
-def setoloc(ob, v):
-    raise NotImplementedError()
-
-
-def ploc(chr):
-    raise NotImplementedError()
-
-
-def pname(chr):
+def pname(state, chr):
     raise NotImplementedError()
 
 
