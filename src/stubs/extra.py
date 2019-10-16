@@ -15,7 +15,7 @@ def levcom(state):
 
 
 def examcom(state):
-    state = set_channel(state, -114)
+    state = change_channel(state, -114)
 
 
 def statplyr(state):
@@ -38,7 +38,7 @@ def jumpcom():
     #
     raise PlayerLoose("I suppose you could be scraped up - with a spatula")
     #
-    return set_channel(state, b)
+    return change_channel(state, b)
 
 
 def wherecom(state):

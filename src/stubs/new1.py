@@ -11,13 +11,13 @@ def ohereandget(state):
 
 def pushcom():
     #
-    broad("[d]You hear a thud and a squelch in the distance.\n[/d]")
+    broad(world, "[d]You hear a thud and a squelch in the distance.\n[/d]")
     #
-    broad("[d]Church bells ring out around you\n[/d]")
+    broad(world, "[d]Church bells ring out around you\n[/d]")
     #
     raise PlayerIsDead("             S   P    L      A         T           !")
     #
-    state = set_channel(state, -140)
+    state = change_channel(state, -140)
 
 
 def gropecom():
@@ -58,4 +58,4 @@ def wounded(state, n):
 
 
 def teletrap(state):
-    state = set_channel(state, newch)
+    state = change_channel(state, newch)

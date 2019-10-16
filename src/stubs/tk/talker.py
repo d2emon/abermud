@@ -1,7 +1,7 @@
 from ..errors import WorldError
 from ..bprintf import make_buffer
 from ..opensys import close_world, open_world
-from . import set_channel
+from .back import change_channel, process_messages
 
 
 def __putmeon(state):
@@ -45,8 +45,9 @@ def __special(state, string):
         setpwpn(state['mynum'], -1)
         setpsexall(state['mynum'], state['my_sex'])
         setphelping(state['mynum'], -1)
+        setploc(state['mynum'], -5 if randperc() > 50 else -183)
 
-        state = set_channel(state, -5 if randperc() > 50 else -183)
+        state = change_channel(state, ploc(state['mynum']))
 
         sendsys(
             state['name'],
@@ -56,7 +57,7 @@ def __special(state, string):
             "[s name=\"{}\"]{}  has entered the game\n[/s]".format(state['name'], state['name']),
         )
 
-        state = state['rte'](state)
+        state = process_messages(state, state['mynum'], state['cms'])
 
         sendsys(
             state['name'],
@@ -103,8 +104,7 @@ def __listen(state):
     work = state['key_buff']
     state['sysbuf'] = "[l]{}\n[/l]".format(work)
 
-    state = open_world(state)
-    state = state['rte'](state)
+    state = process_messages(state, state['mynum'], state['cms'])
     close_world(state)
 
     if state['convflg'] and work == "**":
@@ -140,8 +140,7 @@ def talker(state):
     try:
         state = open_world(state)
         state = __putmeon(state)
-        state['cms'] = -1
-        state = state['rte'](state)
+        state = process_messages(state, state['mynum'], -1)
         close_world(state)
     except WorldError:
         raise WorldError("Sorry AberMUD is currently unavailable")
@@ -156,7 +155,7 @@ def next_turn(state):
     state = state['pbfr'](state)
     __listen(state)
     if state['rd_qd']:
-        state = state['rte'](state)
+        state = process_messages(state, state['mynum'], state['cms'])
     state['rd_qd'] = False
     close_world(state)
     state = state['pbfr'](state)

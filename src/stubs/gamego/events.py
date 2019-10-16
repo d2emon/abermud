@@ -41,7 +41,7 @@ def __on_time(state):
     state = open_world(state)
 
     state = set_interrupt(state, True)
-    state = state['rte'](state)
+    state = state['process_messages'](state, state['mynum'], state['cms'])
     state = set_interrupt(state, False)
 
     on_timing()

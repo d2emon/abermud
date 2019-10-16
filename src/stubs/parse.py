@@ -3,25 +3,26 @@ from .errors import PlayerIsDead
 from .opensys import close_world, open_world
 from .support import pname
 from .sys_log import logger
+from .tk.back import set_message_id, process_messages
+from .tk.message import Message
 
 
-def sendsys(state, __to, __from, codeword, channel, text):
-    return send2(
-        state,
-        {
-            'channel': channel,
-            'code': codeword,
-            'to': __to,
-            'from': __from,
-            'text': text,
-        },
+def sendsys(world, receiver, sender, codeword, channel, text):
+    message = Message(
+        channel,
+        codeword,
+        receiver,
+        sender,
+        text,
     )
+    world.send_message(message)
+    return world.state
 
 
 def doaction(state, n):
     state = open_world(state)
     #
-    state = state['rte'](state)
+    state = process_messages(state, state['mynum'], state['cms'])
     state = open_world(state)
     #
     close_world(state)
@@ -31,57 +32,59 @@ def doaction(state, n):
 
 
 def dodirn(state, n):
-    state = set_channel(state, newch)
+    state = change_channel(state, newch)
 
 
-def gamrcv(state, is_me, message):
-    channel = message['channel']
-    code = message['code']
-    name_to = message['to']
-    name_from = message['from']
-    text = message['text']
+def gamrcv(state, message):
+    if state['debug_mode']:
+        state = state['bprintf'](state, "\n<{}>".format(message.code))
 
-    if code == -20000 and fpbns(name_to) == state['fighting']:
+    is_me = message.is_me(state['name'].lower())
+    is_here = message.channel == state['curch']
+
+    if message.code >= -3:
+        return state['bprintf'](state, message.text)
+    elif message.code == -20000 and fpbns(message.receiver) == state['fighting']:
         state['in_fight'] = 0
         state['fighting'] = -1
-    if code < -10099:
-        new1rcv(is_me, channel, name_to, name_from, code, text)
-    elif code == -401 and is_me:
-        state.update({'snoopd', fpbns(name_from)})
-    elif code == -599 and is_me:
+    elif message.code < -10099:
+        return new1rcv(state, is_me, message.channel, message.receiver, message.sender, message.code, message.text)
+    elif message.code == -401 and is_me:
+        state.update({'snoopd', fpbns(message.sender)})
+    elif message.code == -599 and is_me:
         state.update({
-            'my_lev': text[0],
-            'my_sco': text[1],
-            'my_str': text[2],
+            'my_lev': message.text[0],
+            'my_sco': message.text[1],
+            'my_str': message.text[2],
         })
         state = calibme(state)
-    elif code == -666:
+    elif message.code == -666:
         state['bprintf'](state, "Something Very Evil Has Just Happened...\n")
         raise PlayerIsDead("Bye Bye Cruel World....")
-    elif code == -400 and is_me:
+    elif message.code == -400 and is_me:
         state.update({'snoopd', -1})
-    elif code == -750 and is_me:
-        if fpbns(name_from) != -1:
+    elif message.code == -750 and is_me:
+        if fpbns(message.sender) != -1:
             raise PlayerIsDead("***HALT")
 
         close_world(state)
         raise SystemExit("***HALT")
-    elif code == -9900:
-        setpvis(text[0], text[1])
-    elif code == -10000 and not is_me and state['curch'] == channel:
-        return state['bprintf'](state, text)
-    elif code == -10001:
+    elif message.code == -9900:
+        setpvis(message.text[0], message.text[1])
+    elif message.code == -10000 and not is_me and is_here:
+        return state['bprintf'](state, message.text)
+    elif message.code == -10001:
         if not is_me:
-            return state['bprintf'](state, "[c]A massive lightning bolt strikes [/c][D]{}[/D][c]\n[/c]".format(name_to))
+            return state['bprintf'](state, "[c]A massive lightning bolt strikes [/c][D]{}[/D][c]\n[/c]".format(message.receiver))
         if state['my_lev'] > 10:
-            return state['bprintf'](state, "[p]{}[/p] cast a lightning bolt at you\n".format(name_from))
+            return state['bprintf'](state, "[p]{}[/p] cast a lightning bolt at you\n".format(message.sender))
         # You are in the ....
         sendsys(
             state['name'],
             state['name'],
             -10113,
             state['curch'],
-            "[ [p]{}[/p] has just been zapped by [p]{}[/p] and terminated ]\n".format(state['name'], name_to),
+            "[ [p]{}[/p] has just been zapped by [p]{}[/p] and terminated ]\n".format(state['name'], message.sender),
         )
         state = state['bprintf'](
             state,
@@ -97,38 +100,38 @@ def gamrcv(state, is_me, message):
             state['curch'],
             "[s name=\"{}\"]{} has just died.\n[/s]".format(state['name'], state['name']),
         )
-        state['bprintf'](state, "You have been utterly destroyed by {}\n".format(name_from))
+        state['bprintf'](state, "You have been utterly destroyed by {}\n".format(message.sender))
         raise PlayerIsDead("Bye Bye.... Slain By Lightning")
-    elif code == -10002 and not is_me:
-        if state['curch'] == channel or state['my_lev'] > 9:
-            return state['bprintf'](state, "[P]{}[/P][d] shouts '{}'\n[/d]".format(name_from, text))
-        return state['bprintf'](state, "[d]A voice shouts '{}'\n[/d]".format(text))
-    elif code == -10003 and not is_me and state['curch'] == channel:
-        return state['bprintf'](state, "[P]{}[/P][d] says '{}'\n[/d]".format(name_from, text))
-    elif code == -10004 and is_me:
-        return state['bprintf'](state, "[P]{}[/P][d] tells you '{}'\n[/d]".format(name_from, text))
-    elif code == -10010:
+    elif message.code == -10002 and not is_me:
+        if is_here or state['my_lev'] > 9:
+            return state['bprintf'](state, "[P]{}[/P][d] shouts '{}'\n[/d]".format(message.sender, message.text))
+        return state['bprintf'](state, "[d]A voice shouts '{}'\n[/d]".format(message.text))
+    elif message.code == -10003 and not is_me and is_here:
+        return state['bprintf'](state, "[P]{}[/P][d] says '{}'\n[/d]".format(message.sender, message.text))
+    elif message.code == -10004 and is_me:
+        return state['bprintf'](state, "[P]{}[/P][d] tells you '{}'\n[/d]".format(message.sender, message.text))
+    elif message.code == -10010:
         if not is_me:
-            return state['bprintf'](state, "{} has been kicked off\n".format(name_to))
+            return state['bprintf'](state, "{} has been kicked off\n".format(message.receiver))
         raise PlayerIsDead("You have been kicked off")
-    elif code == -10011 and is_me:
-        return state['bprintf'](state, text)
-    elif code == -10020 and is_me:
-        state['ades'] = channel
+    elif message.code == -10011 and is_me:
+        return state['bprintf'](state, message.text)
+    elif message.code == -10020 and is_me:
+        state['ades'] = message.channel
         if state['my_lev'] < 10:
-            summon_message = "You drop everything you have as you are summoned by [p]{}[/p]\n".format(name_from)
+            summon_message = "You drop everything you have as you are summoned by [p]{}[/p]\n".format(message.sender)
             state['tdes'] = 1
         else:
-            summon_message = "[p]{}[/p] tried to summon you\n".format(name_from)
+            summon_message = "[p]{}[/p] tried to summon you\n".format(message.sender)
         return state['bprintf'](state, summon_message)
-    elif code == -10021 and is_me and state['curch'] == channel:
+    elif message.code == -10021 and is_me and is_here:
         state.update({
             'rdes': 1,
-            'vdes': text[0],
+            'vdes': message.text[0],
         })
-        return bloodrcv(state, text, is_me)
-    elif code == -10030:
-        wthrrcv(channel)
+        return bloodrcv(state, message.text, is_me)
+    elif message.code == -10030:
+        wthrrcv(message.channel)
     return state
 
 
@@ -191,12 +194,13 @@ def eorte(state):
 
 def rescom():
     b = RESET_DATA.connect('r').lock()
-    broad("Reset in progress....\nReset Completed....\n")
+    b.unlock().disconnect()
+    broad(world, "Reset in progress....\nReset Completed....\n")
 
 
 def lightning(state):
     #
-    broad("[d]You hear an ominous clap of thunder in the distance\n[/d]")
+    broad(world, "[d]You hear an ominous clap of thunder in the distance\n[/d]")
     #
     logger.debug("%s zapped %s", state['name'], pname(vic))
     #
@@ -215,7 +219,7 @@ def exorcom(state):
 
 
 def dosummcom(state):
-    state = set_channel(state, loc)
+    state = change_channel(state, loc)
 
 
 def tsscom(state):
@@ -227,6 +231,7 @@ def tsscom(state):
 
 
 def rmeditcom(state):
+    state = set_message_id(state, state['mynum'], -2)
     #
     close_world(state)
     #
@@ -234,10 +239,11 @@ def rmeditcom(state):
     #
     raise PlayerIsDead("You have been kicked off")
     #
-    return state['rte'](state)
+    return process_messages(state, state['mynum'], state['cms'])
 
 
 def u_system(state):
+    state = set_message_id(state, state['mynum'], -2)
     #
     close_world(state)
     #
@@ -245,7 +251,7 @@ def u_system(state):
     #
     raise PlayerIsDead("You have been kicked off")
     #
-    state = state['rte'](state)
+    state = process_messages(state, state['mynum'], state['cms'])
     state = open_world(state)
     #
 
@@ -283,8 +289,8 @@ def becom(state):
 
 
 def rawcom():
-    broad(x[1:])
-    broad(y)
+    broad(world, x[1:])
+    broad(world, y)
 
 def bugcom(state):
     #

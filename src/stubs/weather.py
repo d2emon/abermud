@@ -115,7 +115,7 @@ def sniggercom():
 
 
 def posecom(state):
-    broad(state, "[c]A massive ball of fire explodes high up in the sky\n[/c]")
+    broad(world, "[c]A massive ball of fire explodes high up in the sky\n[/c]")
     raise NotImplementedError()
 
 

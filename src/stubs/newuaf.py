@@ -1,10 +1,22 @@
 from .errors import UserDataError
 
 
+def personactl():
+    a.unlock().disconnect()
+    a.unlock().disconnect()
+
+
 def delpers(name):
     #
     raise UserDataError("Panic: Invalid Persona Delete")
     #
+    i.unlock().disconnect()
+
+
+def putpers():
+    i.unlock().disconnect()
+    i.unlock().disconnect()
+    i.unlock().disconnect()
 
 
 def openuaf(perm):

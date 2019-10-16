@@ -68,6 +68,8 @@ def pbfr(state):
     if state['sysbuf']:
         state = set_clean(state, False)
     #
+    fln.unlock().disconnect()
+    #
     state = __unlock_alarm(state)
     return state
 
@@ -81,3 +83,11 @@ def quprnt(state, x):
 def opensnoop(user, per):
     #
     return z.connect(per).lock()
+
+
+def snoopcom():
+    fx.unlock().disconnect()
+
+
+def viewsnoop():
+    fx.unlock().disconnect()

@@ -1,2 +1,2 @@
 def goloccom(state):
-    state = set_channel(state, a)
+    state = change_channel(state, a)

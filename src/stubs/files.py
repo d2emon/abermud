@@ -25,6 +25,9 @@ class Service:
         #     raise ServiceError("PANIC exit access failure, NFS gone for a snooze")
         return self
 
+    def unlock(self):
+        return self
+
     def push(self, value):
         self.contents.append(value)
 

@@ -6,7 +6,7 @@ from ..errors import PlayerIsDead, LockError, OutputBufferError, SysLogError, Us
 from ..bprintf import bprintf, pbfr, set_clean
 from ..key import set_key_buff
 from ..sys_log import logger
-from ..tk import rte
+from ..tk.back import process_messages
 from ..tk.talker import talker, next_turn
 from .events import events, global_state as signals_state
 
@@ -17,7 +17,7 @@ global_state = {
     #
     'in_fight': None,
     # Helpers
-    'rte': rte,
+    'process_messages': process_messages,
     'bprintf': bprintf,
     'pbfr': pbfr,
 }
