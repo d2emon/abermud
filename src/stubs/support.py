@@ -57,6 +57,10 @@ class Item:
         self.__items[4 * self.item_id + 3] = self.CONTAINED_IN
 
     @property
+    def owned_by(self):
+        return self.location if self.carry_flag in (self.CARRIED_BY, self.WORN_BY) else None
+
+    @property
     def carry_flag(self):
         return self.__items[4 * self.item_id + 3]
 

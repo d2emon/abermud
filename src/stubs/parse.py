@@ -1,7 +1,7 @@
 from datetime import datetime
 from .errors import PlayerIsDead
 from .opensys import close_world, open_world
-from .support import pname
+from .support import Item, pname
 from .sys_log import logger
 from .tk.back import set_message_id, process_messages
 from .tk.message import Message
@@ -32,7 +32,64 @@ def doaction(state, n):
 
 
 def dodirn(state, n):
+    if state['in_fight'] > 0:
+        state = state['bprintf'](state, "You can't just stroll out of a fight!\n")
+        state = state['bprintf'](state, "If you wish to leave a fight, you must FLEE in a direction\n")
+        return state
+
+    if iscarrby(32, state['mynum']) and ploc(25) == state['curch'] and len(pname(25)) > 0:
+        return state['bprintf'](state, "[c]The Golem[/c] bars the doorway!\n")
+
+    if chkcrip():
+        return state
+
+    n -= 2
+    newch = ex_dat[n]
+
+    if 999 < newch < 2000:
+        drnum = newch - 1000
+        droff = Item(state, drnum ^ 1)  # other door side
+        if state(drnum) != 0:
+            if oname(drnum) != 'door' or isdark() or len(olongt(drnum, state(drnum))) == 0:
+                return state['bprintf'](state, "You can't go that way\n")
+            else:
+                return state['bprintf'](state, "The door is not open\n")
+        newch = droff.location
+
+    if newch == -139:
+        if not iswornby(113, state['mynum']) and  not iswornby(114, state['mynum']) and  not iswornby(89, state['mynum']):
+            return state['bprintf'](state, "The intense heat drives you back\n")
+
+        state = state['bprintf'](state, "The shield protects you from the worst of the lava stream's heat\n")
+
+    if n == 2:
+        i = fpbns('figure')
+        if i != state['mynum'] and i != -1 and ploc(i) == state['curch'] and not iswornby(101, state['mynum']) and not iswornby(102, state['mynum']) and not iswornby(103, state['mynum']):
+            state = state['bprintf'](state, "[p]The Figure[/p] holds you back\n")
+            state = state['bprintf'](state, "[p]The Figure[/p] says 'Only true sorcerors may pass'\n")
+            return state
+
+    if newch >= 0:
+        return state['bprintf'](state, "You can't go that way\n")
+
+    sendsys(
+        state,
+        state['name'],
+        state['name'],
+        -10000,
+        state['curch'],
+        "[s name=\"{}\"]{} has gone {} {}.[/s]".format(pname(state['mynum']), state['name'], exittxt[n], state['out_ms']),
+    )
     state = change_channel(state, newch)
+    sendsys(
+        state,
+        state['name'],
+        state['name'],
+        -10000,
+        state['curch'],
+        "[s name=\"{}\"]{} {}\n[/s]".format(state['name'], state['name'], state['in_ms']),
+    )
+    return state
 
 
 def gamrcv(state, message):
@@ -218,6 +275,29 @@ def exorcom(state):
     #
 
 
+def dogive(state, ob, pl):
+    item = Item(state, ob)
+
+    if state['my_lev'] < 10 and ploc(pl) != state['curch']:
+        return state['bprintf'](state, "They are not here\n")
+    if not iscarrby(item.item_id, state['mynum']):
+        state = state['bprintf'](state, "You are not carrying that\n")
+    if not cancarry(pl):
+        return state['bprintf'](state, "They can't carry that\n")
+    if state['my_lev'] < 10 and item.item_id == 32:
+        return state['bprintf'](state, "It doesn't wish to be given away.....\n")
+
+    item.carried_by = pl
+    sendsys(
+        state,
+        pname(pl),
+        state['name'],
+        -10011,
+        state['curch'],
+        "[p]{}[/p] gives you the {}\n".format(state['name'], oname(item.item_id))
+    )
+
+
 def stealcom(state):
     if brkword() == -1:
         return state['bprintf'](state, "Steal what from who?\n")
@@ -257,7 +337,7 @@ def stealcom(state):
             if player.player_id > 15:
                 woundmn(player.player_id, 0)
 
-        setoloc(item.item_id, state['mynum'], 0)
+        item.carried_by = state['mynum']
         return state
     else:
         return state['bprintf'](state, "Your attempt fails\n")
@@ -347,7 +427,29 @@ def typocom(state):
     logger.debug("Typo by %s : %s", y, x)
 
 
+def digcom(state):
+    item = Item(state, 186)
+    if item.location == state['curch'] and isdest(item.item_id):
+        ocreate(item.item_id)
+        return state['bprintf'](state, "You uncover a stone slab!\n")
+    if state['curch'] not in [-172, -192]:
+        return state['bprintf'](state, "You find nothing.\n")
+    if state(176) == 0:
+        return state['bprintf'](state, "You widen the hole, but with little effect.\n")
+    setstate(176, 0)
+    return state['bprintf'](state, "You rapidly dig through to another passage.\n")
+
+
 def emptycom(state):
-    #
-    state = open_world(state)
-    #
+    container = Item(state, ohereandget())
+    if container.item_id == -1:
+        return state
+    for item_id in state['numobs']:
+        item = Item(state, item_id)
+        if iscontin(item.item_id, container.item_id):
+            item.carried_by = state['mynum']
+            state = state['bprintf'](state, "You empty the {} from the {}\n".format(oname(item.item_id), oname(container.item_id)))
+            gamecom("drop {}".format(oname(item.item_id)))
+            state = state['pbdf'](state)
+            state = open_world(state)
+    return state

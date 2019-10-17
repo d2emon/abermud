@@ -155,9 +155,10 @@ def isdark(state):
                 continue
             if ishere(item.item_id):
                 return False
-            if item.carry_flag in (Item.CONTAINED_IN, Item.WORN_BY):
+            owner = item.owned_by
+            if not owner:
                 continue
-            if ploc(oloc(item.item_id)) != state['curch']:
+            if ploc(owner) != state['curch']:
                 continue
             return False
         return True
