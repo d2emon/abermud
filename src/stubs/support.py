@@ -95,6 +95,14 @@ class Player:
         self.__players[16 * self.player_id + 4] = value
 
     @property
+    def strength(self):
+        return self.__players[16 * self.player_id + 7]
+
+    @strength.setter
+    def strength(self, value):
+        self.__players[16 * self.player_id + 7] = value
+
+    @property
     def level(self):
         return self.__players[16 * self.player_id + 10]
 
@@ -115,17 +123,11 @@ class Player:
     def destroy(self):
         self.name = ''
 
-
-def plev(chr):
-    raise NotImplementedError()
-
-
-def setplev(ob, v):
-    raise NotImplementedError()
-
-
-def pchan(chr):
-    raise NotImplementedError()
+    def kill(self):
+        if self.strength < 0:
+            return 0
+        self.strength = -1
+        return self.value
 
 
 def pstr(chr):

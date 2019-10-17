@@ -311,25 +311,24 @@ def missilecom(state):
     target = Player(state, vichfb())
     if target.player_id == -1:
         return state
+    damage = 2 * state['my_lev']
     state = sendsys(
         state,
         target.name,
         state['name'],
         -10106,
         state['curch'],
-        state['my_lev'] * 2,
+        damage,
     )
-    if pstr(target.player_id) - 2 * state['my_lev'] < 0:
+    if target.strength < damage:
         state = state['bprintf'](state, "Your last spell did the trick\n")
-        if pstr(target.player_id) >= 0:
-            state['my_sco'] += target.value
-        setpstr(target.player_id, -1)
+        state['my_sco'] += target.kill()
         state.update({
             'in_fight': 0,
             'fighting': -1,
         })
     if target.player_id > 15:
-        state = woundmn(state, target.player_id, 2 * state['my_lev'])
+        state = woundmn(state, target.player_id, damage)
     return state
 
 
@@ -363,11 +362,10 @@ def fireballcom(state):
         return state['bprintf'](state, "Seems rather dangerous to me....\n")
 
     multiplier = 6 if target.player_id == fpbns('yeti') else 2
-    if pstr(target.player_id) - multiplier * state['my_lev'] < 0:
+    damage = multiplier * state['my_lev']
+    if target.strength < damage:
         state = state['bprintf'](state, "Your last spell did the trick\n")
-        if pstr(target.player_id) >= 0:
-            state['my_sco'] += target.value
-        setpstr(target.player_id, -1)
+        state['my_sco'] += target.kill()
         state.update({
             'in_fight': 0,
             'fighting': -1,
@@ -379,11 +377,11 @@ def fireballcom(state):
         state['name'],
         -10109,
         state['curch'],
-        state['my_lev'] * 2,
+        damage,
     )
 
     if target.player_id > 15:
-        state = woundmn(state, target.player_id, multiplier * state['my_lev'])
+        state = woundmn(state, target.player_id, damage)
     return state
 
 
@@ -394,11 +392,10 @@ def shockcom(state):
     if target.player_id == state['mynum']:
         return state['bprintf'](state, "You are supposed to be killing other people not yourself\n")
 
-    if pstr(target.player_id) - 2 * state['my_lev'] < 0:
+    damage = 2 * state['my_lev']
+    if target.strength < damage:
         state = state['bprintf'](state, "Your last spell did the trick\n")
-        if pstr(target.player_id) >= 0:
-            state['my_sco'] += target.value
-        setpstr(target.player_id, -1)
+        state['my_sco'] += target.kill()
         state.update({
             'in_fight': 0,
             'fighting': -1,
@@ -410,11 +407,11 @@ def shockcom(state):
         state['name'],
         -10110,
         state['curch'],
-        state['my_lev'] * 2,
+        damage,
     )
 
     if target.player_id > 15:
-        state = woundmn(state, target.player_id, 2 * state['my_lev'])
+        state = woundmn(state, target.player_id, damage)
     return state
 
 
@@ -526,10 +523,8 @@ def wounded(state, n):
 def woundmn(state, mobile_id, damage):
     mobile = Player(state, mobile_id)
 
-    strength = pstr(mobile.player_id) - damage
-    setpstr(mobile.player_id, strength)
-
-    if strength >= 0:
+    mobile.strength -= damage
+    if mobile.strength >= 0:
         return mhitplayer(state, mobile.player_id, state['mynum'])
 
     dumpstuff(mobile.player_id, mobile.location)
@@ -600,8 +595,8 @@ def resetplayers(state):
 
         player.name = data.name
         player.location = data.location
+        player.strength = data.strength
 
-        setpstr(player.player_id, data.strength)
         setpsex(player.player_id, data.sex)
         setpwpn(player.player_id, -1)
         setpvis(player.player_id, 0)

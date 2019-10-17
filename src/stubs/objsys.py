@@ -154,7 +154,7 @@ def whocom(state):
 
 def dispuser(state, player_id):
     player = Player(state, player_id)
-    if pstr(player.player_id) < 0:
+    if player.strength < 0:
         return
     if pvis(player.player_id) > state['my_lev']:
         return

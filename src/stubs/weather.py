@@ -152,8 +152,65 @@ def cancarry(state, player_id):
     return False
 
 
-def setcom():
-    raise NotImplementedError()
+def setcom(state):
+    def setmobile(new_state):
+        player = Player(new_state, fpbn(new_state['wordbuf']))
+        if player.player_id == -1:
+            return state['bprintf'](state, "Set what ?\n")
+        if player.player_id < 16:
+            return state['bprintf'](state, "Mobiles only\n")
+        if brkword() == -1:
+            return state['bprintf'](state, "To what value ?\n")
+        player.strength = int(state['wordbuf'])
+        return new_state
+
+    def bitset(new_state, item):
+        if brkword() == -1:
+            return state['bprintf'](state, "Which bit ?\n")
+        b = int(state['wordbuf'])
+        if brkword() == -1:
+            return state['bprintf'](state, "The bit is {}\n".format('TRUE' if otstbit(item, b) else 'FALSE'))
+        c = int(state['wordbuf'])
+        if c < 0 or c > 1 or b < 0 or b > 15:
+            return state['bprintf'](state, "Number out of range\n")
+        if c == 0:
+            oclrbit(item, b)
+        else:
+            osetbit(item, b)
+        return new_state
+
+    def byteset(new_state, item):
+        if brkword() == -1:
+            return state['bprintf'](state, "Which byte ?\n")
+        b = int(state['wordbuf'])
+        if brkword() == -1:
+            return state['bprintf'](state, "Current Value is : {}\n".format(obyte(item, b)))
+        c = int(state['wordbuf'])
+        if c < 0 or c > 255 or b < 0 or b > 1:
+            return state['bprintf'](state, "Number out of range\n")
+        osetbyte(item, b, c)
+        return new_state
+
+    if brkword() == -1:
+        return state['bprintf'](state, "set what\n")
+    if state['my_lev'] < 10:
+        return state['bprintf'](state, "Sorry, wizards only\n")
+    item = Item(state, state['wordbuf'])
+    if item.item_id == -1:
+        return setmobile(state)
+    if brkword() == -1:
+        return state['bprintf'](state, "Set to what value?\n")
+    if state['wordbuf'] == 'bit':
+        return bitset(state, item)
+    if state['wordbuf'] == 'byte':
+        return byteset(state, item)
+    b = int(state['wordbuf'])
+    if b > omaxstate(item.item_id):
+        return state['bprintf'](state, "Sorry max state for that is {}\n".format(omaxstate(item.item_id)))
+    if b < 0>:
+        return state['bprintf'](state, "States start at 0\n")
+    setstate(item, b)
+    return state
 
 
 def isdark(state):

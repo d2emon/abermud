@@ -47,7 +47,7 @@ def doaction(state, n):
             "[ Quitting Game : {} ]\n".format(state['name']),
         )
         dumpitems()
-        setpstr(state['mynum'], -1)
+        state['me'].kill()
         state['me'].destroy()
         close_world(state)
         state.update({
@@ -321,7 +321,7 @@ def calibme(state):
     state['me'].level = state['my_lev']
     if state['my_str'] > 30 + 10 * state['my_lev']:
         state['my_str'] = 30 + 10 * state['my_lev']
-    setpstr(state['mynum'], state['my_str'])
+    state['me'].strength = state['my_str']
     setpsex(state['mynum'], state['my_sex'])
     setpwpn(state['mynum'], state['wpnheld'])
     return state

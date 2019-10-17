@@ -25,7 +25,9 @@ def __putmeon(state):
     player.level = 1
 
     setpvis(player.player_id, 0)
-    setpstr(player.player_id, -1)
+
+    player.strength = -1
+
     setpwpn(player.player_id, -1)
     setpsex(player.player_id, 0)
     return state
@@ -46,8 +48,7 @@ def __special(state, string):
         initme()
         state = open_world(state)
 
-        setpstr(state['mynum'], state['my_str'])
-
+        state['me'].strength = state['my_str']
         state['me'].level = state['my_lev']
 
         setpvis(state['mynum'], 0 if state['my_lev'] < 10000 else 10000)

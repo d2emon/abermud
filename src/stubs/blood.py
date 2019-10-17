@@ -44,12 +44,9 @@ def hitplayer(state, victim_id, weapon_id):
         state = state['bprintf'](state, "\n")
 
         damage = randperc() % dambyitem(weapon.item_id if weapon else -1)
-        if pstr(victim.player_id) < damage:
+        if victim.strength < damage:
             state = state['bprintf'](state, "Your last blow did the trick\n")
-            if pstr(victim.player_id) >= 0:
-                # Bonus
-                state['my_sco'] += victim.value
-            setpstr(victim.player_id, -1)
+            state['my_sco'] += victim.kill()
             state.update({
                 'in_fight': 0,
                 'fighting': -1,
