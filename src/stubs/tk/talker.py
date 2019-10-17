@@ -9,16 +9,17 @@ def __putmeon(state):
     if fpbn(state['name']) != -1:
         raise WorldError("You are already on the system - you may only be on once at a time")
 
-    player_id = next((player_id for player_id in range(state['maxu']) if not len(pname(player_id))), None)
-    if player_id is None:
+    players = (Player(state, player_id)  for player_id in range(state['maxu']))
+    player = next((player for player in players if not player.is_alive), None)
+    if player is None:
         raise Exception("Sorry AberMUD is full at the moment")
 
-    player = Player(state, player_id)
     state['me'] = player
     state['mynum'] = player.player_id
 
-    setpname(player.player_id, state['name'])
+    player.name = state['name']
     player.location = state['curch']
+
     setppos(player.player_id, -1)
     setplev(player.player_id, 1)
     setpvis(player.player_id, 0)
@@ -126,7 +127,7 @@ def __listen(state):
 
     enemy = Player(state, state['fighting'])
     if enemy.player_id > -1:
-        if not pname(enemy.player_id) or enemy.location != state['curch']:
+        if not enemy.is_alive or enemy.location != state['curch']:
             state.update({
                 'in_fight': 0,
                 'fighting': -1,

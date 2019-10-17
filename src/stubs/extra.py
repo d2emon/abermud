@@ -16,19 +16,20 @@ def helpcom(state):
         if phelping(state['mynum']) != -1:
             sendsys(
                 state,
-                pname(player.player_id),
-                pname(player.player_id),
+                player.name,
+                player.name,
                 -10011,
                 state['curch'],
                 "[c]{}[/c] has stopped helping you\n".format(state['name']),
             )
-            state = state['bprintf'](state, "Stopped helping {}\n". format(phelping(state['mynum'])))
+            helping = Player(state, phelping(state['mynum']))
+            state = state['bprintf'](state, "Stopped helping {}\n". format(helping.name))
 
         setphelping(state['mynum'], player.player_id)
         sendsys(
             state,
-            pname(player.player_id),
-            pname(player.player_id),
+            player.name,
+            player.name,
             -10011,
             state['curch'],
             "[c]{}[/c] has offered to help you\n".format(state['name']),
@@ -78,7 +79,8 @@ def stacom(state):
         state = state['bprintf'](state, "\nPosition    :")
         showname(item.location)
     else:
-        state = state['bprintf'](state, "\nHeld By     :{}".format(pname(item.location)))
+        player = Player(state, item.location)
+        state = state['bprintf'](state, "\nHeld By     :{}".format(player.name))
     state = state['bprintf'](state, "\nState       :{}".format(state(item.item_id)))
     state = state['bprintf'](state, "\nCarr_Flag   :{}".format(item.carry_flag))
     state = state['bprintf'](state, "\nSpare       :{}".format(ospare(item.item_id)))
@@ -156,7 +158,7 @@ def statplyr(state):
     player = Player(state, fpbn(state['wordbuf']))
     if player.player_id == -1:
         return state['bprintf'](state, "Whats that?\n")
-    state = state['bprintf'](state, "Name      : {}\n".format(pname(player.player_id)))
+    state = state['bprintf'](state, "Name      : {}\n".format(player.name))
     state = state['bprintf'](state, "Level     : {}\n".format(plev(player.player_id)))
     state = state['bprintf'](state, "Strength  : {}\n".format(pstr(player.player_id)))
     state = state['bprintf'](state, "Sex       : {}\n".format(psex(player.player_id)))
@@ -215,13 +217,37 @@ def wherecom(state):
             else:
                 desrm(item.location, item.carry_flag)
 
-    player = Item(state, fpbn(state['wordbuf']))
+    player = Player(state, fpbn(state['wordbuf']))
     if player.player_id != -1:
         rnd += 1
-        state = state['bprintf'](state, "{} - ".format(pname(player.player_id)))
+        state = state['bprintf'](state, "{} - ".format(player.name))
         desrm(player.location, 0)
 
     if rnd:
         return state
 
     return state['bprintf'](state, "I dont know what that is\n")
+
+
+def desrm(state, location, carry_flag):
+    if state['my_lev'] < 10 and carry_flag == Item.LOCATED_AT and location > -5:
+        return state['bprintf'](state, "Somewhere.....\n")
+    if carry_flag == Item.CONTAINED_IN:
+        return state['bprintf'](state, "In the {}\n".format(oname(location)))
+    if carry_flag != Item.LOCATED_AT:
+        player = Player(state, location)
+        return state['bprintf'](state, "Carried by [c]{}[/c]\n".format(player.name))
+
+    try:
+        unit = openroom(location, 'r')
+        for b in range(7):
+            x = getstr(unit)
+        state = state['bprintf'](state, getstr(unit))
+        if state['my_lev'] > 9:
+            state = state['bprintf'](state, " | ")
+            showname(location)
+        else:
+            state = state['bprintf'](state, "\n")
+        unit.disconnect()
+    except ServiceError:
+        return state['bprintf'](state, "Out in the void\n")

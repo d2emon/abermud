@@ -7,7 +7,7 @@ def sumcom(state):
         if to_summon.player_id < 16:
             return sendsys(
                 new_state,
-                pname(to_summon.player_id),
+                to_summon.name,
                 state['name'],
                 -10020,
                 state['curch'],
@@ -22,7 +22,7 @@ def sumcom(state):
             None,
             -10000,
             state['curch'],
-            "[s name =\"{}\"]{} has arrived\n[/s]".format(pname(to_summon.player_id), pname(to_summon.player_id)),
+            "[s name =\"{}\"]{} has arrived\n[/s]".format(to_summon.name, to_summon.name),
         )
         to_summon.location = state['curch']
         return new_state

@@ -22,13 +22,40 @@ def sendsys(world, receiver, sender, codeword, channel, text):
 def doaction(state, n):
     state = open_world(state)
     #
-    state = process_messages(state, state['mynum'], state['cms'])
-    state = open_world(state)
-    #
-    close_world(state)
-    #
-    raise PlayerIsDead("Goodbye")
-    #
+    if n == 8:
+        if state['is_force']:
+            return state['bprintf'](state, "You can't be forced to do that\n")
+        state = process_messages(state, state['mynum'], state['cms'])
+        state = open_world(state)
+        if state['in_fight']:
+            return state['bprintf'](state, "Not in the middle of a fight!\n")
+        state = state['bprintf'](state, "Ok")
+        state = sendsys(
+            state,
+            state['name'],
+            state['name'],
+            -10000,
+            state['curch'],
+            "{} has left the game\n".format(state['name']),
+        )
+        state = sendsys(
+            state,
+            state['name'],
+            state['name'],
+            -10113,
+            0,
+            "[ Quitting Game : {} ]\n".format(state['name']),
+        )
+        dumpitems()
+        setpstr(state['mynum'], -1)
+        state['me'].destroy()
+        close_world(state)
+        state.update({
+            'curmode': 0,
+            'curch': 0
+        })
+        saveme()
+        raise PlayerIsDead("Goodbye")
 
 
 def dodirn(state, n):
@@ -38,7 +65,7 @@ def dodirn(state, n):
         return state
 
     golem = Player(state, 25)
-    if iscarrby(32, state['mynum']) and golem.location == state['curch'] and len(pname(golem.player_id)) > 0:
+    if iscarrby(32, state['mynum']) and golem.location == state['curch'] and golem.is_alive:
         return state['bprintf'](state, "[c]The Golem[/c] bars the doorway!\n")
 
     if chkcrip():
@@ -79,7 +106,7 @@ def dodirn(state, n):
         state['name'],
         -10000,
         state['curch'],
-        "[s name=\"{}\"]{} has gone {} {}.[/s]".format(pname(state['mynum']), state['name'], exittxt[n], state['out_ms']),
+        "[s name=\"{}\"]{} has gone {} {}.[/s]".format(state['me'].name, state['name'], exittxt[n], state['out_ms']),
     )
     state = change_channel(state, newch)
     sendsys(
@@ -219,7 +246,7 @@ def eorte(state):
                 'fighting': -1,
                 'in_fight': 0,
             })
-        if not len(pname(enemy.player_id)):
+        if not enemy.is_alive:
             state.update({
                 'fighting': -1,
                 'in_fight': 0,
@@ -260,13 +287,13 @@ def lightning(state):
         return state['bprintf'](state, "There is no one on with that name\n")
     sendsys(
         state,
-        pname(enemy.player_id),
+        enemy.name,
         state['globme'],
         -10001,
         enemy.location,
         "",
     )
-    logger.debug("%s zapped %s", state['name'], pname(enemy.player_id))
+    logger.debug("%s zapped %s", state['name'], enemy.name)
     if enemy.player_id > 15:
         state = woundmn(state, enemy.player_id, 10000)
     return broad(world, "[d]You hear an ominous clap of thunder in the distance\n[/d]")
@@ -300,6 +327,24 @@ def calibme(state):
     return state
 
 
+def tellcom(state):
+    if chkdumb():
+        return state
+    if brkword() == -1:
+        return state['bprintf']("Tell who?\n")
+    player = Player(state, fpbn(state['wordbuf']))
+    if player.player_id == -1:
+        return state['bprintf']("No one with that name is playing\n")
+    return sendsys(
+        state,
+        player.name,
+        state['name'],
+        -10004,
+        state['curch'],
+        getreinput(),
+    )
+
+
 def exorcom(state):
     if state['my_lev'] < 10:
         return state['bprintf'](state, "No chance....\n")
@@ -312,17 +357,17 @@ def exorcom(state):
     if ptstflg(player.player_id, 1):
         return state['bprintf'](state, "You can't exorcise them, they dont want to be exorcised\n")
 
-    logger.debug("%s exorcised %s", state['name'], pname(player.player_id))
+    logger.debug("%s exorcised %s", state['name'], player.name)
     dumpstuff(player.player_id, player.location)
     sendsys(
         state,
-        pname(player.player_id),
+        player.name,
         state['name'],
         -10010,
         state['curch'],
         '',
     )
-    setpname(player.player_id, '')
+    player.destroy()
     return state
 
 
@@ -342,7 +387,7 @@ def dogive(state, ob, pl):
     item.carried_by = pl
     sendsys(
         state,
-        pname(pl),
+        player.name,
         state['name'],
         -10011,
         state['curch'],
@@ -380,7 +425,7 @@ def stealcom(state):
         if f & 1:
             sendsys(
                 state,
-                pname(player.player_id),
+                player.name,
                 state['name'],
                 -10011,
                 state['curch'],

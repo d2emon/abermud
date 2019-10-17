@@ -31,13 +31,12 @@ class World:
         return self.last_message_id - self.first_message_id >= 199
 
     def __revise(self, message_id):
-        player_ids = (i for i in range(16) if pname(i) and ppos(i) < message_id / 2 and ppos(i) != -2)
-        for player_id in player_ids:
-            player = Player(self.state, player_id)
+        players = (Player(self.state, player_id) for player_id in range(16))
+        for player in filter(lambda p: p.is_alive and ppos(p.player_id) < message_id / 2 and ppos(p.player_id) != -2, players):
             self.state['rd_qd'] = True
-            self.send_message(Message(text="{} has been timed out\n".format(pname(player.player_id))))
+            self.send_message(Message(text="{} has been timed out\n".format(player.name)))
             dumpstuff(player.player_id, player.location)
-            setpname(player.player_id, '')
+            player.destroy()
 
     def get_message(self, message_id):
         return self.state['__messages'][message_id - self.first_message_id]

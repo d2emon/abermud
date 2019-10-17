@@ -251,6 +251,193 @@ def pushcom(state):
         return state['bprintf'](state, "Nothing happens\n")
 
 
+def cripplecom(state):
+    target = Player(state, victim())
+    if target.player_id == -1:
+        return state
+    return sendsys(
+        state,
+        target.name,
+        state['name'],
+        -10101,
+        state['curch'],
+        "",
+    )
+
+
+def curecom(state):
+    target = Player(state, vichfb())
+    if target.player_id == -1:
+        return state
+    return sendsys(
+        state,
+        target.name,
+        state['name'],
+        -10100,
+        state['curch'],
+        "",
+    )
+
+
+def dumbcom(state):
+    target = Player(state, victim())
+    if target.player_id == -1:
+        return state
+    return sendsys(
+        state,
+        target.name,
+        state['name'],
+        -10102,
+        state['curch'],
+        "",
+    )
+
+
+def forcecom(state):
+    target = Player(state, victim())
+    if target.player_id == -1:
+        return state
+    return sendsys(
+        state,
+        target.name,
+        state['name'],
+        -10103,
+        state['curch'],
+        getreinput(),
+    )
+
+
+def missilecom(state):
+    target = Player(state, vichfb())
+    if target.player_id == -1:
+        return state
+    state = sendsys(
+        state,
+        target.name,
+        state['name'],
+        -10106,
+        state['curch'],
+        state['my_lev'] * 2,
+    )
+    if pstr(target.player_id) - 2 * state['my_lev'] < 0:
+        state = state['bprintf'](state, "Your last spell did the trick\n")
+        if pstr(target.player_id) >= 0:
+            if target.player_id < 16:
+                state['my_sco'] += plev(target.player_id) ** 2 * 100
+            else:
+                state['my_sco'] += 10 * damof(target.player_id)
+        setpstr(target.player_id, -1)
+        state.update({
+            'in_fight': 0,
+            'fighting': -1,
+        })
+    if target.player_id > 15:
+        state = woundmn(state, target.player_id, 2 * state['my_lev'])
+    return state
+
+
+def changecom(state):
+    if brkword() == -1:
+        return state['bprintf'](state, "change what (Sex ?) ?\n")
+    if state['wordbuf'] != 'sex':
+        return state['bprintf'](state, "I don't know how to change that\n")
+
+    target = Player(state, victim())
+    if target.player_id == -1:
+        return state
+    state = sendsys(
+        state,
+        target.name,
+        state['name'],
+        -10107,
+        state['curch'],
+        "",
+    )
+    if target.player_id >= 16:
+        setpsex(target.player_id, 1 - psex(target.player_id))
+    return state
+
+
+def fireballcom(state):
+    target = Player(state, vichfb())
+    if target.player_id == -1:
+        return state
+    if target.player_id == state['mynum']:
+        return state['bprintf'](state, "Seems rather dangerous to me....\n")
+
+    multiplier = 6 if target.player_id == fpbns('yeti') else 2
+    if pstr(target.player_id) - multiplier * state['my_lev'] < 0:
+        state = state['bprintf'](state, "Your last spell did the trick\n")
+        if pstr(target.player_id) >= 0:
+            if target.player_id < 16:
+                state['my_sco'] += plev(target.player_id) ** 2 * 100
+            else:
+                state['my_sco'] += 10 * damof(target.player_id)
+        setpstr(target.player_id, -1)
+        state.update({
+            'in_fight': 0,
+            'fighting': -1,
+        })
+
+    state = sendsys(
+        state,
+        target.name,
+        state['name'],
+        -10109,
+        state['curch'],
+        state['my_lev'] * 2,
+    )
+
+    if target.player_id > 15:
+        state = woundmn(state, target.player_id, multiplier * state['my_lev'])
+    return state
+
+
+def shockcom(state):
+    target = Player(state, vichfb())
+    if target.player_id == -1:
+        return state
+    if target.player_id == state['mynum']:
+        return state['bprintf'](state, "You are supposed to be killing other people not yourself\n")
+
+    if pstr(target.player_id) - 2 * state['my_lev'] < 0:
+        state = state['bprintf'](state, "Your last spell did the trick\n")
+        if pstr(target.player_id) >= 0:
+            if target.player_id < 16:
+                state['my_sco'] += plev(target.player_id) ** 2 * 100
+            else:
+                state['my_sco'] += 10 * damof(target.player_id)
+        setpstr(target.player_id, -1)
+        state.update({
+            'in_fight': 0,
+            'fighting': -1,
+        })
+
+    state = sendsys(
+        state,
+        target.name,
+        state['name'],
+        -10110,
+        state['curch'],
+        state['my_lev'] * 2,
+    )
+
+    if target.player_id > 15:
+        state = woundmn(state, target.player_id, 2 * state['my_lev'])
+    return state
+
+
+def starecom(state):
+    target = Player(state, vichere())
+    if target.player_id == -1:
+        return state
+    if target.player_id == state['mynum']:
+        return state['bprintf'](state, "That is pretty neat if you can do it!\n")
+
+    sillytp(target.player_id, "stares deep into your eyes\n")
+    return state['bprintf'](state, "You stare at [p]{}[/p]\n")
+
+
 def gropecom():
     #
     raise PlayerIsDead("Bye....... LINE TERMINATED - MORALITY REASONS")
@@ -281,6 +468,43 @@ def vichfb(state, player_id):
         state = state['bprintf'](state, "They are not here\n")
         return -1
     return player.player_id
+
+
+def sillytp(state, player_id, message):
+    if message[:4] == "star":
+        text = "[s name=\"{}\"]{} {}\n[/s]".format(state['name'], state['name'], message)
+    else:
+        text = "[p]{}[/p] {}\n".format(state['name'], message)
+
+    player = Player(state, player_id)
+    return sendsys(
+        state,
+        player.name,
+        state['name'],
+        -10111,
+        state['curch'],
+        text,
+    )
+
+
+def tscale(state):
+    players = (Player(state, player_id) for player_id in range(16))
+    count = len(list(filter(lambda player: player.is_alive, players)))
+    if count == 1:
+        return 2
+    elif count == 2:
+        return 3
+    elif count == 3:
+        return 3
+    elif count == 4:
+        return 4
+    elif count == 5:
+        return 4
+    elif count == 6:
+        return 5
+    elif count == 7:
+        return 6
+    return 7
 
 
 def wounded(state, n):
@@ -324,7 +548,7 @@ def woundmn(state, mobile_id, damage):
         None,
         -10000,
         mobile.location,
-        "{} has just died\n".format(pname(mobile.player_id)),
+        "{} has just died\n".format(mobile.name),
     )
     sendsys(
         state,
@@ -332,9 +556,10 @@ def woundmn(state, mobile_id, damage):
         state['name'],
         -10113,
         mobile.location,
-        "[ {} has just died ]\n".format(pname(mobile.player_id)),
+        "[ {} has just died ]\n".format(mobile.name),
     )
-    setpname(mobile.player_id, '')
+    mobile.destroy()
+    return state
 
 
 def mhitplayer(state, mobile_id, player_id):
@@ -353,7 +578,7 @@ def mhitplayer(state, mobile_id, player_id):
         return sendsys(
             state,
             state['name'],
-            pname(mobile.player_id),
+            mobile.name,
             -10021,
             mobile.location,
             [
@@ -366,7 +591,7 @@ def mhitplayer(state, mobile_id, player_id):
         return sendsys(
             state,
             state['name'],
-            pname(mobile.player_id),
+            mobile.name,
             -10021,
             mobile.location,
             [
@@ -381,22 +606,53 @@ def resetplayers(state):
     for player_id in range(16, 35):
         player = Player(state, player_id)
         data = pinit[player_id - 16]
-        setpname(player.player_id, data.name)
+
+        player.name = data.name
         player.location = data.location
+
         setpstr(player.player_id, data.strength)
         setpsex(player.player_id, data.sex)
         setpwpn(player.player_id, -1)
         setpvis(player.player_id, 0)
         setplev(player.player_id, data.level)
+
     for player_id in range(35, 48):
         player = Player(state, player_id)
-        setpname(player.player_id, '')
+        player.destroy()
 
 
 def iswornby(item, player):
     if not iscarrby(item, player):
         return False
     return item.carry_flag == Item.WORN_BY
+
+
+def deafcom(state):
+    target = Player(state, victim())
+    if target.player_id == -1:
+        return state
+    return sendsys(
+        state,
+        target.name,
+        state['name'],
+        -10120,
+        state['curch'],
+        "",
+    )
+
+
+def blindcom(state):
+    target = Player(state, victim())
+    if target.player_id == -1:
+        return state
+    return sendsys(
+        state,
+        target.name,
+        state['name'],
+        -10105,
+        state['curch'],
+        "",
+    )
 
 
 def teletrap(state):

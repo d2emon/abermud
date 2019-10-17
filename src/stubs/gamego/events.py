@@ -74,13 +74,14 @@ def __on_loose(state):
     state = open_world(state)
     dumpitems()
     if pvis(state['mynum']) < 10000:
-        sendsys(
+        state = sendsys(
+            state,
             state['name'],
             state['name'],
             -10113,
             "{} has departed from AberMUDII\n".format(state['name']),
         )
-    setpname(state['mynum'], '')
+    state['me'].destroy()
     close_world(state)
 
     if not state['zapped']:

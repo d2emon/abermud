@@ -79,6 +79,14 @@ class Player:
         return self.state['objinfo']
 
     @property
+    def name(self):
+        return self.__players[16 * self.player_id]
+
+    @name.setter
+    def name(self, value):
+        self.__players[16 * self.player_id] = value
+
+    @property
     def location(self):
         return self.__players[16 * self.player_id + 4]
 
@@ -86,9 +94,12 @@ class Player:
     def location(self, value):
         self.__players[16 * self.player_id + 4] = value
 
+    @property
+    def is_alive(self):
+        return len(self.name) > 0
 
-def pname(state, chr):
-    raise NotImplementedError()
+    def destroy(self):
+        self.name = ''
 
 
 def plev(chr):

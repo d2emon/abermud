@@ -16,7 +16,7 @@ def chkfight(state, player_id):
 
     player = Player(state, player_id)
     consid_move(player.player_id)
-    if not len(pname(player.player_id)):
+    if not player.is_alive:
         return state
     if player.location != state['curch']:
         return state
@@ -82,14 +82,14 @@ def dorune(state):
         player = Player(state, player_id)
         if player.player_id == state['mynum']:
             continue
-        if not len(pname(player.player_id)):
+        if not player.is_alive:
             continue
         if plev(player.player_id) > 9:
             continue
         if player.location == state['curch']:
             if randperc() < 9 * state['my_lev']:
                 return state
-            if fpbns(pname(player.player_id)) == -1:
+            if fpbns(player.name) == -1:
                 return state
             state = state['bprintf'](state, "The runesword twists in your hands lashing out savagely\n")
             return hitplayer(state, player.player_id, 32)
@@ -105,14 +105,14 @@ def pepdrop(state):
         "You start sneezing ATISCCHHOOOOOO!!!!\n",
     )
     dragon = Player(state, 32)
-    if not len(pname(dragon.player_id)) or dragon.location != state['curch']:
+    if not dragon.is_alive or dragon.location != state['curch']:
         return state
 
     # Ok dragon and pepper time
     item = Item(state, 89)
     if iscarrby(item, state['mynum']) and item.carry_flag == Item.WORN_BY:
         # Fried dragon
-        setpname(dragon.player_id, '')  # No dragon
+        dragon.destroy()  # No dragon
         state['my_sco'] += 100
         calibme()
         return state
@@ -138,7 +138,7 @@ def helpchkr(state):
     player = Player(statw, phelping(state['mynum']))
     if not state['i_setup']:
         return state
-    if len(pname(player.player_id)) and ploc(player.player_id) != state['curch']:
-        state = state['bprintf'](state, "You can no longer help [c]{}[/c]\n".format(pname(player.player_id)))
+    if not player.is_alive or ploc(player.player_id) != state['curch']:
+        state = state['bprintf'](state, "You can no longer help [c]{}[/c]\n".format(player.name))
         setphelping(state['mynum'], -1)
     return state

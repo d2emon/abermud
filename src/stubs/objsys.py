@@ -135,20 +135,70 @@ def dumpstuff(state, n, loc):
     return state
 
 
+def whocom(state):
+    if state['my_lev'] > 9:
+        state = state['bprintf'](state, "Players\n")
+        max_player_id = 48
+    else:
+        max_player_id = 16
+
+    for player_id in range(max_player_id):
+        player = Player(state, player_id)
+        if player_id == 16:
+            state = state['bprintf'](state, "----------\nMobiles\n")
+        if player.is_alive:
+            state = dispuser(state, player.player_id)
+
+    return state['bprintf'](state, "\n")
+
+
+def dispuser(state, player_id):
+    player = Player(state, player_id)
+    if pstr(player.player_id) < 0:
+        return
+    if pvis(player.player_id) > state['my_lev']:
+        return
+    if pvis(player.player_id):
+        state = state['bprintf'](state, "(")
+    state = state['bprintf'](state, "{} ".format(player.name))
+    disl4(plev(player.player_id), psex(player.player_id))
+    if pvis(player.player_id):
+        state = state['bprintf'](state, "(")
+    if ppos(player.player_id):
+        state = state['bprintf'](state, " [Absent From Reality]")
+    return state['bprintf'](state, "\n")
+
+
+def fpbns(state, name):
+    for player_id in range(48):
+        player = Player(state, player_id)
+        if not player.is_alive:
+            continue
+
+        player_name = player.name.lower()
+        names = [player_name]
+        if player_name[:4] == "the ":
+            names.append(player_name[4:])
+        if name.lower() in names:
+            return player
+        pass
+    return None
+
+
 def lispeople(state):
     for player_id in range(48):
         player = Player(state, player_id)
         if player.player_id == state['mynum']:
             continue
-        if len(pname(player.player_id)) and player.location == state['curch'] and seeplayer(state, player.player_id):
-            state = state['bprintf'](state, "{} ".format(pname(player.player_id)))
+        if player.is_alive and player.location == state['curch'] and seeplayer(state, player.player_id):
+            state = state['bprintf'](state, "{} ".format(player.name))
             if state['debug_mode']:
                 state = state['bprintf'](state, "{{}}".format(player.player_id))
             disl4(plev(player.player_id), psex(player.player_id))
             if psex(player.player_id):
-                state['wd_her'] = pname(player.player_id)
+                state['wd_her'] = player.name
             else:
-                state['wd_him'] = pname(player.player_id)
+                state['wd_him'] = player.name
             state = state['bprintf'](state, " is here carrying\n")
             lobjsat(player.player_id)
     return state
