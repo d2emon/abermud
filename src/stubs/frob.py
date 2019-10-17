@@ -9,7 +9,7 @@ def frobnicate(state):
     player = Player(state, fpbn(state['wordbuf']))
     if player.player_id > 15 and state['my_lev'] != 10033:
         return state['bprintf'](state, "Can't frob mobiles old bean.\n")
-    if plev(player.player_id) > 9999 and state['my_lev'] != 10033:
+    if player.level > 9999 and state['my_lev'] != 10033:
         return state['bprintf'](state, "You can't frobnicate {}!!!!\n".format(player.name))
 
     keysetback()

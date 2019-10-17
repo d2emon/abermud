@@ -48,10 +48,7 @@ def hitplayer(state, victim_id, weapon_id):
             state = state['bprintf'](state, "Your last blow did the trick\n")
             if pstr(victim.player_id) >= 0:
                 # Bonus
-                if victim.player_id < 16:
-                    state['my_sco'] += plev(victim.player_id) ** 2 * 100
-                else:
-                    state['my_sco'] += 10 * damof(victim.player_id)
+                state['my_sco'] += victim.value
             setpstr(victim.player_id, -1)
             state.update({
                 'in_fight': 0,

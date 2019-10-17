@@ -95,8 +95,22 @@ class Player:
         self.__players[16 * self.player_id + 4] = value
 
     @property
+    def level(self):
+        return self.__players[16 * self.player_id + 10]
+
+    @level.setter
+    def level(self, value):
+        self.__players[16 * self.player_id + 10] = value
+
+    @property
     def is_alive(self):
         return len(self.name) > 0
+
+    @property
+    def value(self):
+        if self.player_id < 16:
+            return self.level ** 2 * 100
+        return 10 * damof(self.player_id)
 
     def destroy(self):
         self.name = ''

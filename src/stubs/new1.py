@@ -322,10 +322,7 @@ def missilecom(state):
     if pstr(target.player_id) - 2 * state['my_lev'] < 0:
         state = state['bprintf'](state, "Your last spell did the trick\n")
         if pstr(target.player_id) >= 0:
-            if target.player_id < 16:
-                state['my_sco'] += plev(target.player_id) ** 2 * 100
-            else:
-                state['my_sco'] += 10 * damof(target.player_id)
+            state['my_sco'] += target.value
         setpstr(target.player_id, -1)
         state.update({
             'in_fight': 0,
@@ -369,10 +366,7 @@ def fireballcom(state):
     if pstr(target.player_id) - multiplier * state['my_lev'] < 0:
         state = state['bprintf'](state, "Your last spell did the trick\n")
         if pstr(target.player_id) >= 0:
-            if target.player_id < 16:
-                state['my_sco'] += plev(target.player_id) ** 2 * 100
-            else:
-                state['my_sco'] += 10 * damof(target.player_id)
+            state['my_sco'] += target.value
         setpstr(target.player_id, -1)
         state.update({
             'in_fight': 0,
@@ -403,10 +397,7 @@ def shockcom(state):
     if pstr(target.player_id) - 2 * state['my_lev'] < 0:
         state = state['bprintf'](state, "Your last spell did the trick\n")
         if pstr(target.player_id) >= 0:
-            if target.player_id < 16:
-                state['my_sco'] += plev(target.player_id) ** 2 * 100
-            else:
-                state['my_sco'] += 10 * damof(target.player_id)
+            state['my_sco'] += target.value
         setpstr(target.player_id, -1)
         state.update({
             'in_fight': 0,
@@ -614,7 +605,8 @@ def resetplayers(state):
         setpsex(player.player_id, data.sex)
         setpwpn(player.player_id, -1)
         setpvis(player.player_id, 0)
-        setplev(player.player_id, data.level)
+
+        player.level = data.level
 
     for player_id in range(35, 48):
         player = Player(state, player_id)

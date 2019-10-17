@@ -84,7 +84,7 @@ def dorune(state):
             continue
         if not player.is_alive:
             continue
-        if plev(player.player_id) > 9:
+        if player.level > 9:
             continue
         if player.location == state['curch']:
             if randperc() < 9 * state['my_lev']:

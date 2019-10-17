@@ -318,7 +318,7 @@ def calibme(state):
         )
         if b == 10:
             state = state['bprintf']("[f]{}[/f]".format(GWIZ))
-    setplev(state['mynum'], state['my_lev'])
+    state['me'].level = state['my_lev']
     if state['my_str'] > 30 + 10 * state['my_lev']:
         state['my_str'] = 30 + 10 * state['my_lev']
     setpstr(state['mynum'], state['my_str'])
@@ -419,8 +419,7 @@ def stealcom(state):
         return state['bprintf'](state, "You can't carry any more\n")
 
     f = randperc()
-    e = 10 + state['my_lev'] - plev(player.player_id)
-    e *= 5
+    e = (10 + state['my_lev'] - player.level) * 5
     if f < e:
         if f & 1:
             sendsys(
@@ -513,6 +512,7 @@ def becom(state):
 def rawcom():
     broad(world, x[1:])
     broad(world, y)
+
 
 def bugcom(state):
     #

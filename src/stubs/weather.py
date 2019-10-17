@@ -139,8 +139,17 @@ def moancom():
     raise NotImplementedError()
 
 
-def cancarry(plyr):
-    raise NotImplementedError()
+def cancarry(state, player_id):
+    player = Player(state, player_id)
+    if player.level > 9:
+        return True
+    if player.level < 0:
+        return True
+    items = (Item(state, item_id) for item_id in range(state['numobs']))
+    items = filter(lambda i: iscarrby(i, player) and not isdest(i.item_id), items)
+    if len(list(items)) < player.level + 5:
+        return True
+    return False
 
 
 def setcom():

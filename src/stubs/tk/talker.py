@@ -21,7 +21,9 @@ def __putmeon(state):
     player.location = state['curch']
 
     setppos(player.player_id, -1)
-    setplev(player.player_id, 1)
+
+    player.level = 1
+
     setpvis(player.player_id, 0)
     setpstr(player.player_id, -1)
     setpwpn(player.player_id, -1)
@@ -45,7 +47,9 @@ def __special(state, string):
         state = open_world(state)
 
         setpstr(state['mynum'], state['my_str'])
-        setplev(state['mynum'], state['my_lev'])
+
+        state['me'].level = state['my_lev']
+
         setpvis(state['mynum'], 0 if state['my_lev'] < 10000 else 10000)
         setpwpn(state['mynum'], -1)
         setpsexall(state['mynum'], state['my_sex'])

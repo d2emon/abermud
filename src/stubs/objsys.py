@@ -161,7 +161,7 @@ def dispuser(state, player_id):
     if pvis(player.player_id):
         state = state['bprintf'](state, "(")
     state = state['bprintf'](state, "{} ".format(player.name))
-    disl4(plev(player.player_id), psex(player.player_id))
+    disl4(player.level, psex(player.player_id))
     if pvis(player.player_id):
         state = state['bprintf'](state, "(")
     if ppos(player.player_id):
@@ -194,7 +194,7 @@ def lispeople(state):
             state = state['bprintf'](state, "{} ".format(player.name))
             if state['debug_mode']:
                 state = state['bprintf'](state, "{{}}".format(player.player_id))
-            disl4(plev(player.player_id), psex(player.player_id))
+            disl4(player.level, psex(player.player_id))
             if psex(player.player_id):
                 state['wd_her'] = player.name
             else:

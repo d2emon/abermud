@@ -159,7 +159,7 @@ def statplyr(state):
     if player.player_id == -1:
         return state['bprintf'](state, "Whats that?\n")
     state = state['bprintf'](state, "Name      : {}\n".format(player.name))
-    state = state['bprintf'](state, "Level     : {}\n".format(plev(player.player_id)))
+    state = state['bprintf'](state, "Level     : {}\n".format(player.level))
     state = state['bprintf'](state, "Strength  : {}\n".format(pstr(player.player_id)))
     state = state['bprintf'](state, "Sex       : {}\n".format(psex(player.player_id)))
     state = state['bprintf'](state, "Location  : ")

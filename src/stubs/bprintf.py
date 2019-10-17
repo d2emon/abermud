@@ -61,7 +61,7 @@ def seeplayer(state, player_id):
         return True
     if player.player_id == state['mynum']:
         return True
-    if plev(state['mynum']) < pvis(player.player_id):
+    if state['me'].level < pvis(player.player_id):
         return False
     if state['ail_blind']:
         return False
@@ -149,7 +149,7 @@ def snoopcom(state):
     target = Player(state, fpbn(state['wordbuf']))
     if target.player_id == -1:
         return state['bprintf'](state, "Who is that?\n")
-    if state['my_lev'] < 10000 and plev(target.player_id) >= 10 or ptstbit(target.player_id, 6):
+    if state['my_lev'] < 10000 and target.level >= 10 or ptstbit(target.player_id, 6):
         state['snoopt'] = -1
         return state['bprintf'](state, "Your magical vision is obscured\n")
 
