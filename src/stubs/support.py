@@ -70,17 +70,21 @@ class Item:
 
 
 class Player:
-    def __init__(self, state, item_id):
+    def __init__(self, state, player_id):
         self.state = state
-        self.item_id = item_id
+        self.player_id = player_id
 
     @property
     def __players(self):
         return self.state['objinfo']
 
+    @property
+    def location(self):
+        return self.__players[16 * self.player_id + 4]
 
-def ploc(state, chr):
-    raise NotImplementedError()
+    @location.setter
+    def location(self, value):
+        self.__players[16 * self.player_id + 4] = value
 
 
 def pname(state, chr):
@@ -175,10 +179,6 @@ def setppos(chr, v):
     raise NotImplementedError()
 
 
-def setploc(chr, n):
-    raise NotImplementedError()
-
-
 def pwpn(chr):
     raise NotImplementedError()
 
@@ -227,8 +227,16 @@ def setphelping(x, y):
     raise NotImplementedError()
 
 
-def ptothlp(pl):
-    raise NotImplementedError()
+def ptothlp(state, pl):
+    who = Player(state, pl)
+    for player_id in range(state['maxu']):
+        player = Player(state, player_id)
+        if player.location != who.location:
+            continue
+        if phelping(player.player_id) != who.player_id:
+            continue
+        return player.player_id
+    return -1
 
 
 def psetflg(ch, x):

@@ -1,4 +1,4 @@
-from .support import Item
+from .support import Item, Player
 
 
 def iscontin(state, o1, o2):
@@ -132,4 +132,23 @@ def dumpstuff(state, n, loc):
         item = Item(state, item_id)
         if iscarrby(state, item.item_id, n):
             item.located_at = loc
+    return state
+
+
+def lispeople(state):
+    for player_id in range(48):
+        player = Player(state, player_id)
+        if player.player_id == state['mynum']:
+            continue
+        if len(pname(player.player_id)) and player.location == state['curch'] and seeplayer(state, player.player_id):
+            state = state['bprintf'](state, "{} ".format(pname(player.player_id)))
+            if state['debug_mode']:
+                state = state['bprintf'](state, "{{}}".format(player.player_id))
+            disl4(plev(player.player_id), psex(player.player_id))
+            if psex(player.player_id):
+                state['wd_her'] = pname(player.player_id)
+            else:
+                state['wd_him'] = pname(player.player_id)
+            state = state['bprintf'](state, " is here carrying\n")
+            lobjsat(player.player_id)
     return state

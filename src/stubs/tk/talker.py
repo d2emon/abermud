@@ -1,6 +1,7 @@
 from ..errors import WorldError
 from ..bprintf import make_buffer
 from ..opensys import close_world, open_world
+from ..support import Player
 from .back import change_channel, process_messages
 
 
@@ -12,15 +13,18 @@ def __putmeon(state):
     if player_id is None:
         raise Exception("Sorry AberMUD is full at the moment")
 
-    state['mynum'] = player_id
-    setpname(player_id, state['name'])
-    setploc(player_id, state['curch'])
-    setppos(player_id, -1)
-    setplev(player_id, 1)
-    setpvis(player_id, 0)
-    setpstr(player_id, -1)
-    setpwpn(player_id, -1)
-    setpsex(player_id, 0)
+    player = Player(state, player_id)
+    state['me'] = player
+    state['mynum'] = player.player_id
+
+    setpname(player.player_id, state['name'])
+    player.location = state['curch']
+    setppos(player.player_id, -1)
+    setplev(player.player_id, 1)
+    setpvis(player.player_id, 0)
+    setpstr(player.player_id, -1)
+    setpwpn(player.player_id, -1)
+    setpsex(player.player_id, 0)
     return state
 
 
@@ -45,9 +49,7 @@ def __special(state, string):
         setpwpn(state['mynum'], -1)
         setpsexall(state['mynum'], state['my_sex'])
         setphelping(state['mynum'], -1)
-        setploc(state['mynum'], -5 if randperc() > 50 else -183)
-
-        state = change_channel(state, ploc(state['mynum']))
+        state = change_channel(state, -5 if randperc() > 50 else -183)
 
         sendsys(
             state['name'],
@@ -122,8 +124,9 @@ def __listen(state):
     else:
         state = __special(state, work)
 
-    if state['fighting'] > -1:
-        if not pname(state['fighting']) or ploc(state['fighting']) != state['curch']:
+    enemy = Player(state, state['fighting'])
+    if enemy.player_id > -1:
+        if not pname(enemy.player_id) or enemy.location != state['curch']:
             state.update({
                 'in_fight': 0,
                 'fighting': -1,

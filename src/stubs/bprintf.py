@@ -1,6 +1,7 @@
 from .errors import OutputBufferError  # PlayerLoose
 from .opensys import close_world
 from .sys_log import logger
+from .support import Player
 
 
 # State
@@ -52,6 +53,23 @@ def tocontinue(state, __str, ct, x, mx):
     #
     raise OutputBufferError("Buffer OverRun in IO_TOcontinue")
     #
+
+
+def seeplayer(state, player_id):
+    player = Player(state, player_id)
+    if player.player_id == -1:
+        return True
+    if player.player_id == state['mynum']:
+        return True
+    if plev(state['mynum']) < pvis(player.player_id):
+        return False
+    if state['ail_blind']:
+        return False
+    if player.location == state['curch'] and isdark(state['curch']):
+        return False
+
+    setname(player.player_id)
+    return True
 
 
 def make_buffer(state):

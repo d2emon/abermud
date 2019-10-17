@@ -1,12 +1,57 @@
 from .errors import PlayerIsDead, PlayerLoose
 from .opensys import close_world, open_world
-from .support import Item
+from .support import Item, Player
 
 
 def helpcom(state):
-    #
+    if brkword() != -1:
+        player = Player(state, fpbn(state['wordbuf']))
+        if player.player_id == -1:
+            return state['bprintf'](state, "Help who?\n")
+        if player.location != state['curch']:
+            return state['bprintf'](state, "They are not here\n")
+        if player.player_id == state['mynum']:
+            return state['bprintf'](state, "You can't help yourself.\n")
+
+        if phelping(state['mynum']) != -1:
+            sendsys(
+                state,
+                pname(player.player_id),
+                pname(player.player_id),
+                -10011,
+                state['curch'],
+                "[c]{}[/c] has stopped helping you\n".format(state['name']),
+            )
+            state = state['bprintf'](state, "Stopped helping {}\n". format(phelping(state['mynum'])))
+
+        setphelping(state['mynum'], player.player_id)
+        sendsys(
+            state,
+            pname(player.player_id),
+            pname(player.player_id),
+            -10011,
+            state['curch'],
+            "[c]{}[/c] has offered to help you\n".format(state['name']),
+        )
+        return state['bprintf'](state, "OK...\n")
+
     close_world(state)
-    #
+    state = state['bprintf'](state, "[f]{}[/f]".format(HELP1))
+    if state['my_lev'] > 9:
+        state = state['bprintf'](state, "Hit <Return> For More....\n")
+        state = state['pbfr'](state)
+        while getchar() != "\n":
+            pass
+        state = state['bprintf'](state, "[f]{}[/f]".format(HELP2))
+    state = state['bprintf'](state, "\n")
+    if state['my_lev'] > 9999:
+        state = state['bprintf'](state, "Hit <Return> For More....\n")
+        state = state['pbfr'](state)
+        while getchar() != "\n":
+            pass
+        state = state['bprintf'](state, "[f]{}[/f]".format(HELP3))
+    state = state['bprintf'](state, "\n")
+    return state
 
 
 def levcom(state):
@@ -108,9 +153,16 @@ def examcom(state):
 
 
 def statplyr(state):
-    #
-    close_world(state)
-    #
+    player = Player(state, fpbn(state['wordbuf']))
+    if player.player_id == -1:
+        return state['bprintf'](state, "Whats that?\n")
+    state = state['bprintf'](state, "Name      : {}\n".format(pname(player.player_id)))
+    state = state['bprintf'](state, "Level     : {}\n".format(plev(player.player_id)))
+    state = state['bprintf'](state, "Strength  : {}\n".format(pstr(player.player_id)))
+    state = state['bprintf'](state, "Sex       : {}\n".format(psex(player.player_id)))
+    state = state['bprintf'](state, "Location  : ")
+    showname(player.location)
+    return state
 
 
 def incom(state):
@@ -163,11 +215,11 @@ def wherecom(state):
             else:
                 desrm(item.location, item.carry_flag)
 
-    item = Item(state, fpbn(state['wordbuf']))
-    if item.item_id != -1:
+    player = Item(state, fpbn(state['wordbuf']))
+    if player.player_id != -1:
         rnd += 1
-        state = state['bprintf'](state, "{} - ".format(pname(item.item_id)))
-        desrm(ploc(item.item_id), 0)
+        state = state['bprintf'](state, "{} - ".format(pname(player.player_id)))
+        desrm(player.location, 0)
 
     if rnd:
         return state

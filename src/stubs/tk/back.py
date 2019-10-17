@@ -1,5 +1,6 @@
 from ..errors import PlayerIsDead
 from ..parse import gamrcv, eorte
+from ..support import Player
 from .message import Message
 from .world import World
 
@@ -43,7 +44,8 @@ def set_message_id(state, player_id, message_id):
 
 
 def set_channel(world, player_id, channel):
-    setploc(world, player_id, channel)
+    player = Player(world.state, player_id)
+    player.location = channel
     return world
 
 

@@ -1,5 +1,5 @@
 from .errors import PlayerIsDead
-from .support import Item
+from .support import Item, Player
 
 
 def on_timing():
@@ -10,8 +10,23 @@ def onlook():
     raise NotImplementedError()
 
 
-def chkfight(x):
-    raise NotImplementedError()
+def chkfight(state, player_id):
+    if player_id < 0:
+        return state
+
+    player = Player(state, player_id)
+    consid_move(player.player_id)
+    if not len(pname(player.player_id)):
+        return state
+    if player.location != state['curch']:
+        return state
+    if pvis(state['mynum']):
+        return state
+    if randperc() > 40:
+        return state
+    if player.player_id == fpbns('yeti') and ohany(1 << 13):
+        return state
+    return mhitplayer(state, player.player_id, state['mynum'])
 
 
 def consid_move(x):
@@ -60,8 +75,24 @@ def sys_reset():
     raise NotImplementedError()
 
 
-def dorune():
-    raise NotImplementedError()
+def dorune(state):
+    if state['in_fight']:
+        return state
+    for player_id in range(32):
+        player = Player(state, player_id)
+        if player.player_id == state['mynum']:
+            continue
+        if not len(pname(player.player_id)):
+            continue
+        if plev(player.player_id) > 9:
+            continue
+        if player.location == state['curch']:
+            if randperc() < 9 * state['my_lev']:
+                return state
+            if fpbns(pname(player.player_id)) == -1:
+                return state
+            state = state['bprintf'](state, "The runesword twists in your hands lashing out savagely\n")
+            return hitplayer(state, player.player_id, 32)
 
 
 def pepdrop(state):
@@ -74,14 +105,14 @@ def pepdrop(state):
         "You start sneezing ATISCCHHOOOOOO!!!!\n",
     )
     dragon = Player(state, 32)
-    if not len(pname(dragon.item_id)) or ploc(dragon.item_id) != state['curch']:
+    if not len(pname(dragon.player_id)) or dragon.location != state['curch']:
         return state
 
     # Ok dragon and pepper time
     item = Item(state, 89)
     if iscarrby(item, state['mynum']) and item.carry_flag == Item.WORN_BY:
         # Fried dragon
-        setpname(dragon.item_id, '')  # No dragon
+        setpname(dragon.player_id, '')  # No dragon
         state['my_sco'] += 100
         calibme()
         return state
@@ -92,9 +123,22 @@ def pepdrop(state):
     raise PlayerIsDead("Whoops.....   Frying tonight")
 
 
-def dragget():
-    raise NotImplementedError()
+def dragget(state):
+    if state['my_lev'] > 9:
+        return False
+    dragon = Player(state, fpbns('dragon'))
+    if dragon.player_id == -1:
+        return False
+    if dragon.location != state['curch']:
+        return False
+    return True
 
 
-def helpchkr():
-    raise NotImplementedError()
+def helpchkr(state):
+    player = Player(statw, phelping(state['mynum']))
+    if not state['i_setup']:
+        return state
+    if len(pname(player.player_id)) and ploc(player.player_id) != state['curch']:
+        state = state['bprintf'](state, "You can no longer help [c]{}[/c]\n".format(pname(player.player_id)))
+        setphelping(state['mynum'], -1)
+    return state

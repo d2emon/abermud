@@ -1,6 +1,6 @@
 from .errors import PlayerIsDead
 from .opensys import close_world, open_world
-from .support import Item
+from .support import Item, Player
 from .sys_log import logger
 
 
@@ -257,10 +257,30 @@ def gropecom():
     #
 
 
-def vicbase(state):
+def vicbase(state, x):
     #
     state = open_world(state)
     #
+
+
+def vichere(state, player_id):
+    player = Player(state, vicbase(state, player_id))
+    if player.player_id == -1:
+        return player.player_id
+    if player.location != state['curch']:
+        state = state['bprintf'](state, "They are not here\n")
+        return -1
+    return player.player_id
+
+
+def vichfb(state, player_id):
+    player = Player(state, vicfb(state, player_id))
+    if player.player_id == -1:
+        return -1
+    if player.location != state['curch']:
+        state = state['bprintf'](state, "They are not here\n")
+        return -1
+    return player.player_id
 
 
 def wounded(state, n):
@@ -288,6 +308,91 @@ def wounded(state, n):
     #
 
 
+def woundmn(state, mobile_id, damage):
+    mobile = Player(state, mobile_id)
+
+    strength = pstr(mobile.player_id) - damage
+    setpstr(mobile.player_id, strength)
+
+    if strength >= 0:
+        return mhitplayer(state, mobile.player_id, state['mynum'])
+
+    dumpstuff(mobile.player_id, mobile.location)
+    sendsys(
+        state,
+        None,
+        None,
+        -10000,
+        mobile.location,
+        "{} has just died\n".format(pname(mobile.player_id)),
+    )
+    sendsys(
+        state,
+        state['name'],
+        state['name'],
+        -10113,
+        mobile.location,
+        "[ {} has just died ]\n".format(pname(mobile.player_id)),
+    )
+    setpname(mobile.player_id, '')
+
+
+def mhitplayer(state, mobile_id, player_id):
+    mobile = Player(state, mobile_id)
+    if mobile.location != state['curch']:
+        return state
+    if mobile.player_id < 0 or mobile.player_id > 47:
+        return state
+
+    a = randperc()
+    b = 3 * (15 - state['my_lev']) + 20
+    if iswornby(Item(state, 89), state['mynum']) or iswornby(Item(state, 113), state['mynum']) or iswornby(Item(state, 114), state['mynum']):
+        b -= 10
+
+    if a < b:
+        return sendsys(
+            state,
+            state['name'],
+            pname(mobile.player_id),
+            -10021,
+            mobile.location,
+            [
+                mobile.player_id,
+                randperc() % damof(mobile.player_id),
+                -1,
+            ],
+        )
+    else:
+        return sendsys(
+            state,
+            state['name'],
+            pname(mobile.player_id),
+            -10021,
+            mobile.location,
+            [
+                mobile.player_id,
+                -1,
+                -1,
+            ],
+        )
+
+
+def resetplayers(state):
+    for player_id in range(16, 35):
+        player = Player(state, player_id)
+        data = pinit[player_id - 16]
+        setpname(player.player_id, data.name)
+        player.location = data.location
+        setpstr(player.player_id, data.strength)
+        setpsex(player.player_id, data.sex)
+        setpwpn(player.player_id, -1)
+        setpvis(player.player_id, 0)
+        setplev(player.player_id, data.level)
+    for player_id in range(35, 48):
+        player = Player(state, player_id)
+        setpname(player.player_id, '')
+
+
 def iswornby(item, player):
     if not iscarrby(item, player):
         return False
@@ -301,5 +406,5 @@ def teletrap(state):
 def on_flee_event(state):
     for item_id in range(state['numobs']):
         item = Item(state, item_id)
-        if iscarrby(item.item_id, state['mynum']) and not iswornby(item.item_id, state['mynum']):
-            item.located_at = ploc(state['mynum'])
+        if iscarrby(item, state['mynum']) and not iswornby(item, state['mynum']):
+            item.located_at = state['me'].location

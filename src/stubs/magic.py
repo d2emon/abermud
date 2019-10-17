@@ -1,4 +1,4 @@
-from .support import Item
+from .support import Item, Player
 
 
 def sumcom(state):
@@ -15,7 +15,7 @@ def sumcom(state):
             )
         if to_summon.player_id == 17 or to_summon.player_id == 23:
             return new_state
-        dumpstuff(to_summon.player_id, ploc(to_summon.player_id))
+        dumpstuff(to_summon.player_id, to_summon.location)
         new_state = sendsys(
             new_state,
             None,
@@ -24,7 +24,7 @@ def sumcom(state):
             state['curch'],
             "[s name =\"{}\"]{} has arrived\n[/s]".format(pname(to_summon.player_id), pname(to_summon.player_id)),
         )
-        setploc(to_summon.player_id, state['curch'])
+        to_summon.location = state['curch']
         return new_state
 
     def sumob(new_state, to_summon):
@@ -39,8 +39,8 @@ def sumcom(state):
         :return: 
         """
         x = to_summon.location
-        if to_summon.carry_flag != Item.LOCATED_AT:
-            x = ploc(x)
+        if to_summon.owned_by:
+            x = Player(state, to_summon.owned_by).location
         sendsys(
             new_state['name'],
             new_state['name'],
@@ -60,8 +60,8 @@ def sumcom(state):
     if item.item_id != -1:
         return sumob(state, item)
 
-    player = fpbn(state['wordbuf'])
-    if player == -1:
+    player = Player(state, fpbn(state['wordbuf']))
+    if player.player_id == -1:
         return state['bprintf'](state, "I dont know who that is\n")
 
     if state['my_str'] < 10:

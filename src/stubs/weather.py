@@ -155,10 +155,10 @@ def isdark(state):
                 continue
             if ishere(item.item_id):
                 return False
-            owner = item.owned_by
-            if not owner:
+            if not item.owned_by:
                 continue
-            if ploc(owner) != state['curch']:
+            owner = Player(state, item.owned_by)
+            if owner.location != state['curch']:
                 continue
             return False
         return True

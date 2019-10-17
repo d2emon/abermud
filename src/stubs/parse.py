@@ -1,7 +1,7 @@
 from datetime import datetime
 from .errors import PlayerIsDead
 from .opensys import close_world, open_world
-from .support import Item, pname
+from .support import Item, Player, pname
 from .sys_log import logger
 from .tk.back import set_message_id, process_messages
 from .tk.message import Message
@@ -37,7 +37,8 @@ def dodirn(state, n):
         state = state['bprintf'](state, "If you wish to leave a fight, you must FLEE in a direction\n")
         return state
 
-    if iscarrby(32, state['mynum']) and ploc(25) == state['curch'] and len(pname(25)) > 0:
+    golem = Player(state, 25)
+    if iscarrby(32, state['mynum']) and golem.location == state['curch'] and len(pname(golem.player_id)) > 0:
         return state['bprintf'](state, "[c]The Golem[/c] bars the doorway!\n")
 
     if chkcrip():
@@ -63,8 +64,8 @@ def dodirn(state, n):
         state = state['bprintf'](state, "The shield protects you from the worst of the lava stream's heat\n")
 
     if n == 2:
-        i = fpbns('figure')
-        if i != state['mynum'] and i != -1 and ploc(i) == state['curch'] and not iswornby(101, state['mynum']) and not iswornby(102, state['mynum']) and not iswornby(103, state['mynum']):
+        figure = Player(state, fpbns('figure'))
+        if figure.player_id != state['mynum'] and figure.player_id != -1 and figure.location == state['curch'] and not iswornby(101, state['mynum']) and not iswornby(102, state['mynum']) and not iswornby(103, state['mynum']):
             state = state['bprintf'](state, "[p]The Figure[/p] holds you back\n")
             state = state['bprintf'](state, "[p]The Figure[/p] says 'Only true sorcerors may pass'\n")
             return state
@@ -212,27 +213,20 @@ def eorte(state):
         dosumm(state['ades'])
 
     if state['in_fight']:
-        """
-        if(ploc(fighting)!=curch)
-          {
-          fighting= -1;
-          in_fight=0;
-          }
-        if(!strlen(pname(fighting)))
-          {
-          fighting= -1;
-          in_fight=0;
-          }
-        if(in_fight)
-          {
-          if(interrupt)
-             {
-             in_fight=0;
-             hitplayer(fighting,wpnheld);
-             }
-          }
-        """
-        pass
+        enemy = Player(state, state['fighting'])
+        if enemy.location != state['curch']:
+            state.update({
+                'fighting': -1,
+                'in_fight': 0,
+            })
+        if not len(pname(enemy.player_id)):
+            state.update({
+                'fighting': -1,
+                'in_fight': 0,
+            })
+        if state['in_fight'] and state['interrupt']:
+            state.update({'in_fight': 0})
+            hitplayer(enemy.player_id, state['wpnheld'])
     if iswornby(18, state['mynum']) or randperc() < 10:
         state['my_str'] += 1
         if state['i_setup']:
@@ -256,29 +250,87 @@ def rescom():
 
 
 def lightning(state):
-    #
-    broad(world, "[d]You hear an ominous clap of thunder in the distance\n[/d]")
-    #
-    logger.debug("%s zapped %s", state['name'], pname(vic))
-    #
+    if state['my_lev'] < 10:
+        return state['bprintf'](state, "Your spell fails.....\n")
+    if brkword() == -1:
+        return state['bprintf'](state, "But who do you wish to blast into pieces....\n")
+
+    enemy = Player(state, fpbn(state['wordbuf']))
+    if enemy.player_id == -1:
+        return state['bprintf'](state, "There is no one on with that name\n")
+    sendsys(
+        state,
+        pname(enemy.player_id),
+        state['globme'],
+        -10001,
+        enemy.location,
+        "",
+    )
+    logger.debug("%s zapped %s", state['name'], pname(enemy.player_id))
+    if enemy.player_id > 15:
+        state = woundmn(state, enemy.player_id, 10000)
+    return broad(world, "[d]You hear an ominous clap of thunder in the distance\n[/d]")
 
 
 def calibme(state):
-    #
-    logger.debug("%s to level %s", state['name'], b)
-    #
+    if not state['i_setup']:
+        return state
+    b = levelof(state['my_sco'])
+    if b != state['my_lev']:
+        state['my_lev'] = b
+        state = state['bprintf']("You are now {} ".format(state['name']))
+        logger.debug("%s to level %s", state['name'], b)
+        disle3(b, state['my_sex'])
+        sendsys(
+            state,
+            state['name'],
+            state['name'],
+            -10113,
+            state['me'].location,
+            "[p]{}[/p] is now level {}\n".format(state['name'], state['my_lev']),
+        )
+        if b == 10:
+            state = state['bprintf']("[f]{}[/f]".format(GWIZ))
+    setplev(state['mynum'], state['my_lev'])
+    if state['my_str'] > 30 + 10 * state['my_lev']:
+        state['my_str'] = 30 + 10 * state['my_lev']
+    setpstr(state['mynum'], state['my_str'])
+    setpsex(state['mynum'], state['my_sex'])
+    setpwpn(state['mynum'], state['wpnheld'])
+    return state
 
 
 def exorcom(state):
-    #
-    logger.debug("%s exorcised %s", state['name'], pname(x))
-    #
+    if state['my_lev'] < 10:
+        return state['bprintf'](state, "No chance....\n")
+    if brkword() == -1:
+        return state['bprintf'](state, "Exorcise who?\n")
+
+    player = Player(state, fpbn(state['wordbuf']))
+    if player.player_id == -1:
+        return state['bprintf'](state, "They aren't playing\n")
+    if ptstflg(player.player_id, 1):
+        return state['bprintf'](state, "You can't exorcise them, they dont want to be exorcised\n")
+
+    logger.debug("%s exorcised %s", state['name'], pname(player.player_id))
+    dumpstuff(player.player_id, player.location)
+    sendsys(
+        state,
+        pname(player.player_id),
+        state['name'],
+        -10010,
+        state['curch'],
+        '',
+    )
+    setpname(player.player_id, '')
+    return state
 
 
 def dogive(state, ob, pl):
     item = Item(state, ob)
+    player = Player(state, pl)
 
-    if state['my_lev'] < 10 and ploc(pl) != state['curch']:
+    if state['my_lev'] < 10 and player.location != state['curch']:
         return state['bprintf'](state, "They are not here\n")
     if not iscarrby(item.item_id, state['mynum']):
         state = state['bprintf'](state, "You are not carrying that\n")
@@ -312,7 +364,7 @@ def stealcom(state):
     item = Item(state, fobncb(x, player.player_id))
     if item.item_id == -1:
         return state['bprintf'](state, "They are not carrying that\n")
-    if state['my_lev'] < 10 and ploc(player.player_id) != state['curch']:
+    if state['my_lev'] < 10 and player.location != state['curch']:
         return state['bprintf'](state, "But they aren't here\n")
     if item.carry_flag == Item.WORN_BY:
         return state['bprintf'](state, "They are wearing that\n")
