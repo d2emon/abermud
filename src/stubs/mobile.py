@@ -60,7 +60,7 @@ def dircom(state):
             d = "IN ITEM"
         elif item.carry_flag:
             d = "CARRIED"
-        state = state['bprintf'](state, "{}{}".format(oname(item.item_id), d))
+        state = state['bprintf'](state, "{}{}".format(item.name, d))
         if item_id % 3 == 2:
             state = state['bprintf'](state, "\n")
         if item_id % 18 == 17:

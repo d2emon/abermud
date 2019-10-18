@@ -1,6 +1,39 @@
 from .support import Item, Player
 
 
+def aobjsat(state, location, mode):
+    found = False
+    cols = 0
+    for item_id in range(state['NOBS']):
+        item = Item(state, item_id)
+        if iscarrby(state, item, location) and mode == 1 or iscontin(state, item, location) and mode == 3:
+            found = True
+            cols += 1 + len(item.name)
+            if state['debug_mode']:
+                cols += 5
+            if isdest(item.item_id):
+                cols += 2
+            if iswornby(item, location):
+                cols += len("<worn> ")
+            if cols > 79:
+                cols = 0
+                state = state['bprintf'](state, "\n")
+            if isdest(item.item_id):
+                state = state['bprintf'](state, "(")
+            state = state['bprintf'](state, item.name)
+            if state['debug_mode']:
+                state = state['bprintf'](state, "{{}}".format(item_id))
+            if iswornby(item, location):
+                state = state['bprintf'](state, "<worn> ")
+            if isdest(item.item_id):
+                state = state['bprintf'](state, ")")
+            state = state['bprintf'](state, " ")
+            cols += 1
+    if not found:
+        state = state['bprintf'](state, "Nothing")
+    return state['bprintf'](state, "\n")
+
+
 def iscontin(state, o1, o2):
     item1 = Item(state, o1)
     item2 = Item(state, o2)
@@ -9,6 +42,49 @@ def iscontin(state, o1, o2):
     if state['my_lev'] < 10 and isdest(item1.item_id):
         return False
     return True
+
+
+def fobnsys(state, name, control, args):
+    name = name.lower()
+    if name == 'red':
+        brkword()
+        return 4
+    if name == 'blue':
+        brkword()
+        return 5
+    if name == 'green':
+        brkword()
+        return 6
+
+    for item_id in range(state['NOBS']):
+        item = Item(state, item_id)
+        if item.name.lower() != name:
+            continue
+        state['wd_it'] = name
+        if control == 0:
+            return item.item_id
+        elif control == 1:
+            if item.item_id == 112 and iscarrby(Item(state, 113), state['mynum']):
+                return 113
+            if item.item_id == 112 and iscarrby(Item(state, 114), state['mynum']):
+                return 114
+            if isavl(item.item_id):
+                return item.item_id
+        elif control == 2:
+            if iscarrby(item, state['mynum']):
+                return item.item_id
+        elif control == 3:
+            if iscarrby(item, args):
+                return item.item_id
+        elif control == 4:
+            if ishere(item):
+                return item.item_id
+        elif control == 5:
+            if iscontin(item, args):
+                return item.item_id
+        else:
+            return item.item_id
+    return -1
 
 
 def getobj(state):
@@ -60,7 +136,7 @@ def getobj(state):
         state['name'],
         -10000,
         state['curch'],
-        "[D]{}[/D][c] takes the {}\n[/c]".format(state['name'], oname(item.item_id)),
+        "[D]{}[/D][c] takes the {}\n[/c]".format(state['name'], item.name),
     )
     if otstbit(item.item_id, 12):
         setstate(item.item_id, 0)
@@ -124,6 +200,20 @@ def dropitem(state):
     state['my_sco'] += tscale() * obaseval(item.item_id) / 5
     calibme()
     item.located_at = -6
+    return state
+
+
+def lojal2(state, flannel):
+    for item_id in range(state['NOBS']):
+        item = Item(state, item_id)
+        if ishere(item.item_id) and oflannel(item.item_id) == flannel:
+            if state(item.item_id) > 3:
+                continue
+            if len(olongt(item.item_id, state(item.item_id))):
+                if isdest(item.item_id):
+                    state = state['bprintf'](state, "--")
+                oplong(item.item_id)
+                state['wd_it'] = item.name
     return state
 
 

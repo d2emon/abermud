@@ -75,10 +75,10 @@ def dodirn(state, n):
     newch = ex_dat[n]
 
     if 999 < newch < 2000:
-        drnum = newch - 1000
-        droff = Item(state, drnum ^ 1)  # other door side
-        if state(drnum) != 0:
-            if oname(drnum) != 'door' or isdark() or len(olongt(drnum, state(drnum))) == 0:
+        door = Item(state, newch - 1000)
+        droff = Item(state, door.item_id ^ 1)  # other door side
+        if state(door.item_id) != 0:
+            if door.name != 'door' or isdark() or len(olongt(door.item_id, state(door.item_id))) == 0:
                 return state['bprintf'](state, "You can't go that way\n")
             else:
                 return state['bprintf'](state, "The door is not open\n")
@@ -392,7 +392,7 @@ def dogive(state, ob, pl):
         state['name'],
         -10011,
         state['curch'],
-        "[p]{}[/p] gives you the {}\n".format(state['name'], oname(item.item_id))
+        "[p]{}[/p] gives you the {}\n".format(state['name'], item.name)
     )
 
 
@@ -429,7 +429,7 @@ def stealcom(state):
                 state['name'],
                 -10011,
                 state['curch'],
-                "[p]{}[/p] steals the {} from you !\n".format(state['name'], oname(item.item_id)),
+                "[p]{}[/p] steals the {} from you !\n".format(state['name'], item.name),
             )
             if player.player_id > 15:
                 woundmn(player.player_id, 0)
@@ -525,6 +525,31 @@ def typocom(state):
     logger.debug("Typo by %s : %s", y, x)
 
 
+def look_cmd(state):
+    if brkword() == -1:
+        brhold = state['brmode']
+        state['brmode'] = 0
+        lookin(state, state['curch'])
+        state['brmode'] = brhold
+        return state
+    if state['wordbuf'] == 'at':
+        return examcom(state)
+    if state['wordbuf'] != 'in' and state['wordbuf'] != 'into':
+        return state
+    if brkword() == -1:
+        return state['bprintf'](state, "In what ?\n")
+    item = Item(state, fobna(state['wordbuf']))
+    if item.item_id == -1:
+        return state['bprintf'](state, "What ?\n")
+    if not otstbit(item.item_id, 14):
+        return state['bprintf'](state, "That isn't a container\n")
+    if otstbit(item.item_id, 2) and state(item.item_id) != 0:
+        return state['bprintf'](state, "It's closed!\n")
+
+    state = state['bprintf'](state, "The {} contains:\n".format(item.name))
+    aobjsat(item.item_id, 3)
+
+
 def digcom(state):
     item = Item(state, 186)
     if item.location == state['curch'] and isdest(item.item_id):
@@ -546,8 +571,8 @@ def emptycom(state):
         item = Item(state, item_id)
         if iscontin(item.item_id, container.item_id):
             item.carried_by = state['mynum']
-            state = state['bprintf'](state, "You empty the {} from the {}\n".format(oname(item.item_id), oname(container.item_id)))
-            gamecom("drop {}".format(oname(item.item_id)))
+            state = state['bprintf'](state, "You empty the {} from the {}\n".format(item.name, container.name))
+            gamecom("drop {}".format(item.name))
             state = state['pbdf'](state)
             state = open_world(state)
     return state

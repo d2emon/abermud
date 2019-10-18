@@ -13,7 +13,7 @@ def hitplayer(state, victim_id, weapon_id):
 
     # Chance to hit stuff
     if not iscarrby(weapon, state['mynum']) and weapon.item_id != -1:
-        state = state['bprintf'](state, "You belatedly realise you dont have the {},\nand are forced to use your hands instead..\n".format(oname(weapon.item_id)))
+        state = state['bprintf'](state, "You belatedly realise you dont have the {},\nand are forced to use your hands instead..\n".format(weapon.name))
         if state['wpnheld'] == weapon.item_id:
             weapon = None
 
@@ -40,7 +40,7 @@ def hitplayer(state, victim_id, weapon_id):
     if cth > res:
         state = state['bprintf'](state, "You hit [p]{}[/p] ".format(victim.name))
         if weapon:
-            state = state['bprintf'](state, "with the {}".format(oname(weapon.item_id)))
+            state = state['bprintf'](state, "with the {}".format(weapon.name))
         state = state['bprintf'](state, "\n")
 
         damage = randperc() % dambyitem(weapon.item_id if weapon else -1)
@@ -143,12 +143,12 @@ def bloodrcv(state, data, is_me):
     if damage == -1:
         state = state['bprintf'](state, "[p]{}[/p] attacks you".format(enemy.name))
         if weapon.item_id != -1:
-            state = state['bprintf'](state, "with the {}".format(oname(weapon.item_id)))
+            state = state['bprintf'](state, "with the {}".format(weapon.name))
         return state['bprintf'](state, "\n")
 
     state = state['bprintf'](state, "You are wounded by [p]{}[/p]".format(enemy.name))
     if weapon.item_id != -1:
-        state = state['bprintf'](state, "with the {}".format(oname(weapon.item_id)))
+        state = state['bprintf'](state, "with the {}".format(weapon.name))
     state = state['bprintf'](state, "\n")
 
     if state['my_lev'] >= 10:

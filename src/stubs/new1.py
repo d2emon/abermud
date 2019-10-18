@@ -80,7 +80,7 @@ def putcom(state):
             None,
             -10000,
             chute.location,
-            "The {} comes out of the chute!\n".format(oname(item.item_id)),
+            "The {} comes out of the chute!\n".format(item.name),
         )
         item.located_at = chute.location
         return state
@@ -110,7 +110,7 @@ def putcom(state):
         state['name'],
         -10000,
         state['curch'],
-        "[D]{}[/D][c] puts the {} in the {}.\n[c]".format(state['name'], oname(item.item_id), oname(location.item_id)),
+        "[D]{}[/D][c] puts the {} in the {}.\n[c]".format(state['name'], item.name, location.name),
     )
     if otstbit(item.item_id, 12):
         setstate(item.item_id, 0)

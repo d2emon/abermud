@@ -23,11 +23,19 @@ class Item:
 
     @property
     def __items(self):
+        return self.state['objects']
+
+    @property
+    def __item_vars(self):
         return self.state['objinfo']
 
     @property
+    def name(self):
+        return self.__items[self.item_id].name
+
+    @property
     def location(self):
-        return self.__items[4 * self.item_id]
+        return self.__item_vars[4 * self.item_id]
 
     @property
     def located_at(self):
@@ -35,8 +43,8 @@ class Item:
 
     @located_at.setter
     def located_at(self, value):
-        self.__items[4 * self.item_id] = value
-        self.__items[4 * self.item_id + 3] = self.LOCATED_AT
+        self.__item_vars[4 * self.item_id] = value
+        self.__item_vars[4 * self.item_id + 3] = self.LOCATED_AT
 
     @property
     def carried_by(self):
@@ -44,8 +52,8 @@ class Item:
 
     @carried_by.setter
     def carried_by(self, value):
-        self.__items[4 * self.item_id] = value
-        self.__items[4 * self.item_id + 3] = self.CARRIED_BY
+        self.__item_vars[4 * self.item_id] = value
+        self.__item_vars[4 * self.item_id + 3] = self.CARRIED_BY
 
     @property
     def contained_in(self):
@@ -53,8 +61,8 @@ class Item:
 
     @contained_in.setter
     def contained_in(self, value):
-        self.__items[4 * self.item_id] = value
-        self.__items[4 * self.item_id + 3] = self.CONTAINED_IN
+        self.__item_vars[4 * self.item_id] = value
+        self.__item_vars[4 * self.item_id + 3] = self.CONTAINED_IN
 
     @property
     def owned_by(self):
@@ -62,7 +70,7 @@ class Item:
 
     @property
     def carry_flag(self):
-        return self.__items[4 * self.item_id + 3]
+        return self.__item_vars[4 * self.item_id + 3]
 
     # @carry_flag.setter
     # def carry_flag(self, value):
@@ -163,10 +171,6 @@ class Player:
         return self.value
 
 
-def oname(ob):
-    raise NotImplementedError()
-
-
 def olongt(st):
     raise NotImplementedError()
 
@@ -220,7 +224,7 @@ def ocreate(ob):
 
 
 def osetbit(ob, x):
-    raise NotImplementedError()
+    raise NotImplementedError()item_id)
 
 
 def oclearbit(ob, x):

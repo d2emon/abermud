@@ -72,9 +72,10 @@ def stacom(state):
     if item.item_id == -1:
         return statplyr(state)
 
-    state = state['bprintf'](state, "\nItem        :{}".format(oname(item.item_id)))
+    state = state['bprintf'](state, "\nItem        :{}".format(item.name))
     if item.carry_flag == Item.CONTAINED_IN:
-        state = state['bprintf'](state, "\nContained in:{}".format(oname(item.location)))
+        container = Item(state, item.location)
+        state = state['bprintf'](state, "\nContained in:{}".format(container.name))
     elif item.carry_flag == Item.LOCATED_AT:
         state = state['bprintf'](state, "\nPosition    :")
         showname(item.location)
@@ -207,11 +208,11 @@ def wherecom(state):
     rnd = 0
     for cha in range(state['numobs']):
         item = Item(state, cha)
-        if oname(item.item_id) == state['wordbuf']:
+        if item.name == state['wordbuf']:
             rnd = 1
             if state['my_lev'] > 9999:
                 state = state['bprintf'](state, "[{}]".format(item.item_id))
-            state = state['bprintf'](state, "{} - ".format(oname(item.item_id)))
+            state = state['bprintf'](state, "{} - ".format(item.name))
             if state['my_lev'] < 10 and ospare(item.item_id) == -1:
                 state = state['bprintf'](state, "Nowhere\n")
             else:
@@ -233,7 +234,7 @@ def desrm(state, location, carry_flag):
     if state['my_lev'] < 10 and carry_flag == Item.LOCATED_AT and location > -5:
         return state['bprintf'](state, "Somewhere.....\n")
     if carry_flag == Item.CONTAINED_IN:
-        return state['bprintf'](state, "In the {}\n".format(oname(location)))
+        return state['bprintf'](state, "In the {}\n".format(Item(state, location).name))
     if carry_flag != Item.LOCATED_AT:
         player = Player(state, location)
         return state['bprintf'](state, "Carried by [c]{}[/c]\n".format(player.name))

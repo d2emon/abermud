@@ -46,9 +46,9 @@ def sumcom(state):
             new_state['name'],
             -10000,
             x,
-            "[p]{}[/p] has summoned the {}\n".format(new_state['name'], oname(to_summon.item_id)),
+            "[p]{}[/p] has summoned the {}\n".format(new_state['name'], to_summon.name),
         )
-        new_state = new_state['bprintf'](new_state, "The {} flies into your hand  was ".format(oname(to_summon.item_id)))
+        new_state = new_state['bprintf'](new_state, "The {} flies into your hand  was ".format(to_summon.name))
         desrm(to_summon.location, to_summon.carry_flag)
         item.carried_by = state['mynum']
         return new_state
@@ -165,6 +165,6 @@ def ressurcom(state):
         None,
         -10000,
         state['curch'],
-        "The {} suddenly appears\n".format(oname(item.item_id)),
+        "The {} suddenly appears\n".format(item.name),
     )
     return state
