@@ -119,7 +119,7 @@ def getobj(state):
         else:
             state = state['bprintf'](state, "The shields are all to firmly secured to the walls\n")
 
-    if obflannel(item.item_id):
+    if not item.is_movable:
         return state['bprintf'](state, "You can't take that!\n")
     if dragget():
         return state
@@ -203,10 +203,10 @@ def dropitem(state):
     return state
 
 
-def lojal2(state, flannel):
+def lojal2(state, is_fixed):
     for item_id in range(state['NOBS']):
         item = Item(state, item_id)
-        if ishere(item.item_id) and oflannel(item.item_id) == flannel:
+        if ishere(item.item_id) and item.is_movable != is_fixed:
             if state(item.item_id) > 3:
                 continue
             if len(item.description):

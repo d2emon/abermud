@@ -42,6 +42,10 @@ class Item:
         return self.__items[self.item_id].max_state
 
     @property
+    def is_movable(self):
+        return not self.__items[self.item_id].is_fixed
+
+    @property
     def location(self):
         return self.__item_vars[4 * self.item_id]
 
@@ -181,14 +185,6 @@ class Player:
             return 0
         self.strength = -1
         return self.value
-
-
-def obflannel(ob):
-    raise NotImplementedError()
-
-
-def oflannel(ob):
-    raise NotImplementedError()
 
 
 def obaseval(ob):

@@ -97,7 +97,7 @@ def putcom(state):
         return state['bprintf'](state, "You can't do that\n")
     if state(location.item_id) != 0:
         return state['bprintf'](state, "That's not open\n")
-    if obflannel(litem.item_id) != 0:
+    if not item.is_movable:
         return state['bprintf'](state, "You can't take that!\n")
     if dragget():
         return state
