@@ -155,7 +155,7 @@ def ressurcom(state):
     item = Item(state, fobn(state['wordbuf']))
     if item.item_id == -1:
         return state['bprintf'](state, "You can only ressurect objects\n")
-    if ospare(item.item_id) != -1:
+    if not item.is_destroyed:
         return state['bprintf'](state, "That already exists\n")
     ocreate(item.item_id)
     item.located_at = state['curch']

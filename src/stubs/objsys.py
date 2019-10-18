@@ -11,21 +11,21 @@ def aobjsat(state, location, mode):
             cols += 1 + len(item.name)
             if state['debug_mode']:
                 cols += 5
-            if isdest(item.item_id):
+            if item.is_destroyed:
                 cols += 2
             if iswornby(item, location):
                 cols += len("<worn> ")
             if cols > 79:
                 cols = 0
                 state = state['bprintf'](state, "\n")
-            if isdest(item.item_id):
+            if item.is_destroyed:
                 state = state['bprintf'](state, "(")
             state = state['bprintf'](state, item.name)
             if state['debug_mode']:
                 state = state['bprintf'](state, "{{}}".format(item_id))
             if iswornby(item, location):
                 state = state['bprintf'](state, "<worn> ")
-            if isdest(item.item_id):
+            if item.is_destroyed:
                 state = state['bprintf'](state, ")")
             state = state['bprintf'](state, " ")
             cols += 1
@@ -39,7 +39,7 @@ def iscontin(state, o1, o2):
     item2 = Item(state, o2)
     if item1.contained_in != item2.item_id:
         return False
-    if state['my_lev'] < 10 and isdest(item1.item_id):
+    if state['my_lev'] < 10 and item1.is_destroyed:
         return False
     return True
 
@@ -68,7 +68,7 @@ def fobnsys(state, name, control, args):
                 return 113
             if item.item_id == 112 and iscarrby(Item(state, 114), state['mynum']):
                 return 114
-            if isavl(item.item_id):
+            if item.is_available(state['me']):
                 return item.item_id
         elif control == 2:
             if iscarrby(item, state['mynum']):
@@ -109,9 +109,9 @@ def getobj(state):
         return state['bprintf'](state, "That is not here.\n")
 
     if item.item_id == 112 and location.item_id == -1:
-        if isdest(113):
+        if Item(state, 113).is_destroyed:
             item = Item(state, 113)
-        elif isdest(114):
+        elif Item(state, 114).is_destroyed:
             item = Item(state, 114)
 
         if item.item_id in (113, 114):
@@ -148,7 +148,7 @@ def getobj(state):
 
 def ishere(state, item_id):
     item = Item(state, item_id)
-    if state['my_lev'] < 10 and isdest(item.item_id):
+    if state['my_lev'] < 10 and item.is_destroyed:
         return False
     if item.carried_by != state['curch']:
         return False
@@ -157,7 +157,7 @@ def ishere(state, item_id):
 
 def iscarrby(state, item_id, player_id):
     item = Item(state, item_id)
-    if state['my_lev'] < 10 and isdest(item.item_id):
+    if state['my_lev'] < 10 and item.is_destroyed:
         return False
     if item.owned_by != player_id:
         return False
@@ -210,7 +210,7 @@ def lojal2(state, is_fixed):
             if state(item.item_id) > 3:
                 continue
             if len(item.description):
-                if isdest(item.item_id):
+                if item.is_destroyed:
                     state = state['bprintf'](state, "--")
                 oplong(item.item_id)
                 state['wd_it'] = item.name

@@ -96,8 +96,15 @@ class Item:
     # def carry_flag(self, value):
     #     self.__items[4 * self.item_id + 3] = value
 
+    @property
+    def is_destroyed(self):
+        return otstbit(self.item_id, 0)
+
     def state_description(self, state):
         return self.__items[self.item_id].description[state]
+
+    def is_available(self, player):
+        return ishere(self) or iscarrby(self, player)
 
 
 
@@ -195,18 +202,6 @@ class Player:
         return self.value
 
 
-def isdest(ob):
-    raise NotImplementedError()
-
-
-def isavl(ob):
-    raise NotImplementedError()
-
-
-def ospare(ob):
-    raise NotImplementedError()
-
-
 def ppos(chr):
     raise NotImplementedError()
 
@@ -228,7 +223,7 @@ def ocreate(ob):
 
 
 def osetbit(ob, x):
-    raise NotImplementedError()item_id)
+    raise NotImplementedError()
 
 
 def oclearbit(ob, x):

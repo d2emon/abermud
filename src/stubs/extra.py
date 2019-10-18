@@ -93,7 +93,7 @@ def stacom(state):
         state = state['bprintf'](state, "\nHeld By     :{}".format(player.name))
     state = state['bprintf'](state, "\nState       :{}".format(state(item.item_id)))
     state = state['bprintf'](state, "\nCarr_Flag   :{}".format(item.carry_flag))
-    state = state['bprintf'](state, "\nSpare       :{}".format(ospare(item.item_id)))
+    state = state['bprintf'](state, "\nSpare       :{}".format(item.is_destroyed))
     state = state['bprintf'](state, "\nMax State   :{}".format(item.max_state))
     state = state['bprintf'](state, "\nBase Value  :{}".format(item.base_value))
     state = state['bprintf'](state, "\n")
@@ -222,7 +222,7 @@ def wherecom(state):
             if state['my_lev'] > 9999:
                 state = state['bprintf'](state, "[{}]".format(item.item_id))
             state = state['bprintf'](state, "{} - ".format(item.name))
-            if state['my_lev'] < 10 and ospare(item.item_id) == -1:
+            if state['my_lev'] < 10 and item.is_destroyed:
                 state = state['bprintf'](state, "Nowhere\n")
             else:
                 desrm(item.location, item.carry_flag)

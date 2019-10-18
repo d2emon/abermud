@@ -146,7 +146,7 @@ def cancarry(state, player_id):
     if player.level < 0:
         return True
     items = (Item(state, item_id) for item_id in range(state['numobs']))
-    items = filter(lambda i: iscarrby(i, player) and not isdest(i.item_id), items)
+    items = filter(lambda i: iscarrby(i, player) and not i.is_destroyed, items)
     if len(list(items)) < player.level + 5:
         return True
     return False

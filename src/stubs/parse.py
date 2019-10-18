@@ -328,6 +328,17 @@ def calibme(state):
     return state
 
 
+def playcom(state):
+    if brkword() == -1:
+        return state['bprintf'](state, "Play what ?\n")
+    item = Item(state, fobna(state['wordbuf']))
+    if item.item_id == -1:
+        return state['bprintf'](state, "That isn't here\n")
+    if not item.is_available(state['me']):
+        return state['bprintf'](state, "That isn't here\n")
+    return state
+
+
 def tellcom(state):
     if chkdumb():
         return state
@@ -552,7 +563,7 @@ def look_cmd(state):
 
 def digcom(state):
     item = Item(state, 186)
-    if item.location == state['curch'] and isdest(item.item_id):
+    if item.location == state['curch'] and item.is_destroyed:
         ocreate(item.item_id)
         return state['bprintf'](state, "You uncover a stone slab!\n")
     if state['curch'] not in [-172, -192]:
