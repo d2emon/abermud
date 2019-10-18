@@ -70,6 +70,9 @@ class Item:
 
 
 class Player:
+    male = 'MALE'
+    female = 'FEMALE'
+
     def __init__(self, state, player_id):
         self.state = state
         self.player_id = player_id
@@ -111,6 +114,22 @@ class Player:
         self.__players[16 * self.player_id + 8] = value
 
     @property
+    def flags(self):
+        return self.__players[16 * self.player_id + 9]
+
+    @flags.setter
+    def flags(self, value):
+        self.__players[16 * self.player_id + 9] = value
+
+    @property
+    def sex(self):
+        return self.male if self.flags[0] else self.female
+
+    @sex.setter
+    def sex(self, value):
+        self.flags[0] = value == self.male
+
+    @property
     def level(self):
         return self.__players[16 * self.player_id + 10]
 
@@ -131,6 +150,9 @@ class Player:
     def is_visible(self, level):
         return level >= self.visibility
 
+    def set_flags(self, flags):
+        self.__players[16 * self.player_id + 9] = flags
+
     def destroy(self):
         self.name = ''
 
@@ -139,22 +161,6 @@ class Player:
             return 0
         self.strength = -1
         return self.value
-
-
-def psex(chr):
-    raise NotImplementedError()
-
-
-def setpsex(ob, v):
-    raise NotImplementedError()
-
-
-def setpsexall(ob, v):
-    raise NotImplementedError()
-
-
-def psexall(chr):
-    raise NotImplementedError()
 
 
 def oname(ob):

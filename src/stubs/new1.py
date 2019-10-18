@@ -350,7 +350,7 @@ def changecom(state):
         "",
     )
     if target.player_id >= 16:
-        setpsex(target.player_id, 1 - psex(target.player_id))
+        target.sex = Player.male if target.sex == Player.female else Player.female
     return state
 
 
@@ -596,8 +596,8 @@ def resetplayers(state):
         player.name = data.name
         player.location = data.location
         player.strength = data.strength
+        player.sex = data.sex
 
-        setpsex(player.player_id, data.sex)
         setpwpn(player.player_id, -1)
 
         player.visibility = 0

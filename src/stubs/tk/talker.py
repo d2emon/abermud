@@ -27,7 +27,8 @@ def __putmeon(state):
     player.strength = -1
 
     setpwpn(player.player_id, -1)
-    setpsex(player.player_id, 0)
+
+    player.sex = 0
     return state
 
 
@@ -51,7 +52,9 @@ def __special(state, string):
         state['me'].visibility = 0 if state['my_lev'] < 10000 else 10000
 
         setpwpn(state['mynum'], -1)
-        setpsexall(state['mynum'], state['my_sex'])
+
+        state['me'].flags = state['my_sex']
+
         setphelping(state['mynum'], -1)
         state = change_channel(state, -5 if randperc() > 50 else -183)
 

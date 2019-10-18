@@ -307,7 +307,7 @@ def calibme(state):
         state['my_lev'] = b
         state = state['bprintf']("You are now {} ".format(state['name']))
         logger.debug("%s to level %s", state['name'], b)
-        disle3(b, state['my_sex'])
+        disle3(b, state['my_sex'][0])
         sendsys(
             state,
             state['name'],
@@ -322,7 +322,8 @@ def calibme(state):
     if state['my_str'] > 30 + 10 * state['my_lev']:
         state['my_str'] = 30 + 10 * state['my_lev']
     state['me'].strength = state['my_str']
-    setpsex(state['mynum'], state['my_sex'])
+    state['me'].sex = state['my_sex'][0]
+
     setpwpn(state['mynum'], state['wpnheld'])
     return state
 

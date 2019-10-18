@@ -181,9 +181,11 @@ def setname(state, player_id):
     if player.player_id > 15 and player.player_id != fpbns('riatha') and player.player_id != fpbns('shazareth'):
         state['wd_it'] = player.name
         return state
-    if psex(player.player_id):
+
+    if player.sex == player.male:
         state['wd_her'] = player.name
-    else
+    else:
         state['wd_him'] = player.name
     state['wd_them'] = player.name
+
     return state

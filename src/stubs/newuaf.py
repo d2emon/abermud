@@ -35,3 +35,18 @@ def initme():
     s = input()[:2]
     keysetup()
     #
+
+
+def saveme(state):
+    person = Person(
+        name=state['name'],
+        strength=state['my_str'],
+        level=state['my_lev'],
+        flags=state['me'].flags,
+        score=state['my_sco'],
+    )
+    if state['zapped']:
+        return state
+    state = state['bprintf'](state, "\nSaving {}\n".format(state['name']))
+    putpers(state['name'], person)
+    return state

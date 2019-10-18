@@ -161,7 +161,7 @@ def dispuser(state, player_id):
     if not player.is_visible(0):
         state = state['bprintf'](state, "(")
     state = state['bprintf'](state, "{} ".format(player.name))
-    disl4(player.level, psex(player.player_id))
+    disl4(player.level, player.sex)
     if not player.is_visible(0):
         state = state['bprintf'](state, "(")
     if ppos(player.player_id):
@@ -194,8 +194,8 @@ def lispeople(state):
             state = state['bprintf'](state, "{} ".format(player.name))
             if state['debug_mode']:
                 state = state['bprintf'](state, "{{}}".format(player.player_id))
-            disl4(player.level, psex(player.player_id))
-            if psex(player.player_id):
+            disl4(player.level, player.sex)
+            if player.sex == Player.female:
                 state['wd_her'] = player.name
             else:
                 state['wd_him'] = player.name
