@@ -197,7 +197,7 @@ def dropitem(state):
         state['curch'],
         "The {} disappears into the bottomless pit.\n".format(state['wordbuf']),
     )
-    state['my_sco'] += tscale() * obaseval(item.item_id) / 5
+    state['my_sco'] += item.value
     calibme()
     item.located_at = -6
     return state

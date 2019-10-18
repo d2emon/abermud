@@ -46,6 +46,14 @@ class Item:
         return not self.__items[self.item_id].is_fixed
 
     @property
+    def base_value(self):
+        return self.__items[self.item_id].value
+
+    @property
+    def value(self):
+        return self.base_value * tscale() / 5
+
+    @property
     def location(self):
         return self.__item_vars[4 * self.item_id]
 
@@ -185,10 +193,6 @@ class Player:
             return 0
         self.strength = -1
         return self.value
-
-
-def obaseval(ob):
-    raise NotImplementedError()
 
 
 def isdest(ob):

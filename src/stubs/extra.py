@@ -61,6 +61,15 @@ def levcom(state):
     #
 
 
+def valuecom(state):
+    if brkword() == -1:
+        return state['bprintf'](state, "Value what ?\n")
+    item = Item(state, fobna(state['wordbuf']))
+    if item.item_id == -1:
+        return state['bprintf'](state, "There isn't one of those here.\n")
+    return state['bprintf'](state, "{} : {} points\n".format(item.name, item.value))
+
+
 def stacom(state):
     if brkword() == -1:
         return state['bprintf'](state, "STATS what?\n")
@@ -86,7 +95,7 @@ def stacom(state):
     state = state['bprintf'](state, "\nCarr_Flag   :{}".format(item.carry_flag))
     state = state['bprintf'](state, "\nSpare       :{}".format(ospare(item.item_id)))
     state = state['bprintf'](state, "\nMax State   :{}".format(item.max_state))
-    state = state['bprintf'](state, "\nBase Value  :{}".format(obaseval(item.item_id)))
+    state = state['bprintf'](state, "\nBase Value  :{}".format(item.base_value))
     state = state['bprintf'](state, "\n")
     return state
 
