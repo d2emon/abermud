@@ -110,9 +110,11 @@ def examcom(state):
     elif item.item_id == 144 and obyte(item.item_id, 0) == 0:
         osetbyte(item.item_id, 0, 1)
         state = state['bprintf'](state, "You take a scroll from the tube.\n")
+
         scroll = Item(state, 145)
-        ocreate(scroll.item_id)
+        scroll.create()
         scroll.carried_by = state['mynum']
+
         return state
     elif item.item_id == 145:
         destroy(item.item_id)
@@ -143,12 +145,12 @@ def examcom(state):
         return state
     elif item.item_id == 85 and not obyte(83, 0):
         state = state['bprintf'](state, "Aha. under the bed you find a loaf and a rabbit pie\n")
-        ocreate(83)
-        ocreate(84)
+        Item(state, 83).create()
+        Item(state, 84).create()
         oclrbyte(83, 0, 1)
         return state
     elif item.item_id == 91 and not obyte(90, 0):
-        ocreate(90)
+        Item(state, 90).create()
         state = state['bprintf'](state, "You pull an amulet from the bedding\n")
         oclrbyte(90, 0, 1)
         return state

@@ -157,7 +157,7 @@ def ressurcom(state):
         return state['bprintf'](state, "You can only ressurect objects\n")
     if not item.is_destroyed:
         return state['bprintf'](state, "That already exists\n")
-    ocreate(item.item_id)
+    item.create()
     item.located_at = state['curch']
     sendsys(
         state,

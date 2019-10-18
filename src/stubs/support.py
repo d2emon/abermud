@@ -106,6 +106,8 @@ class Item:
     def is_available(self, player):
         return ishere(self) or iscarrby(self, player)
 
+    def create(self):
+        oclrbit(self, 0)
 
 
 class Player:

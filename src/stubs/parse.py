@@ -563,7 +563,7 @@ def look_cmd(state):
 def digcom(state):
     item = Item(state, 186)
     if item.location == state['curch'] and item.is_destroyed:
-        ocreate(item.item_id)
+        item.create()
         return state['bprintf'](state, "You uncover a stone slab!\n")
     if state['curch'] not in [-172, -192]:
         return state['bprintf'](state, "You find nothing.\n")
