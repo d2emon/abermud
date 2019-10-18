@@ -30,9 +30,9 @@ class World:
     def is_full(self):
         return self.last_message_id - self.first_message_id >= 199
 
-    def __revise(self, message_id):
+    def __revise(self, min_message_id):
         players = (Player(self.state, player_id) for player_id in range(16))
-        for player in filter(lambda p: p.is_alive and ppos(p.player_id) < message_id / 2 and ppos(p.player_id) != -2, players):
+        for player in filter(lambda p: p.is_alive and p.message_id < min_message_id and not p.is_absent, players):
             self.state['rd_qd'] = True
             self.send_message(Message(text="{} has been timed out\n".format(player.name)))
             dumpstuff(player.player_id, player.location)
@@ -58,5 +58,5 @@ class World:
             return
 
         self.state = cleanup(self.state)
-        self.__revise(self.last_message_id)
+        self.__revise(self.last_message_id / 2)
         longwthr()

@@ -597,9 +597,7 @@ def resetplayers(state):
         player.location = data.location
         player.strength = data.strength
         player.sex = data.sex
-
-        setpwpn(player.player_id, -1)
-
+        player.weapon = None
         player.visibility = 0
         player.level = data.level
 

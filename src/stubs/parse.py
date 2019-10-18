@@ -323,8 +323,7 @@ def calibme(state):
         state['my_str'] = 30 + 10 * state['my_lev']
     state['me'].strength = state['my_str']
     state['me'].sex = state['my_sex'][0]
-
-    setpwpn(state['mynum'], state['wpnheld'])
+    state['me'].weapon = Item(state, state['wpnheld'])
     return state
 
 
@@ -425,7 +424,7 @@ def stealcom(state):
         return state['bprintf'](state, "But they aren't here\n")
     if item.carry_flag == Item.WORN_BY:
         return state['bprintf'](state, "They are wearing that\n")
-    if pwpn(player.player_id) == item.item_id:
+    if player.weapon.item_id == item.item_id:
         return state['bprintf'](state, "They have that firmly to hand .. for KILLING people with\n")
     if not cancarry(state['mynum']):
         return state['bprintf'](state, "You can't carry any more\n")

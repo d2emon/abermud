@@ -37,10 +37,10 @@ def set_message_id(state, player_id, message_id):
     if abs(message_id - __last_save) < 10:
         return state
 
-    world = World(state)
-    setppos(world, player_id, message_id)
+    player = Player(World(state), player_id)
+    player.message_id = message_id
     __last_save = message_id
-    return world.state
+    return player.state
 
 
 def set_channel(world, player_id, channel):

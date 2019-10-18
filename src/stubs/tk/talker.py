@@ -19,16 +19,12 @@ def __putmeon(state):
 
     player.name = state['name']
     player.location = state['curch']
-
-    setppos(player.player_id, -1)
-
     player.level = 1
     player.visibility = 0
     player.strength = -1
-
-    setpwpn(player.player_id, -1)
-
+    player.weapon = None
     player.sex = 0
+    player.reset_messages()
     return state
 
 
@@ -50,9 +46,7 @@ def __special(state, string):
         state['me'].strength = state['my_str']
         state['me'].level = state['my_lev']
         state['me'].visibility = 0 if state['my_lev'] < 10000 else 10000
-
-        setpwpn(state['mynum'], -1)
-
+        state['me'].weapon = None
         state['me'].flags = state['my_sex']
 
         setphelping(state['mynum'], -1)

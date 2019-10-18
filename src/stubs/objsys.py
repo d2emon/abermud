@@ -254,7 +254,7 @@ def dispuser(state, player_id):
     disl4(player.level, player.sex)
     if not player.is_visible(0):
         state = state['bprintf'](state, "(")
-    if ppos(player.player_id):
+    if player.is_absent:
         state = state['bprintf'](state, " [Absent From Reality]")
     return state['bprintf'](state, "\n")
 

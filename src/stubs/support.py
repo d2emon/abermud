@@ -137,6 +137,14 @@ class Player:
         self.__players[16 * self.player_id + 4] = value
 
     @property
+    def message_id(self):
+        return self.__players[16 * self.player_id + 5]
+
+    @message_id.setter
+    def message_id(self, value):
+        self.__players[16 * self.player_id + 5] = value
+
+    @property
     def strength(self):
         return self.__players[16 * self.player_id + 7]
 
@@ -177,8 +185,21 @@ class Player:
         self.__players[16 * self.player_id + 10] = value
 
     @property
+    def weapon(self):
+        weapon_id = self.__players[16 * self.player_id + 11]
+        return Item(self.state, weapon_id) if weapon_id != -1 else None
+
+    @weapon.setter
+    def weapon(self, value):
+        self.__players[16 * self.player_id + 11] = value.item_id if value is not None else None
+
+    @property
     def is_alive(self):
         return len(self.name) > 0
+
+    @property
+    def is_absent(self):
+        return self.message_id == -2
 
     @property
     def value(self):
@@ -201,21 +222,8 @@ class Player:
         self.strength = -1
         return self.value
 
-
-def ppos(chr):
-    raise NotImplementedError()
-
-
-def setppos(chr, v):
-    raise NotImplementedError()
-
-
-def pwpn(chr):
-    raise NotImplementedError()
-
-
-def setpwpn(chr, v):
-    raise NotImplementedError()
+    def reset_messages(self):
+        self.message_id = -1
 
 
 def ocreate(ob):
