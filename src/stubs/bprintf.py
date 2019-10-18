@@ -61,7 +61,7 @@ def seeplayer(state, player_id):
         return True
     if player.player_id == state['mynum']:
         return True
-    if state['me'].level < pvis(player.player_id):
+    if not player.is_visible(state['me'].level):
         return False
     if state['ail_blind']:
         return False

@@ -20,7 +20,7 @@ def chkfight(state, player_id):
         return state
     if player.location != state['curch']:
         return state
-    if pvis(state['mynum']):
+    if not state['mу'].is_visible(0):
         return state
     if randperc() > 40:
         return state

@@ -100,6 +100,51 @@ def goloccom(state):
     state = change_channel(state, a)
 
 
+def viscom(state):
+    if state['my_lev'] < 10:
+        return state['bprintf'](state, "You can't just do that sort of thing at will you know.\n")
+    if state['me'].is_visible(0):
+        return state['bprintf'](state, "You already are visible\n")
+    state['me'].visible = 0
+    state = sendsys(
+        state,
+        None,
+        None,
+        -9900,
+        0,
+        [
+            state['mynum'],
+            state['me'].visible,
+        ]
+    )
+    state = state['bprintf'](state, "Ok\n")
+    return sillycom(state, "[s name=\"{}\"]{} suddenely appears in a puff of smoke\n[/s]")
+
+
+def inviscom(state):
+    if state['my_lev'] < 10:
+        return state['bprintf'](state, "You can't just turn invisible like that!\n")
+    level = 10000 if state['my_lev'] > 9999 else 10
+    if state['my_lev'] == 10033 and brkword() != -1:
+        level = int(state['wordbuf'])
+    if state['me'].is_visible(level):
+        return state['bprintf'](state, "You are already invisible\n")
+    state['me'].visible = level
+    state = sendsys(
+        state,
+        None,
+        None,
+        -9900,
+        0,
+        [
+            state['mynum'],
+            state['me'].visible,
+        ]
+    )
+    state = state['bprintf'](state, "Ok\n")
+    return sillycom(state, "[c]{} vanishes!\n[/s]")
+
+
 def ressurcom(state):
     if state['my_lev'] < 10:
         return state['bprintf'](state, "Huh?\n")

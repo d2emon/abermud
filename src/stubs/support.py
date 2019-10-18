@@ -103,6 +103,14 @@ class Player:
         self.__players[16 * self.player_id + 7] = value
 
     @property
+    def visibility(self):
+        return self.__players[16 * self.player_id + 8]
+
+    @visibility.setter
+    def visibility(self, value):
+        self.__players[16 * self.player_id + 8] = value
+
+    @property
     def level(self):
         return self.__players[16 * self.player_id + 10]
 
@@ -120,6 +128,9 @@ class Player:
             return self.level ** 2 * 100
         return 10 * damof(self.player_id)
 
+    def is_visible(self, level):
+        return level >= self.visibility
+
     def destroy(self):
         self.name = ''
 
@@ -128,22 +139,6 @@ class Player:
             return 0
         self.strength = -1
         return self.value
-
-
-def pstr(chr):
-    raise NotImplementedError()
-
-
-def setpstr(ob, v):
-    raise NotImplementedError()
-
-
-def pvis(chr):
-    raise NotImplementedError()
-
-
-def setpvis(ob, v):
-    raise NotImplementedError()
 
 
 def psex(chr):

@@ -599,8 +599,8 @@ def resetplayers(state):
 
         setpsex(player.player_id, data.sex)
         setpwpn(player.player_id, -1)
-        setpvis(player.player_id, 0)
 
+        player.visibility = 0
         player.level = data.level
 
     for player_id in range(35, 48):

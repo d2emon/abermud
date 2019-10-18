@@ -73,7 +73,7 @@ def __on_loose(state):
 
     state = open_world(state)
     dumpitems()
-    if pvis(state['mynum']) < 10000:
+    if state['me'].is_visible(10000):
         state = sendsys(
             state,
             state['name'],

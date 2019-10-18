@@ -155,7 +155,7 @@ def gamrcv(state, message):
         close_world(state)
         raise SystemExit("***HALT")
     elif message.code == -9900:
-        setpvis(message.text[0], message.text[1])
+        Player(state, message.text[0]).visibility = message.text[1]
     elif message.code == -10000 and not is_me and is_here:
         return state['bprintf'](state, message.text)
     elif message.code == -10001:
@@ -230,7 +230,7 @@ def eorte(state):
     if state['me_ivct']:
         state['me_ivct'] -= 1
     if state['me_ivct'] <= 1:
-        setpvis(state['mynum'], 0)
+        state['me'].visibility = 0
 
     if state['me_cal']:
         state['me_cal'] = False

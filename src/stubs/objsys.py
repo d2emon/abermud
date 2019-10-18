@@ -156,13 +156,13 @@ def dispuser(state, player_id):
     player = Player(state, player_id)
     if player.strength < 0:
         return
-    if pvis(player.player_id) > state['my_lev']:
+    if not player.is_visible(state['my_lev']):
         return
-    if pvis(player.player_id):
+    if not player.is_visible(0):
         state = state['bprintf'](state, "(")
     state = state['bprintf'](state, "{} ".format(player.name))
     disl4(player.level, psex(player.player_id))
-    if pvis(player.player_id):
+    if not player.is_visible(0):
         state = state['bprintf'](state, "(")
     if ppos(player.player_id):
         state = state['bprintf'](state, " [Absent From Reality]")

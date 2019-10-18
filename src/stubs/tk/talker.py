@@ -23,9 +23,7 @@ def __putmeon(state):
     setppos(player.player_id, -1)
 
     player.level = 1
-
-    setpvis(player.player_id, 0)
-
+    player.visibility = 0
     player.strength = -1
 
     setpwpn(player.player_id, -1)
@@ -50,8 +48,8 @@ def __special(state, string):
 
         state['me'].strength = state['my_str']
         state['me'].level = state['my_lev']
+        state['me'].visibility = 0 if state['my_lev'] < 10000 else 10000
 
-        setpvis(state['mynum'], 0 if state['my_lev'] < 10000 else 10000)
         setpwpn(state['mynum'], -1)
         setpsexall(state['mynum'], state['my_sex'])
         setphelping(state['mynum'], -1)
@@ -100,9 +98,9 @@ def __listen(state):
 
     state = state['pbfr'](state)
 
-    if pvis(state['mynum']) > 9999:
+    if not state['me'].is_visible(9999):
         state['program'] = "-csh"
-    elif pvis(state['mynum']) == 0:
+    elif state['me'].is_visible(0):
         state['program'] = "   --}----- ABERMUD -----{--     Playing as {}".format(state['name'])
 
     state = set_alarm(state, True)
