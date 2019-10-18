@@ -299,6 +299,44 @@ def lightning(state):
     return broad(world, "[d]You hear an ominous clap of thunder in the distance\n[/d]")
 
 
+def eatcom(state):
+    if brkword() == -1:
+        return state['bprintf'](state, "What\n")
+
+    if state['curch'] == -609 and state['wordbuf'] == 'water':
+        state['wordbuf'] = 'spring'
+    if state['wordbuf'] == 'from':
+        brkword()
+
+    item = Item(state, fobna(state['wordbuf']))
+    if item.item_id == -1:
+        return state['bprintf'](state, "There isn't one of those here\n")
+    elif item.item_id == 11:
+        state = state['bprintf'](state, "You feel funny, and then pass out\n")
+        state = state['bprintf'](state, "You wake up elsewhere....\n")
+        return teletrap(-1076)
+    elif item.item_id == 75:
+        return state['bprintf'](state, "very refreshing\n")
+    elif item.item_id == 175:
+        if state['my_lev'] < 3:
+            state['my_sco'] += 40
+            state = calibme(state)
+            return state['bprintf'](state, "You feel a wave of energy sweeping through you.\n")
+        else:
+            if state['my_str'] < 40:
+                state['my_sco'] += 2
+            state = calibme(state)
+            return state['bprintf'](state, "Faintly magical by the taste.\n")
+    else:
+        if item.is_edible:
+            item.destroy()
+            state['my_str'] += 12
+            state = calibme(state)
+            return state['bprintf'](state, "Ok....\n")
+        else:
+            return state['bprintf'](state, "Thats sure not the latest in health food....\n")
+
+
 def calibme(state):
     if not state['i_setup']:
         return state
@@ -551,9 +589,9 @@ def look_cmd(state):
     item = Item(state, fobna(state['wordbuf']))
     if item.item_id == -1:
         return state['bprintf'](state, "What ?\n")
-    if not otstbit(item.item_id, 14):
+    if not item.is_container:
         return state['bprintf'](state, "That isn't a container\n")
-    if otstbit(item.item_id, 2) and state(item.item_id) != 0:
+    if item.can_open and item.state != 0:
         return state['bprintf'](state, "It's closed!\n")
 
     state = state['bprintf'](state, "The {} contains:\n".format(item.name))

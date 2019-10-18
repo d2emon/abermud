@@ -115,7 +115,7 @@ def getobj(state):
             item = Item(state, 114)
 
         if item.item_id in (113, 114):
-            oclrbit(item.item_id, 0)
+            item.create()
         else:
             state = state['bprintf'](state, "The shields are all to firmly secured to the walls\n")
 
@@ -138,10 +138,10 @@ def getobj(state):
         state['curch'],
         "[D]{}[/D][c] takes the {}\n[/c]".format(state['name'], item.name),
     )
-    if otstbit(item.item_id, 12):
-        setstate(item.item_id, 0)
+    if item.turn_on_put:
+        item.state = 0
     if state['curch'] == -1081:
-        setstate(20, 1)
+        Item(state, 20).state = 1
         state = state['bprintf'](state, "The door clicks shut....\n")
     return state
 

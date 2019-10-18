@@ -35,7 +35,7 @@ class Item:
 
     @property
     def description(self):
-        return self.state_description(state(self.item_id))
+        return self.state_description(self.state)
 
     @property
     def max_state(self):
@@ -89,6 +89,20 @@ class Item:
         return self.location if self.carry_flag in (self.CARRIED_BY, self.WORN_BY) else None
 
     @property
+    def state(self):
+        return state(self.item_id)
+
+    @state.setter
+    def state(self, value):
+        self.__item_vars[4 * self.item_id + 1] = value
+        if self.has_pair:
+            self.__item_vars[4 * (self.item_id ^ 1) + 1] = value
+
+    @property
+    def flags(self):
+        return self.__item_vars[4 * self.item_id + 2]
+
+    @property
     def carry_flag(self):
         return self.__item_vars[4 * self.item_id + 3]
 
@@ -98,7 +112,67 @@ class Item:
 
     @property
     def is_destroyed(self):
-        return otstbit(self.item_id, 0)
+        return self.flags[0]
+
+    @property
+    def has_pair(self):
+        return self.flags[1]
+
+    @property
+    def can_open(self):
+        return self.flags[2]
+
+    @property
+    def can_lock(self):
+        return self.flags[3]
+
+    @property
+    def is_turnable(self):
+        return self.flags[4]
+
+    @property
+    def is_switchable(self):
+        return self.flags[5]
+
+    @property
+    def is_edible(self):
+        return self.flags[6]
+
+    @property
+    def can_wear(self):
+        return self.flags[8]
+
+    @property
+    def can_light(self):
+        return self.flags[9]
+
+    @property
+    def can_extinguish(self):
+        return self.flags[10]
+
+    @can_extinguish.setter
+    def can_extinguish(self, value):
+        self.flags[10] = value
+
+    @property
+    def turn_on_put(self):
+        return self.flags[12]
+
+    @property
+    def is_lit(self):
+        return self.flags[13]
+
+    @is_lit.setter
+    def is_lit(self, value):
+        self.flags[13] = value
+
+    @property
+    def is_container(self):
+        return self.flags[14]
+
+    @property
+    def is_weapon(self):
+        return self.flags[15]
 
     def state_description(self, state):
         return self.__items[self.item_id].description[state]
@@ -107,7 +181,10 @@ class Item:
         return ishere(self) or iscarrby(self, player)
 
     def create(self):
-        oclrbit(self, 0)
+        self.flags[0] = False
+
+    def destroy(self):
+        self.flags[0] = True
 
 
 class Player:
@@ -226,26 +303,6 @@ class Player:
 
     def reset_messages(self):
         self.message_id = -1
-
-
-def ocreate(ob):
-    raise NotImplementedError()
-
-
-def osetbit(ob, x):
-    raise NotImplementedError()
-
-
-def oclearbit(ob, x):
-    raise NotImplementedError()
-
-
-def oclrbit(ob, x):
-    raise NotImplementedError()
-
-
-def otstbit(ob, x):
-    raise NotImplementedError()
 
 
 def osetbyte(ob, x, y):

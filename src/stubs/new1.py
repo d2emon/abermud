@@ -10,6 +10,85 @@ def ohereandget(state):
     #
 
 
+def opencom(state):
+    item = Item(state, ohereandget(state))
+    if item.item_id == -1:
+        return state
+    elif item.item_id == 21:
+        if state(item.item_id) == 1:
+            return state['bprintf'](state, "It is\n")
+        else:
+            return state['bprintf'](state, "It seems to be magically closed\n")
+    elif item.item_id == 1:
+        if state(item.item_id) != 0:
+            return state['bprintf'](state, "It is!\n")
+        else:
+            item.item_id.state = 1
+            return state['bprintf'](state, "The Umbrella Opens\n")
+    elif item.item_id == 20:
+        return state['bprintf'](state, "You can't shift the door from this side!!!!\n")
+    else:
+        if not item.can_open:
+            return state['bprintf'](state, "You can't open that\n")
+        if state(item.item_id) == 0:
+            return state['bprintf'](state, "It already is\n")
+        if state(item.item_id) == 2:
+            return state['bprintf'](state, "It's locked!\n")
+        item.state = 0
+        return state['bprintf'](state, "Ok\n")
+
+
+def closecom(state):
+    item = Item(state, ohereandget(state))
+    if item.item_id == -1:
+        return state
+    elif item.item_id == 1:
+        if state(item.item_id) == 0:
+            return state['bprintf'](state, "It is closed, silly!\n")
+        else:
+            item.state = 0
+            return state['bprintf'](state, "Ok\n")
+    else:
+        if not item.can_open:
+            return state['bprintf'](state, "You can't close that\n")
+        if state(item.item_id) != 0:
+            return state['bprintf'](state, "It is open already\n")
+        if state(item.item_id) == 2:
+            return state['bprintf'](state, "It's locked!\n")
+        item.state = 1
+        return state['bprintf'](state, "Ok\n")
+
+
+def lockcom(state):
+    item = Item(state, ohereandget(state))
+    if item.item_id == -1:
+        return state
+    elif not ohany(1 << 11):
+        return state['bprintf'](state, "You haven't got a key\n")
+    else:
+        if not item.can_lock:
+            return state['bprintf'](state, "You can't lock that!\n")
+        if state(item.item_id) == 2:
+            return state['bprintf'](state, "It's already locked\n")
+        item.state = 2
+        return state['bprintf'](state, "Ok\n")
+
+
+def unlockcom(state):
+    item = Item(state, ohereandget(state))
+    if item.item_id == -1:
+        return state
+    elif not ohany(1 << 11):
+        return state['bprintf'](state, "You have no keys\n")
+    else:
+        if not item.can_lock:
+            return state['bprintf'](state, "You can't unlock that\n")
+        if state(item.item_id) != 2:
+            return state['bprintf'](state, "It's not locked!\n")
+        item.state = 1
+        return state['bprintf'](state, "Ok\n")
+
+
 def wavecom(state):
     item = Item(state, ohereandget(state))
     if item.item_id == -1:
@@ -46,26 +125,25 @@ def putcom(state):
             return state['bprintf'](state, "There is already a candle in it!\n")
         return state['bprintf'](state, "The candle fixes firmly into the candlestick\n")
         state['my_sco'] += 50
-        destroy(item.item_id)
+        item.destroy()
         osetbyte(location.item_id, 1, item.item_id)
-        osetbit(location.item_id, 9)
-        osetbit(location.item_id, 10)
-        if otstbit(item.item_id, 13):
-            osetbit(location.item_id, 13)
-            setstate(location.item_id, 0)
+        location.can_light = True
+        location.can_extinguish = True
+        location.is_lit = item.is_lit
+        if location.is_lit:
+            location.state = 0
         else:
-            setstate(location.item_id, 1)
-            oclearbit(location.item_id, 13)
+            location.state = 1
         return state
     elif location.item_id == 137:
         if state(location.item_id) == 0:
             item.located_at = -162
             return state['bprintf'](state, "ok\n")
-        destroy(item.item_id)
+        item.destroy()
         state = state['bprintf'](state, "It dissappears with a fizzle into the slime\n")
         if item.item_id == 108:
             state = state['bprintf'](state, "There isn't one of those here.\n")
-            setstate(location.item_id, 0)
+            location.state = 0
         return state
     elif location.item_id == 193:
         return state['bprintf'](state, "You can't do that, the chute leads up from here!\n")
@@ -87,15 +165,15 @@ def putcom(state):
     elif location.item_id == 23:
         if item.item_id == 19 and state(21) == 1:
             state = state['bprintf'](state, "The door clicks open!\n")
-            setstate(20, 0)
+            Item(state, 20).state = 0
             return state
         return state['bprintf'](state, "Nothing happens\n")
     elif location.item_id == item.item_id:
         return state['bprintf'](state, "What do you think this is, the goon show?\n")
 
-    if otstbit(location.item_id, 14) == 0:
+    if not location.is_container:
         return state['bprintf'](state, "You can't do that\n")
-    if state(location.item_id) != 0:
+    if location.state != 0:
         return state['bprintf'](state, "That's not open\n")
     if not item.is_movable:
         return state['bprintf'](state, "You can't take that!\n")
@@ -112,12 +190,44 @@ def putcom(state):
         state['curch'],
         "[D]{}[/D][c] puts the {} in the {}.\n[c]".format(state['name'], item.name, location.name),
     )
-    if otstbit(item.item_id, 12):
-        setstate(item.item_id, 0)
+    if item.turn_on_put:
+        item.state = 0
     if state['curch'] == -1081:
-        setstate(20, 1)
+        Item(state, 20).state = 1
         state = state['bprintf'](state, "The door clicks shut....\n")
     return state
+
+
+def lightcom(state):
+    item = Item(state, ohereandget(state))
+    if item.item_id == -1:
+        return state
+    if not ohany(1 << 13):
+        return state['bprintf'](state, "You have nothing to light things from\n")
+    # By item_id
+    # Default
+    if not item.can_light:
+        return state['bprintf'](state, "You can't light that!\n")
+    if state(item.item_id):
+        return state['bprintf'](state, "It is lit\n")
+    item.state = 0
+    item.is_lit = True
+    return state['bprintf'](state, "Ok\n")
+
+
+def extinguishcom(state):
+    item = Item(state, ohereandget(state))
+    if item.item_id == -1:
+        return state
+    # By item_id
+    # Default
+    if not item.is_lit:
+        return state['bprintf'](state, "That isn't lit\n")
+    if not item.can_extinguish:
+        return state['bprintf'](state, "You can't extinguish that!\n")
+    item.state = 1
+    item.is_lit = False
+    return state['bprintf'](state, "Ok\n")
 
 
 def pushcom(state):
@@ -135,34 +245,39 @@ def pushcom(state):
         state = state['bprintf'](state, "A trapdoor opens at your feet and you plumment downwards!\n")
         return change_channel(state, -140)
     elif item.item_id == 130:
-        if state(132) == 1:
-            setstate(132, 0)
+        panel = Item(state, 132)
+        if panel.state == 1:
+            panel.state = 0
             return state['bprintf'](state, "A secret panel opens in the east wall!\n")
         else:
             return state['bprintf'](state, "Nothing happens\n")
     elif item.item_id == 131:
-        if state(134) == 1:
-            setstate(134, 0)
+        hole = Item(state, 134)
+        if hole.state == 1:
+            hole.state = 0
             state = state['bprintf'](state, "Uncovering a hole behind it.\n")
         return state
     elif item.item_id == 138:
-        if state(137) == 1:
-            setstate(137, 0)
+        connected = Item(state, 137)
+        if connected.state == 1:
+            connected.state = 0
             return state['bprintf'](state, "You hear a gurgling noise and then silence.\n")
         else:
             return state['bprintf'](state, "Ok...\n")
     elif item.item_id in (146, 147):
-        setstate(146, 1 - state(146))
+        connected = Item(state, 146)
+        connected.state = 1 - connected.state
         return state['bprintf'](state, "Ok...\n")
     elif item.item_id == 30:
-        setstate(28, 1 - state(28))
-        if state(28):
+        connected = Item(state, 28)
+        connected.state = 1 - connected.state
+        if connected.state:
             sendsys(
                 state,
                 None,
                 None,
                 -10000,
-                Item(state, 28).location,
+                connected.location,
                 "[c]The portcullis falls\n[/c]",
             )
             sendsys(
@@ -179,7 +294,7 @@ def pushcom(state):
                 None,
                 None,
                 -10000,
-                Item(state, 28).location,
+                connected.location,
                 "[c]The portcullis rises\n[/c]",
             )
             sendsys(
@@ -192,14 +307,15 @@ def pushcom(state):
             )
         return state
     elif item.item_id == 149:
-        setstate(150, 1 - state(150))
-        if state(150):
+        connected = Item(state, 150)
+        connected.state = 1 - connected.state
+        if connected.state:
             sendsys(
                 state,
                 None,
                 None,
                 -10000,
-                Item(state, 150).location,
+                connected.location,
                 "[c]The drawbridge rises\n[/c]",
             )
             sendsys(
@@ -216,7 +332,7 @@ def pushcom(state):
                 None,
                 None,
                 -10000,
-                Item(state, 150).location,
+                connected.location,
                 "[c]The drawbridge is lowered\n[/c]",
             )
             sendsys(
@@ -229,8 +345,9 @@ def pushcom(state):
             )
         return state
     elif item.item_id == 24:
-        if state(26) == 1:
-            setstate(26, 0)
+        connected = Item(state, 26)
+        if connected.state == 1:
+            connected.state = 0
             return state['bprintf'](state, "A secret door slides quietly open in the south wall!!!\n")
         else:
             return state['bprintf'](state, "It moves but nothing seems to happen\n")
@@ -239,12 +356,12 @@ def pushcom(state):
     elif item.item_id == 104:
         return state['bprintf'](state, "You can't shift it alone, maybe you need help\n")
 
-    if otstbit(item.item_id, 4):
-        setstate(item.item_id, 0)
+    if item.is_turnable:
+        item.state = 0
         oplong(item.item_id)
         return state
-    elif otstbit(item.item_id, 5):
-        setstate(item.item_id, 1 - state(item.item_id))
+    elif item.is_switchable:
+        item.state = 1 - item.state
         oplong(item.item_id)
         return state
     else:
@@ -610,6 +727,11 @@ def iswornby(item, player):
     if not iscarrby(item, player):
         return False
     return item.carry_flag == Item.WORN_BY
+
+
+def canwear(state, item_id):
+    item = Item(state, item_id)
+    return item.can_wear
 
 
 def deafcom(state):

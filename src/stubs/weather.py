@@ -169,14 +169,11 @@ def setcom(state):
             return state['bprintf'](state, "Which bit ?\n")
         b = int(state['wordbuf'])
         if brkword() == -1:
-            return state['bprintf'](state, "The bit is {}\n".format('TRUE' if otstbit(item, b) else 'FALSE'))
+            return state['bprintf'](state, "The bit is {}\n".format('TRUE' if item.flags[b] else 'FALSE'))
         c = int(state['wordbuf'])
         if c < 0 or c > 1 or b < 0 or b > 15:
             return state['bprintf'](state, "Number out of range\n")
-        if c == 0:
-            oclrbit(item, b)
-        else:
-            osetbit(item, b)
+        item.flags[b] = (c == 1)
         return new_state
 
     def byteset(new_state, item):

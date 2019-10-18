@@ -4,6 +4,14 @@ from .support import Item, Player, pname
 from .sys_log import logger
 
 
+def dambyitem(state, item_id):
+    item = Item(state, item_id)
+    if item.item_id == -1:
+        return 4
+    else:
+        return obyte(item.item_id, 0) if item.is_weapon else -1
+
+
 def hitplayer(state, victim_id, weapon_id):
     victim = Player(state, victim_id)
     weapon = Item(state, weapon_id)

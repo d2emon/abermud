@@ -117,14 +117,14 @@ def examcom(state):
 
         return state
     elif item.item_id == 145:
-        destroy(item.item_id)
+        item.destroy()
         state = change_channel(state, -114)
         state = state['bprintf'](state, "As you read the scroll you are teleported!\n")
         return state
     elif item.item_id == 101 and obyte(item.item_id, 0) == 0:
         osetbyte(item.item_id, 0, 1)
         key = Item(state, 107)
-        oclrbit(key, 0)
+        key.create()
         key.carried_by = state['mynum']
         state = state['bprintf'](state, "You take a key from one pocket\n")
         return state
@@ -138,9 +138,9 @@ def examcom(state):
             state = state['bprintf'](state, "It glows green")
         state = state['bprintf'](state, "\n")
         return state
-    elif item.item_id == 8 and state(7) != 0 and iscarrby(3 + state(7), state['mynum']) and otstbit(3 + state(7), 13):
+    elif item.item_id == 8 and state(7) != 0 and iscarrby(3 + state(7), state['mynum']) and Item(state, 3 + state(7)).is_lit:
         state = state['bprintf'](state, "Everything shimmers and then solidifies into a different view!\n")
-        destroy(item.item_id)
+        item.destroy()
         teletrap(-1074)
         return state
     elif item.item_id == 85 and not obyte(83, 0):
