@@ -209,7 +209,7 @@ def lojal2(state, flannel):
         if ishere(item.item_id) and oflannel(item.item_id) == flannel:
             if state(item.item_id) > 3:
                 continue
-            if len(olongt(item.item_id, state(item.item_id))):
+            if len(item.description):
                 if isdest(item.item_id):
                     state = state['bprintf'](state, "--")
                 oplong(item.item_id)
@@ -291,4 +291,13 @@ def lispeople(state):
                 state['wd_him'] = player.name
             state = state['bprintf'](state, " is here carrying\n")
             lobjsat(player.player_id)
+    return state
+
+
+def oplong(state, item_id):
+    item = Item(state, item_id)
+    if state['debug_mode']:
+        return state['bprintf'](state, "{{}} {}\n".format(item.item_id, item.description))
+    if len(item.description):
+        return state['bprintf'](state, "{}\n".format(item.description))
     return state

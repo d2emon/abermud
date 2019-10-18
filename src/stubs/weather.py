@@ -205,9 +205,9 @@ def setcom(state):
     if state['wordbuf'] == 'byte':
         return byteset(state, item)
     b = int(state['wordbuf'])
-    if b > omaxstate(item.item_id):
-        return state['bprintf'](state, "Sorry max state for that is {}\n".format(omaxstate(item.item_id)))
-    if b < 0>:
+    if b > item.max_state:
+        return state['bprintf'](state, "Sorry max state for that is {}\n".format(item.max_state))
+    if b < 0:
         return state['bprintf'](state, "States start at 0\n")
     setstate(item, b)
     return state

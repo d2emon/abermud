@@ -18,20 +18,28 @@ class Item:
     CONTAINED_IN = 3
 
     def __init__(self, state, item_id):
-        self.state = state
+        self.__state = state
         self.item_id = item_id
 
     @property
     def __items(self):
-        return self.state['objects']
+        return self.__state['objects']
 
     @property
     def __item_vars(self):
-        return self.state['objinfo']
+        return self.__state['objinfo']
 
     @property
     def name(self):
         return self.__items[self.item_id].name
+
+    @property
+    def description(self):
+        return self.state_description(state(self.item_id))
+
+    @property
+    def max_state(self):
+        return self.__items[self.item_id].max_state
 
     @property
     def location(self):
@@ -75,6 +83,10 @@ class Item:
     # @carry_flag.setter
     # def carry_flag(self, value):
     #     self.__items[4 * self.item_id + 3] = value
+
+    def state_description(self, state):
+        return self.__items[self.item_id].description[state]
+
 
 
 class Player:
@@ -169,14 +181,6 @@ class Player:
             return 0
         self.strength = -1
         return self.value
-
-
-def olongt(st):
-    raise NotImplementedError()
-
-
-def omaxstate(ob):
-    raise NotImplementedError()
 
 
 def obflannel(ob):

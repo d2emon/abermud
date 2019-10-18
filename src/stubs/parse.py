@@ -78,7 +78,7 @@ def dodirn(state, n):
         door = Item(state, newch - 1000)
         droff = Item(state, door.item_id ^ 1)  # other door side
         if state(door.item_id) != 0:
-            if door.name != 'door' or isdark() or len(olongt(door.item_id, state(door.item_id))) == 0:
+            if door.name != 'door' or isdark() or len(door.description) == 0:
                 return state['bprintf'](state, "You can't go that way\n")
             else:
                 return state['bprintf'](state, "The door is not open\n")

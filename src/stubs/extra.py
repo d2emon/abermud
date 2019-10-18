@@ -85,7 +85,7 @@ def stacom(state):
     state = state['bprintf'](state, "\nState       :{}".format(state(item.item_id)))
     state = state['bprintf'](state, "\nCarr_Flag   :{}".format(item.carry_flag))
     state = state['bprintf'](state, "\nSpare       :{}".format(ospare(item.item_id)))
-    state = state['bprintf'](state, "\nMax State   :{}".format(omaxstate(item.item_id)))
+    state = state['bprintf'](state, "\nMax State   :{}".format(item.max_state))
     state = state['bprintf'](state, "\nBase Value  :{}".format(obaseval(item.item_id)))
     state = state['bprintf'](state, "\n")
     return state
