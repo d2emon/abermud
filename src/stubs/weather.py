@@ -181,11 +181,11 @@ def setcom(state):
             return state['bprintf'](state, "Which byte ?\n")
         b = int(state['wordbuf'])
         if brkword() == -1:
-            return state['bprintf'](state, "Current Value is : {}\n".format(obyte(item, b)))
+            return state['bprintf'](state, "Current Value is : {}\n".format(item.bytes[b]))
         c = int(state['wordbuf'])
         if c < 0 or c > 255 or b < 0 or b > 1:
             return state['bprintf'](state, "Number out of range\n")
-        osetbyte(item, b, c)
+        item.bytes[b] = c
         return new_state
 
     if brkword() == -1:

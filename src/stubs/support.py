@@ -100,7 +100,11 @@ class Item:
 
     @property
     def flags(self):
-        return self.__item_vars[4 * self.item_id + 2]
+        return self.__item_vars[4 * self.item_id + 2]['bits']
+
+    @property
+    def bytes(self):
+        return self.__item_vars[4 * self.item_id + 2]['bytes']
 
     @property
     def carry_flag(self):
@@ -173,6 +177,10 @@ class Item:
     @property
     def is_weapon(self):
         return self.flags[15]
+
+    @property
+    def damage(self):
+        return self.bytes[0] if self.is_weapon else -1
 
     def state_description(self, state):
         return self.__items[self.item_id].description[state]
@@ -303,14 +311,6 @@ class Player:
 
     def reset_messages(self):
         self.message_id = -1
-
-
-def osetbyte(ob, x, y):
-    raise NotImplementedError()
-
-
-def obyte(o, x):
-    raise NotImplementedError()
 
 
 def ohany(mask):

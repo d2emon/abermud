@@ -9,7 +9,7 @@ def dambyitem(state, item_id):
     if item.item_id == -1:
         return 4
     else:
-        return obyte(item.item_id, 0) if item.is_weapon else -1
+        return item.damage
 
 
 def hitplayer(state, victim_id, weapon_id):

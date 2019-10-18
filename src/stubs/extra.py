@@ -107,8 +107,8 @@ def examcom(state):
     item = Item(state, fobna(state['wordbuf']))
     if item.item_id == -1:
         return state['bprintf'](state, "You see nothing special at all\n")
-    elif item.item_id == 144 and obyte(item.item_id, 0) == 0:
-        osetbyte(item.item_id, 0, 1)
+    elif item.item_id == 144 and item.bytes[0] == 0:
+        item.bytes[0] = 1
         state = state['bprintf'](state, "You take a scroll from the tube.\n")
 
         scroll = Item(state, 145)
@@ -121,8 +121,8 @@ def examcom(state):
         state = change_channel(state, -114)
         state = state['bprintf'](state, "As you read the scroll you are teleported!\n")
         return state
-    elif item.item_id == 101 and obyte(item.item_id, 0) == 0:
-        osetbyte(item.item_id, 0, 1)
+    elif item.item_id == 101 and item.bytes[0] == 0:
+        item.bytes[0] = 1
         key = Item(state, 107)
         key.create()
         key.carried_by = state['mynum']
@@ -143,16 +143,16 @@ def examcom(state):
         item.destroy()
         teletrap(-1074)
         return state
-    elif item.item_id == 85 and not obyte(83, 0):
+    elif item.item_id == 85 and not Item(state, 83).bytes[0]:
         state = state['bprintf'](state, "Aha. under the bed you find a loaf and a rabbit pie\n")
         Item(state, 83).create()
+        Item(state, 83).bytes[0] = 1
         Item(state, 84).create()
-        oclrbyte(83, 0, 1)
         return state
-    elif item.item_id == 91 and not obyte(90, 0):
-        Item(state, 90).create()
+    elif item.item_id == 91 and not Item(state, 90).bytes[0]:
         state = state['bprintf'](state, "You pull an amulet from the bedding\n")
-        oclrbyte(90, 0, 1)
+        Item(state, 90).create()
+        Item(state, 90).bytes[0] = 1
         return state
 
     try:

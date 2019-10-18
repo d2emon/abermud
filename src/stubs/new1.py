@@ -126,7 +126,7 @@ def putcom(state):
         return state['bprintf'](state, "The candle fixes firmly into the candlestick\n")
         state['my_sco'] += 50
         item.destroy()
-        osetbyte(location.item_id, 1, item.item_id)
+        location.bytes[1] = item.item_id
         location.can_light = True
         location.can_extinguish = True
         location.is_lit = item.is_lit
