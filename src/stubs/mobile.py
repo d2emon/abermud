@@ -24,7 +24,7 @@ def chkfight(state, player_id):
         return state
     if randperc() > 40:
         return state
-    if player.player_id == fpbns('yeti') and ohany(1 << 13):
+    if player.player_id == fpbns('yeti') and ohany(state, lambda item: item.is_lit):
         return state
     return mhitplayer(state, player.player_id, state['mynum'])
 

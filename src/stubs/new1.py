@@ -63,7 +63,7 @@ def lockcom(state):
     item = Item(state, ohereandget(state))
     if item.item_id == -1:
         return state
-    elif not ohany(1 << 11):
+    elif not ohany(state, lambda i: i.is_key):
         return state['bprintf'](state, "You haven't got a key\n")
     else:
         if not item.can_lock:
@@ -78,7 +78,7 @@ def unlockcom(state):
     item = Item(state, ohereandget(state))
     if item.item_id == -1:
         return state
-    elif not ohany(1 << 11):
+    elif not ohany(state, lambda i: i.is_key):
         return state['bprintf'](state, "You have no keys\n")
     else:
         if not item.can_lock:
@@ -202,7 +202,7 @@ def lightcom(state):
     item = Item(state, ohereandget(state))
     if item.item_id == -1:
         return state
-    if not ohany(1 << 13):
+    if not ohany(state, lambda i: i.is_lit):
         return state['bprintf'](state, "You have nothing to light things from\n")
     # By item_id
     # Default

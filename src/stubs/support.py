@@ -159,6 +159,10 @@ class Item:
         self.flags[10] = value
 
     @property
+    def is_key(self):
+        return self.flags[11]
+
+    @property
     def turn_on_put(self):
         return self.flags[12]
 
@@ -313,8 +317,12 @@ class Player:
         self.message_id = -1
 
 
-def ohany(mask):
-    raise NotImplementedError()
+def ohany(state, mask=lambda item: True):
+    for item_id in state['numobs']:
+        item = Item(state, item_id)
+        if iscarrby(item, state['mynum']) or ishere(item, state['mynum']) and mask(item):
+            return True
+    return False
 
 
 def phelping(x, y):
