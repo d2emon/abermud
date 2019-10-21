@@ -125,7 +125,7 @@ def getobj(state):
         return state
     if not cancarry(state['mynum']):
         return state['bprintf'](state, "You can't carry any more\n")
-    if item.item_id == 32 and state(item.item_id) == 1 and ptothlp(state['mynum']) == -1:
+    if item.item_id == 32 and state(item.item_id) == 1 and state['me'].helper is None:
         return state['bprintf'](state, "Its too well embedded to shift alone.\n")
 
     item.carried_by = state['mynum']

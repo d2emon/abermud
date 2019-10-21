@@ -6,8 +6,31 @@ def on_timing():
     raise NotImplementedError()
 
 
-def onlook():
-    raise NotImplementedError()
+def onlook(state):
+    enemies = [
+        'shazareth',
+        'bomber',
+        'owin',
+        'glowin',
+        'dio',
+        'rat',
+        'ghoul',
+        'ogre',
+        'riatha',
+        'yeti',
+        'guardian',
+    ]
+    if not iscarrby(Item(state, 45), state['mynum']):
+        enemies.append('wraith')
+        enemies.append('zombie')
+    enemies = (Player(state, fpbns(enemy)) for enemy in enemies)
+    for enemy in enemies:
+        state = chkfight(state, enemy)
+    if iscarrby(Item(state, 32), state['mynum']):
+        state = dorune(state)
+    if state['me'].helping is not None:
+        state = helpchkr(state)
+    return state
 
 
 def chkfight(state, player_id):
@@ -24,7 +47,7 @@ def chkfight(state, player_id):
         return state
     if randperc() > 40:
         return state
-    if player.player_id == fpbns('yeti') and ohany(state, lambda item: item.is_lit):
+    if player.player_id == fpbns('yeti') and Item.find(state, lambda item: item.is_lit):
         return state
     return mhitplayer(state, player.player_id, state['mynum'])
 
@@ -135,10 +158,10 @@ def dragget(state):
 
 
 def helpchkr(state):
-    player = Player(statw, phelping(state['mynum']))
+    player = state['me'].helping
     if not state['i_setup']:
         return state
-    if not player.is_alive or ploc(player.player_id) != state['curch']:
+    if not player.is_alive or player.location != state['curch']:
         state = state['bprintf'](state, "You can no longer help [c]{}[/c]\n".format(player.name))
-        setphelping(state['mynum'], -1)
+        state['me'].helping = None
     return state

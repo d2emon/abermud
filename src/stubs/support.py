@@ -198,6 +198,15 @@ class Item:
     def destroy(self):
         self.flags[0] = True
 
+    @classmethod
+    def find(cls, state, search=lambda item: True):
+        items = (cls(state, item_id) for item_id in state['numobs'])
+        return any(
+            item
+            for item in items
+            if iscarrby(item, state['mynum']) or ishere(item, state['mynum']) and search(item)
+        )
+
 
 class Player:
     male = 'MALE'
@@ -285,6 +294,15 @@ class Player:
         self.__players[16 * self.player_id + 11] = value.item_id if value is not None else None
 
     @property
+    def helping(self):
+        player_id = self.__players[16 * self.player_id + 13]
+        return Player(self.state, player_id) if player_id != -1 else None
+
+    @helping.setter
+    def helping(self, value):
+        self.__players[16 * self.player_id + 13] = value.player_id if value is not None else None
+
+    @property
     def is_alive(self):
         return len(self.name) > 0
 
@@ -316,33 +334,16 @@ class Player:
     def reset_messages(self):
         self.message_id = -1
 
-
-def ohany(state, mask=lambda item: True):
-    for item_id in state['numobs']:
-        item = Item(state, item_id)
-        if iscarrby(item, state['mynum']) or ishere(item, state['mynum']) and mask(item):
-            return True
-    return False
-
-
-def phelping(x, y):
-    raise NotImplementedError()
-
-
-def setphelping(x, y):
-    raise NotImplementedError()
-
-
-def ptothlp(state, pl):
-    who = Player(state, pl)
-    for player_id in range(state['maxu']):
-        player = Player(state, player_id)
-        if player.location != who.location:
-            continue
-        if phelping(player.player_id) != who.player_id:
-            continue
-        return player.player_id
-    return -1
+    def helper(self):
+        players = (Player(state, player_id) for player_id in range(state['maxu']))
+        return next(
+            (
+                player
+                for player in players
+                if player.location == self.location and player.helping == self.player_id
+            ),
+            None,
+        )
 
 
 def psetflg(ch, x):

@@ -63,7 +63,7 @@ def lockcom(state):
     item = Item(state, ohereandget(state))
     if item.item_id == -1:
         return state
-    elif not ohany(state, lambda i: i.is_key):
+    elif not Item.find(state, lambda i: i.is_key):
         return state['bprintf'](state, "You haven't got a key\n")
     else:
         if not item.can_lock:
@@ -78,7 +78,7 @@ def unlockcom(state):
     item = Item(state, ohereandget(state))
     if item.item_id == -1:
         return state
-    elif not ohany(state, lambda i: i.is_key):
+    elif not Item.find(state, lambda i: i.is_key):
         return state['bprintf'](state, "You have no keys\n")
     else:
         if not item.can_lock:
@@ -202,7 +202,7 @@ def lightcom(state):
     item = Item(state, ohereandget(state))
     if item.item_id == -1:
         return state
-    if not ohany(state, lambda i: i.is_lit):
+    if not Item.find(state, lambda i: i.is_lit):
         return state['bprintf'](state, "You have nothing to light things from\n")
     # By item_id
     # Default
@@ -354,7 +354,8 @@ def pushcom(state):
     elif item.item_id == 49:
         return broad(world, "[d]Church bells ring out around you\n[/d]")
     elif item.item_id == 104:
-        return state['bprintf'](state, "You can't shift it alone, maybe you need help\n")
+        if state['me'].helper is None:
+            return state['bprintf'](state, "You can't shift it alone, maybe you need help\n")
 
     if item.is_turnable:
         item.state = 0

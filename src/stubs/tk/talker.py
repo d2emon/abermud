@@ -48,8 +48,8 @@ def __special(state, string):
         state['me'].visibility = 0 if state['my_lev'] < 10000 else 10000
         state['me'].weapon = None
         state['me'].flags = state['my_sex']
+        state['me'].helping = None
 
-        setphelping(state['mynum'], -1)
         state = change_channel(state, -5 if randperc() > 50 else -183)
 
         sendsys(

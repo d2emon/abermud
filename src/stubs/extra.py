@@ -13,8 +13,9 @@ def helpcom(state):
         if player.player_id == state['mynum']:
             return state['bprintf'](state, "You can't help yourself.\n")
 
-        if phelping(state['mynum']) != -1:
-            sendsys(
+        helping = state['me'].helping
+        if helping is not None:
+            state = sendsys(
                 state,
                 player.name,
                 player.name,
@@ -22,11 +23,10 @@ def helpcom(state):
                 state['curch'],
                 "[c]{}[/c] has stopped helping you\n".format(state['name']),
             )
-            helping = Player(state, phelping(state['mynum']))
             state = state['bprintf'](state, "Stopped helping {}\n". format(helping.name))
 
-        setphelping(state['mynum'], player.player_id)
-        sendsys(
+        state['me'].helping = player.player_id
+        state = sendsys(
             state,
             player.name,
             player.name,
@@ -35,9 +35,10 @@ def helpcom(state):
             "[c]{}[/c] has offered to help you\n".format(state['name']),
         )
         return state['bprintf'](state, "OK...\n")
-
     close_world(state)
+
     state = state['bprintf'](state, "[f]{}[/f]".format(HELP1))
+
     if state['my_lev'] > 9:
         state = state['bprintf'](state, "Hit <Return> For More....\n")
         state = state['pbfr'](state)
@@ -45,6 +46,7 @@ def helpcom(state):
             pass
         state = state['bprintf'](state, "[f]{}[/f]".format(HELP2))
     state = state['bprintf'](state, "\n")
+
     if state['my_lev'] > 9999:
         state = state['bprintf'](state, "Hit <Return> For More....\n")
         state = state['pbfr'](state)
@@ -52,6 +54,7 @@ def helpcom(state):
             pass
         state = state['bprintf'](state, "[f]{}[/f]".format(HELP3))
     state = state['bprintf'](state, "\n")
+
     return state
 
 
