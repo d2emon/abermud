@@ -266,3 +266,40 @@ def desrm(state, location, carry_flag):
         unit.disconnect()
     except ServiceError:
         return state['bprintf'](state, "Out in the void\n")
+
+
+def edit_world(state):
+    def e_player(new_state):
+        player_id = getnarg(0, 47)
+        if player_id == -1:
+            return new_state
+        player = Player(new_state, player_id)
+        c = getnarg(0, 15)
+        if c == -1:
+            return new_state
+        d = getnarg(0, 0)
+        if d == -1:
+            return new_state
+        player.data[c] = d
+        return new_state['bprintf'](new_state, "Tis done\n")
+
+    if not state['me'].is_editor:
+        return state['bprintf'](state, "Must be Game Administrator\n")
+    if brkword() == -1:
+        return state['bprintf'](state, "Must Specify Player or Object\n")
+    if state['wordbuf'] == 'player':
+        return e_player(state)
+    if state['wordbuf'] != 'object':
+        return state['bprintf'](state, "Must specify Player or Object\n")
+    item_id = getnarg(0, state['numobs'] - 1)
+    if item_id == -1:
+        return state
+    item = Item(state, item_id)
+    c = getnarg(0, 3)
+    if c == -1:
+        return state
+    d = getnarg(0, 0)
+    if d == -1:
+        return state
+    item.data[c] = d
+    return state['bprintf'](state, "Tis done\n")

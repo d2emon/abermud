@@ -56,6 +56,10 @@ def doaction(state, n):
         })
         saveme()
         raise PlayerIsDead("Goodbye")
+    if n == 180:
+        if state['me'].is_debugger:
+            state['debug_mode'] = not state['debug_mode']
+        return state
 
 
 def dodirn(state, n):
@@ -403,7 +407,7 @@ def exorcom(state):
     player = Player(state, fpbn(state['wordbuf']))
     if player.player_id == -1:
         return state['bprintf'](state, "They aren't playing\n")
-    if ptstflg(player.player_id, 1):
+    if player.can_be_exorcised:
         return state['bprintf'](state, "You can't exorcise them, they dont want to be exorcised\n")
 
     logger.debug("%s exorcised %s", state['name'], player.name)
@@ -501,14 +505,40 @@ def tsscom(state):
 
 
 def rmeditcom(state):
+    if not state['me'].can_edit:
+        return state['bprintf'](state, "Dum de dum.....\n")
+    state = sendsys(
+        state,
+        state['name'],
+        state['name'],
+        -10113,
+        0,
+        "[s name=\"{}\"]{} fades out of reality\n[/s]".format(state['name'], state['name']),
+    )
+
     state = set_message_id(state, state['mynum'], -2)
-    #
+    state = state['pbfr'](state)
     close_world(state)
-    #
+
+    try:
+        chdir(ROOMS)
+    except FileNotFoundError:
+        return state['bprintf'](state, "Warning: Can't CHDIR\n")
+    system("/cs_d/aberstudent/yr2/hy8/.sunbin/emacs")
+    state['cms'] = -1
+
     state = open_world(state)
-    #
-    raise PlayerIsDead("You have been kicked off")
-    #
+    if fpbns(state['name']) == -1:
+        raise PlayerIsDead("You have been kicked off")
+
+    state = sendsys(
+        state,
+        state['name'],
+        state['name'],
+        -10113,
+        0,
+        "[s name=\"{}\"]{} re-enters the normal universe\n[/s]".format(state['name'], state['name']),
+    )
     return process_messages(state, state['mynum'], state['cms'])
 
 

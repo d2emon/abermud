@@ -241,5 +241,21 @@ def modifwthr(n):
     raise NotImplementedError()
 
 
-def setpflags():
-    raise NotImplementedError()
+def setpflags(state):
+    if not state['me'].can_change_flags:
+        return state['bprintf'](state, "You can't do that\n")
+    if brkword() == -1:
+        return state['bprintf'](state, "Whose PFlags?\n")
+    target = Player(state, fpbns(state['wordbuf']))
+    if target.player_id == -1:
+        return state['bprintf'](state, "Who is that?\n")
+    if brkword() == -1:
+        return state['bprintf'](state, "Flag number?\n")
+    flag_id = int(state['wordbuf'])
+    if brkword() == -1:
+        return state['bprintf'](state, "Value is {}\n".format('TRUE' if target.flags[flag_id] else 'FALSE'))
+    value = int(state['wordbuf'])
+    if value < 0 or value > 1 or flag_id < 0 or flag_id > 31:
+        return state['bprintf'](state, "Out of range\n")
+    target.flags[flag_id] = value
+    return state

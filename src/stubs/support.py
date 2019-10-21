@@ -262,6 +262,17 @@ class Player:
 
     @property
     def flags(self):
+        """
+        Pflags
+
+        0 sex
+        1 May not be exorcised ok
+        2 May change pflags ok
+        3 May use rmedit ok
+        4 May use debugmode ok
+        5 May use patch
+        6 May be snooped upon
+        """
         return self.__players[16 * self.player_id + 9]
 
     @flags.setter
@@ -275,6 +286,30 @@ class Player:
     @sex.setter
     def sex(self, value):
         self.flags[0] = value == self.male
+
+    @property
+    def can_be_exorcised(self):
+        return self.flags[1]
+
+    @property
+    def can_change_flags(self):
+        return self.flags[2]
+
+    @property
+    def can_edit(self):
+        return self.flags[3]
+
+    @property
+    def is_debugger(self):
+        return self.flags[4]
+
+    @property
+    def is_editor(self):
+        return self.flags[5]
+
+    @property
+    def can_be_snooped(self):
+        return self.flags[6]
 
     @property
     def level(self):
@@ -344,32 +379,3 @@ class Player:
             ),
             None,
         )
-
-
-def psetflg(ch, x):
-    raise NotImplementedError()
-
-
-def pclrflg(ch, x):
-    raise NotImplementedError()
-
-
-"""
-Pflags
-
-0 sex
-1 May not be exorcised ok
-2 May change pflags ok
-3 May use rmedit ok
-4 May use debugmode ok
-5 May use patch 
-6 May be snooped upon
-"""
-
-
-def ptstbit(ch, x):
-    raise NotImplementedError()
-
-
-def ptstflg(ch, x):
-    raise NotImplementedError()

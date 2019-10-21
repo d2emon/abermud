@@ -149,7 +149,7 @@ def snoopcom(state):
     target = Player(state, fpbn(state['wordbuf']))
     if target.player_id == -1:
         return state['bprintf'](state, "Who is that?\n")
-    if state['my_lev'] < 10000 and target.level >= 10 or ptstbit(target.player_id, 6):
+    if state['my_lev'] < 10000 and target.level >= 10 or not target.can_be_snooped:
         state['snoopt'] = -1
         return state['bprintf'](state, "Your magical vision is obscured\n")
 
