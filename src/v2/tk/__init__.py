@@ -1,8 +1,7 @@
+from ..gamego.error import MudError
+
+
 def closeworld():
-    raise NotImplementedError()
-
-
-def crapup(message):
     raise NotImplementedError()
 
 
@@ -244,7 +243,7 @@ if(in_fight) in_fight-=1;
     long inpbk[128];
     extern char *echoback;
     	unit=openworld();
-    if (unit<0) {loseme();crapup("\nAberMUD: FILE_ACCESS : Access failed\n");}
+    if (unit<0) {loseme();raise MudError("\nAberMUD: FILE_ACCESS : Access failed\n");}
     sec_read(unit,inpbk,0,64);
     number=2*inpbk[1]-inpbk[0];inpbk[1]++;
     sec_write(unit,block,number,128);
@@ -278,7 +277,7 @@ extern long findend();
     long too,ct,block[128];
     unit=openworld();
     fl_com=unit;
-    if (unit==NULL) crapup("AberMUD: FILE_ACCESS : Access failed\n");
+    if (unit==NULL) raise MudError("AberMUD: FILE_ACCESS : Access failed\n");
     if (player.message_id== -1) player.message_id=findend(unit);
     too=findend(unit);
     ct=player.message_id;
@@ -309,10 +308,10 @@ intr:if(flock(fileno(unit),LOCK_EX)== -1)
 		if(errno==EINTR) goto intr; /* INTERRUPTED SYSTEM CALL CATCH */
     switch(errno)
     {
-    	case ENOSPC:crapup("PANIC exit device full\n");
+    	case ENOSPC:raise MudError("PANIC exit device full\n");
 /*    	case ESTALE:;*/
     	case EHOSTDOWN:;
-    	case EHOSTUNREACH:crapup("PANIC exit access failure, NFS gone for a snooze");
+    	case EHOSTUNREACH:raise MudError("PANIC exit access failure, NFS gone for a snooze");
     }
     return(unit);
     }
@@ -343,9 +342,9 @@ def __start(player):
     try:
         openworld()
     except:
-        crapup("Sorry AberMUD is currently unavailable")
+        raise MudError("Sorry AberMUD is currently unavailable")
     if get_mynum() >= get_maxu():
-        crapup("Sorry AberMUD is full at the moment")
+        raise MudError("Sorry AberMUD is full at the moment")
     closeworld()
 
     player.reset_message_id()
@@ -524,7 +523,7 @@ long mynum=0;
     f=0;
     if(fpbn(name)!= -1)
        {
-       crapup("You are already on the system - you may only be on once at a time");
+       raise MudError("You are already on the system - you may only be on once at a time");
        }
     while((f==0)&&(ct<maxu))
        {
@@ -651,7 +650,7 @@ xx1:   xxx=0;
              else
                 {
                 loseme(player.name);
-                crapup("bye bye.....\n");
+                raise MudError("bye bye.....\n");
                 }
              }
           else
