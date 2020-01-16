@@ -9,10 +9,6 @@ def get_maxu():
     raise NotImplementedError()
 
 
-def get_mynum():
-    raise NotImplementedError()
-
-
 def get_rd_qd():
     raise NotImplementedError()
 
@@ -64,8 +60,13 @@ long curch=0;
 
 class Player:
     def __init__(self, name=""):
-        self.__name = name
         self.__message_id = -1
+        self.__name = name
+        self.__player_id = 0
+
+    @property
+    def player_id(self):
+        return self.__player_id
 
     @property
     def name(self):
@@ -82,12 +83,8 @@ class Player:
     def message_id(self):
         return self.__message_id
 
-    @message_id.setter
-    def message_id(self, value):
-        self.__message_id = value
-
     def reset_message_id(self):
-        self.message_id = -1
+        self.__message_id = -1
 
 """
 long  curmode=0;
@@ -146,7 +143,7 @@ sendmsg(name)
     {
     extern long debug_mode;
     extern char *sysbuf;
-    extern long curch,moni,mynum;
+    extern long curch,moni;
     char prmpt[32];
     long a;
 extern long tty;
@@ -162,7 +159,7 @@ extern long fighting;
     l:pbfr();
 if(tty==4) btmscr();
 strcpy(prmpt,"\r");
-    if(pvis(mynum)) strcat(prmpt,"(");
+    if(pvis(player.player_id)) strcat(prmpt,"(");
     if(debug_mode) strcat(prmpt,"#");
     if(my_lev>9)strcat(prmpt,"----");
     switch(convflg)
@@ -179,12 +176,12 @@ strcpy(prmpt,"\r");
        default:
           strcat(prmpt,"?");
           }
-    if(pvis(mynum)) strcat(prmpt,")");
+    if(pvis(player.player_id)) strcat(prmpt,")");
     pbfr();
-    if(pvis(mynum)>9999) set_progname(0,"-csh");
+    if(pvis(player.player_id)>9999) set_progname(0,"-csh");
     else
     sprintf(work,"   --}----- ABERMUD -----{--     Playing as %s",name);
-    if(pvis(mynum)==0) set_progname(0,work);
+    if(pvis(player.player_id)==0) set_progname(0,work);
     sig_alon();
     key_input(prmpt,80);
     sig_aloff();
@@ -343,7 +340,7 @@ def __start(player):
         openworld()
     except:
         raise MudError("Sorry AberMUD is currently unavailable")
-    if get_mynum() >= get_maxu():
+    if player.player_id >= get_maxu():
         raise MudError("Sorry AberMUD is full at the moment")
     closeworld()
 
@@ -399,7 +396,6 @@ long rd_qd=0;
     extern long curmode;
     char ch,bk[128];
     extern long curch,moni;
-    extern long mynum;
     extern long my_str,my_lev,my_sco,my_sex;
     FILE * ufl;
     char xx[128];
@@ -417,13 +413,13 @@ long rd_qd=0;
           curch= -5;
           initme();
           ufl=openworld();
-          setpstr(mynum,my_str);
-          setplev(mynum,my_lev);
- if(my_lev<10000) setpvis(mynum,0);
-    else setpvis(mynum,10000);
-          setpwpn(mynum,-1);
-          setpsexall(mynum,my_sex);
-          setphelping(mynum,-1);
+          setpstr(player.player_id,my_str);
+          setplev(player.player_id,my_lev);
+ if(my_lev<10000) setpvis(player.player_id,0);
+    else setpvis(player.player_id,10000);
+          setpwpn(player.player_id,-1);
+          setpsexall(player.player_id,my_sex);
+          setphelping(player.player_id,-1);
           cuserid(us);
           sprintf(xy,"\001s%s\001%s  has entered the game\n\001",name,name);
           sprintf(xx,"\001s%s\001[ %s  has entered the game ]\n\001",name,name);
@@ -498,21 +494,18 @@ if(!strcmp(lowercase(nam1+4),lowercase(luser))) return(1);
  long chan;
     {
 extern long curch;
-    extern long mynum;
     FILE *unit;
     extern long my_lev;
     if(my_lev>9) goto ndie;
     ndie:unit=openworld();
-    setploc(mynum,chan);
+    setploc(player.player_id,chan);
     lookin(chan);
     }
- 
-long mynum=0;
  
  putmeon(name)
  char *name;
     {
-    extern long mynum,curch;
+    extern long curch;
     extern long maxu;
     long ct,f;
     FILE *unit;
@@ -533,7 +526,7 @@ long mynum=0;
        }
     if(ct==maxu)
        {
-       mynum=maxu;
+       player.player_id=maxu;
        return;
        }
     strcpy(pname(ct),name);
@@ -544,7 +537,7 @@ long mynum=0;
     setpstr(ct,-1);
     setpwpn(ct,-1);
     setpsex(ct,0);
-    mynum=ct;
+    player.player_id=ct;
 iamon=1;
     }
  
@@ -552,7 +545,6 @@ iamon=1;
  char *name;
     {
 extern long iamon;
-extern long mynum;
 extern long zapped;
 char bk[128];
 FILE *unit;  
@@ -562,11 +554,11 @@ i_setup=0;
 			   
 unit=openworld();
     dumpitems();
-if(pvis(mynum)<10000) {
+if(pvis(player.player_id)<10000) {
 sprintf(bk,"%s has departed from AberMUDII\n", player.name);
 sendsys(player.name,player.name,-10113,0,bk);
 }
-    pname(mynum)[0]=0;
+    pname(player.player_id)[0]=0;
     	closeworld();
 if(!zapped) saveme();
     	chksnp();
@@ -577,7 +569,6 @@ long lasup=0;
  update(name)
  char *name;
     {
-    extern long mynum;
     FILE *unit;
     long xp;
     extern long lasup;
@@ -585,7 +576,7 @@ long lasup=0;
     if(xp<0) xp= -xp;
     if(xp<10) goto noup;
     unit=openworld();
-    setppos(mynum,player.message_id);
+    setppos(player.player_id,player.message_id);
     lasup=player.message_id;
     noup:;
     }
