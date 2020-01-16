@@ -352,29 +352,6 @@ extern long findend();
     rdes=0;tdes=0;vdes=0;
     }
     
-FILE *openlock(file,perm)
-char *file;
-char *perm;
-    {
-    FILE *unit;
-    long ct;
-    extern int errno;
-    ct=0;
-   unit=fopen(file,perm);
-   if(unit==NULL) return(unit);
-   /* NOTE: Always open with R or r+ or w */
-intr:if(flock(fileno(unit),LOCK_EX)== -1)
-		if(errno==EINTR) goto intr; /* INTERRUPTED SYSTEM CALL CATCH */
-    switch(errno)
-    {
-    	case ENOSPC:raise MudError("PANIC exit device full\n");
-/*    	case ESTALE:;*/
-    	case EHOSTDOWN:;
-    	case EHOSTUNREACH:raise MudError("PANIC exit access failure, NFS gone for a snooze");
-    }
-    return(unit);
-    }
- 
 long findstart(unit)
  FILE *unit;
     {
@@ -670,13 +647,5 @@ userwrap()
 {
 extern long iamon;
 if(fpbns(player.name)!= -1) {loseme();syslog("System Wrapup exorcised %s",player.name);}
-}
-
-fcloselock(file)
-FILE *file;
-{
-	fflush(file);
-	flock(fileno(file),LOCK_UN);
-	fclose(file);
 }
 """
