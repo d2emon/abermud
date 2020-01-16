@@ -33,19 +33,11 @@ def sendmsg(name):
     raise NotImplementedError()
 
 
-def set_i_setup(value):
-    raise NotImplementedError()
-
-
 def special(code, name):
     raise NotImplementedError()
 
 
 """
-long i_setup=0;
-long oddcat=0;
-long  talkfl=0;
-
 long curch=0;
 """
 
@@ -57,8 +49,11 @@ class Reader:
 
 class Player:
     def __init__(self, name=""):
+        self.in_game = False
         self.__message_id = -1
         self.__player_id = 0
+
+        self.reader = Reader()
 
         if name == "Phantom":
             self.__name = "The {}".format(name)
@@ -80,8 +75,33 @@ class Player:
     def reset_message_id(self):
         self.__message_id = -1
 
+    def start(self):
+        makebfr()
+        self.reset_message_id()
+        putmeon(self.name)
 
-__READER = Reader()
+        try:
+            openworld()
+        except:
+            raise MudError("Sorry AberMUD is currently unavailable")
+        if self.player_id >= get_maxu():
+            raise MudError("Sorry AberMUD is full at the moment")
+        closeworld()
+
+        self.reset_message_id()
+        special('.g', self.name)
+        self.in_game = True
+
+    def next_turn(self):
+        pbfr()
+        sendmsg(self.name)
+
+        if self.reader.to_read:
+            rte(self.name)
+            self.reader.to_read = False
+
+        closeworld()
+        pbfr()
 
 
 """
@@ -329,40 +349,10 @@ long findend(unit)
 """
 
 
-def __start(player):
-    makebfr()
-    player.reset_message_id()
-    putmeon(player.name)
-
-    try:
-        openworld()
-    except:
-        raise MudError("Sorry AberMUD is currently unavailable")
-    if player.player_id >= get_maxu():
-        raise MudError("Sorry AberMUD is full at the moment")
-    closeworld()
-
-    player.reset_message_id()
-    special('.g', player.name)
-    set_i_setup(True)
-
-
-def __next_turn(player):
-    pbfr()
-    sendmsg(player.name)
-
-    if __READER.to_read:
-        rte(player.name)
-        Reader.to_read = False
-
-    closeworld()
-    pbfr()
-
-
 def talker(player):
-    __start(player)
+    player.start()
     while True:
-        __next_turn(player)
+        player.next_turn()
 
 
 """
@@ -545,6 +535,7 @@ char bk[128];
 FILE *unit;  
 sig_aloff(); /* No interruptions while you are busy dying */
 			/* ABOUT 2 MINUTES OR SO */
+player.in_setup = False
 i_setup=0;
 			   
 unit=openworld();
