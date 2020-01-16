@@ -43,10 +43,6 @@ def rte(name):
     raise NotImplementedError()
 
 
-def set_interrupt(value):
-    raise NotImplementedError()
-
-
 def set_name(value):
     raise NotImplementedError()
 
@@ -143,11 +139,24 @@ class Signals:
     def active(self, value):
         self.__active = value
         if value:
-            self.__signals['SIGALRM'] = self.__on_time
+            self.blocked = False
             self.__alarm = 2
         else:
-            self.__signals['SIGALRM'] = None
+            self.blocked = True
             self.__alarm = 2147487643
+
+    @property
+    def blocked(self):
+        return self.__signals.get('SIGALRM') is None
+
+    @blocked.setter
+    def blocked(self, value):
+        if value:
+            self.__signals['SIGALRM'] = None
+        else:
+            self.__signals['SIGALRM'] = self.__on_time
+            if self.__active:
+                self.__alarm = 2
 
     def signal(self, signal_id):
         return self.__signals[signal_id]
@@ -177,9 +186,9 @@ class Signals:
 
         openworld()
 
-        set_interrupt(True)
+        self.interrupt = True
         rte(get_name())
-        set_interrupt(False)
+        self.interrupt = False
 
         on_timing()
         closeworld()
@@ -192,19 +201,12 @@ class Signals:
 __SIGNALS = Signals()
 
 
-"""
-unblock_alarm()
-{
-	extern int sig_occur();
-	signal(SIGALRM,sig_occur);
-	if(sig_active) alarm(2);
-}
+def unblock_alarm():
+    __SIGNALS.blocked = False
 
-block_alarm()
-{
-	signal(SIGALRM,SIG_IGN);
-}
-"""
+
+def block_alarm():
+    __SIGNALS.blocked = True
 
 
 def sig_alon():
