@@ -9,10 +9,6 @@ def get_maxu():
     raise NotImplementedError()
 
 
-def get_rd_qd():
-    raise NotImplementedError()
-
-
 def makebfr():
     raise NotImplementedError()
 
@@ -41,10 +37,6 @@ def set_i_setup(value):
     raise NotImplementedError()
 
 
-def set_rd_qd(value):
-    raise NotImplementedError()
-
-
 def special(code, name):
     raise NotImplementedError()
 
@@ -56,6 +48,11 @@ long  talkfl=0;
 
 long curch=0;
 """
+
+
+class Reader:
+    def __init__(self):
+        self.to_read = False
 
 
 class Player:
@@ -82,6 +79,10 @@ class Player:
 
     def reset_message_id(self):
         self.__message_id = -1
+
+
+__READER = Reader()
+
 
 """
 long  curmode=0;
@@ -350,9 +351,9 @@ def __next_turn(player):
     pbfr()
     sendmsg(player.name)
 
-    if get_rd_qd():
+    if __READER.to_read:
         rte(player.name)
-    set_rd_qd(False)
+        Reader.to_read = False
 
     closeworld()
     pbfr()
@@ -365,8 +366,6 @@ def talker(player):
 
 
 """
-long rd_qd=0;
- 
  cleanup(inpbk)
  long *inpbk;
     {
@@ -442,10 +441,9 @@ long moni=0;
  broad(mesg)
  char *mesg;
     {
-extern long rd_qd;
 char bk2[256];
 long block[128];
-rd_qd=1;
+    __READER.to_read = True
 block[1]= -1;
 strcpy(bk2,mesg);
 vcpy(block,2,(long *)bk2,0,126);
