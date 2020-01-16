@@ -16,12 +16,15 @@ class Player:
 __PLAYER = Player()
 
 
+def set_name(name):
+    if name == "Phantom":
+        __PLAYER.name = "The {}".format(name)
+    else:
+        __PLAYER.name = name
+
+
 def get_name():
     return __PLAYER.name
-
-
-def set_name(name):
-    __PLAYER.name = name
 
 
 

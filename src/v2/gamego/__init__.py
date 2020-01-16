@@ -39,12 +39,7 @@ def talker(name):
 
 def main(game_user, program_name, username):
     print("Entering Game ....")
-    if username == "Phantom":
-        name = "The {}".format(username)
-    else:
-        name = username
-    set_name(name)
-
+    set_name(username)
     print("Hello {}".format(get_name()))
     logging.info("GAME ENTRY: %s[%s]", get_name(), game_user.user_id)
 
