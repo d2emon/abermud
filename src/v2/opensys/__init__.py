@@ -23,7 +23,7 @@ class Service:
     @classmethod
     def lock(cls, name, **kwargs):
         try:
-            return Service(name, **kwargs)
+            return cls(name, **kwargs)
         except WorldError:
             # ENOSPC        PANIC exit device full
             # EHOSTUNREACH  PANIC exit access failure, NFS gone for a snooze
@@ -54,18 +54,23 @@ class Service:
 
 
 class World(Service):
-    __filename = '/usr/tmp/-iy7AM'
+    __FILENAME = '/usr/tmp/-iy7AM'
+    __ITEMS = 400
+    __PLAYERS = 350
+    __ITEMS_COUNT = 194
+    __PLAYERS_COUNT = 48
+
     __world = None
     __data = {
-        350: [{} for _ in range(48)],
-        400: [{} for _ in range(194)],
-        'players_count': 48,
-        'items_count': 194,
+        __PLAYERS: [{} for _ in range(__PLAYERS_COUNT)],
+        __ITEMS: [{} for _ in range(__ITEMS_COUNT)],
+        'players_count': __PLAYERS_COUNT,
+        'items_count': __ITEMS_COUNT,
         'players_size': 16,
         'items_size': 4,
     }
-    __items = [None for _ in range(194)]
-    __players = [None for _ in range(48)]
+    __items = [None for _ in range(__ITEMS_COUNT)]
+    __players = [None for _ in range(__PLAYERS_COUNT)]
 
     @property
     def data(self):
@@ -74,7 +79,7 @@ class World(Service):
     @classmethod
     def __connect(cls):
         try:
-            return cls.lock(cls.__filename, create=True)
+            return cls.lock(cls.__FILENAME, read=True, create=True, write=True)
         except WorldError:
             raise WorldError("Cannot find World file")
 
@@ -84,8 +89,8 @@ class World(Service):
             return cls.__world
 
         cls.__world = cls.__connect()
-        cls.__items = cls.__world.read(400)
-        cls.__players = cls.__world.read(350)
+        cls.__items = cls.__world.read(cls.__ITEMS)
+        cls.__players = cls.__world.read(cls.__PLAYERS)
         return cls.__world
 
     @classmethod
@@ -93,7 +98,7 @@ class World(Service):
         if cls.__world is None:
             return
 
-        cls.__world.write(cls.__items, 400)
-        cls.__world.write(cls.__players, 350)
+        cls.__world.write(cls.__ITEMS, cls.__items)
+        cls.__world.write(cls.__PLAYERS, cls.__players)
         cls.__world.unlock()
         cls.__world = None
