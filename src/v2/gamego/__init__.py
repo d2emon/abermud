@@ -1,12 +1,9 @@
 import logging
 import sys
+from ..opensys import World
 from ..tk import Player, talker
 from .error import on_error
 from .user import User
-
-
-def closeworld():
-    raise NotImplementedError()
 
 
 def get_in_fight():
@@ -22,10 +19,6 @@ def loseme():
 
 
 def on_timing():
-    raise NotImplementedError()
-
-
-def openworld():
     raise NotImplementedError()
 
 
@@ -48,9 +41,9 @@ char *name;
 {
 FILE *a;
 char b[128];
-a=openlock(name,"r+");
+a=Service.lock(name,"r+");
 while(fgets(b,128,a)) printf("%s\n",b);
-fcloselock(a);
+a.unlock()
 }
 
 char *getkbd(s,l)   /* Getstr() with length limit and filter ctrl */
@@ -138,20 +131,20 @@ class Signals:
         self.__shutdown()
         sys.exit(255)
 
-    def __on_time(self):
+    def __on_time(self, player):
         if not self.active:
             return
 
         self.active = False
 
-        openworld()
+        World.load()
 
         self.interrupt = True
-        rte(get_name())
+        rte(player.name)
         self.interrupt = False
 
         on_timing()
-        closeworld()
+        World.save()
 
         key_reprint()
 

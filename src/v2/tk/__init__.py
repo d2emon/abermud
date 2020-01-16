@@ -1,13 +1,6 @@
 from ..bprintf import reset_messages
 from ..gamego.error import MudError
-
-
-class WorldError(Exception):
-    pass
-
-
-def closeworld():
-    raise NotImplementedError()
+from ..opensys import World, WorldError
 
 
 def fpbn(name):
@@ -15,10 +8,6 @@ def fpbn(name):
 
 
 def get_maxu():
-    raise NotImplementedError()
-
-
-def openworld():
     raise NotImplementedError()
 
 
@@ -113,11 +102,12 @@ class Player:
         self.reader.reset()
 
         try:
-            openworld()
+            World.load()
             self.__player_id = self.__new_player()
-            closeworld()
         except WorldError:
             raise MudError("Sorry AberMUD is currently unavailable")
+        finally:
+            World.save()
 
         self.reader.reset()
         special('.g', self.name)
@@ -131,7 +121,7 @@ class Player:
             rte(self.name)
             self.reader.to_read = False
 
-        closeworld()
+        World.save()
         pbfr()
 
     def __new_player(self):
@@ -252,9 +242,9 @@ if(tty==4) topscr();
 strcat(sysbuf,"\001l");
 strcat(sysbuf,work);
 strcat(sysbuf,"\n\001");
-openworld();
+World.load()
 rte(name);
-closeworld();
+World.save()
     if((convflg)&&(!strcmp(work,"**")))
        {
        convflg=0;
@@ -301,7 +291,7 @@ if(in_fight) in_fight-=1;
     long number;
     long inpbk[128];
     extern char *echoback;
-    	unit=openworld();
+    	unit=World.load()
     if (unit<0) {loseme();raise MudError("\nAberMUD: FILE_ACCESS : Access failed\n");}
     sec_read(unit,inpbk,0,64);
     number=2*inpbk[1]-inpbk[0];inpbk[1]++;
@@ -334,7 +324,7 @@ extern long findend();
     extern long debug_mode;
     FILE *unit;
     long too,ct,block[128];
-    unit=openworld();
+    unit=World.load()
     fl_com=unit;
     if (unit==NULL) raise MudError("AberMUD: FILE_ACCESS : Access failed\n");
     if (player.reader.event_id== -1) player.reader.event_id=findend(unit);
@@ -382,7 +372,7 @@ def talker(player):
     {
     FILE * unit;
     long buff[128],ct,work,*bk;
-    unit=openworld();
+    unit=World.load()
     bk=(long *)malloc(1280*sizeof(long));
     sec_read(unit,bk,101,1280);sec_write(unit,bk,1,1280);
     sec_read(unit,bk,121,1280);sec_write(unit,bk,21,1280);
@@ -419,7 +409,7 @@ def talker(player):
           curmode=1;
           player.channel_id= -5;
           initme();
-          ufl=openworld();
+          ufl=World.load()
           setpstr(player.player_id,my_str);
           setplev(player.player_id,my_lev);
  if(my_lev<10000) setpvis(player.player_id,0);
@@ -502,7 +492,7 @@ if(!strcmp(lowercase(nam1+4),lowercase(luser))) return(1);
     FILE *unit;
     extern long my_lev;
     if(my_lev>9) goto ndie;
-    ndie:unit=openworld();
+    ndie:unit=World.load()
     setploc(player.player_id,chan);
     lookin(chan);
     }
@@ -522,14 +512,14 @@ sig_aloff(); /* No interruptions while you are busy dying */
 player.in_setup = False
 i_setup=0;
 			   
-unit=openworld();
+unit=World.load()
     dumpitems();
 if(pvis(player.player_id)<10000) {
 sprintf(bk,"%s has departed from AberMUDII\n", player.name);
 sendsys(player.name,player.name,-10113,0,bk);
 }
     pname(player.player_id)[0]=0;
-    	closeworld();
+World.save()
 if(!zapped) saveme();
     	chksnp();
     }
@@ -545,7 +535,7 @@ long lasup=0;
     xp=player.reader.event_id-lasup;
     if(xp<0) xp= -xp;
     if(xp<10) goto noup;
-    unit=openworld();
+    unit=World.load()
     setppos(player.player_id,player.reader.event_id);
     lasup=player.reader.event_id;
     noup:;
@@ -557,7 +547,7 @@ long lasup=0;
     char mess[128];
     long ct;
     FILE *unit;
-    unit=openworld();
+    unit=World.load()
     ct=0;
     while(ct<16)
        {
@@ -583,7 +573,7 @@ long lasup=0;
     extern long ail_blind;
     long ct;
     extern long my_lev;
-    closeworld();
+World.save()
     if(ail_blind)
     {
     	bprintf("You are blind... you can't see a thing!\n");
@@ -596,9 +586,9 @@ xx1:   xxx=0;
        lodex(un1);
        	if(isdark())
        	{
-          		fclose(un1);
+       	    un1.disconnect()
           		bprintf("It is dark\n");
-                        openworld();
+                        World.load()
           		onlook();
           		return;
           	}
@@ -625,8 +615,8 @@ else
        }
     else
        bprintf("\nYou are on channel %d\n",room);
-    fclose(un1);
-    openworld();
+    un1.disconnect()
+    World.load()
     if(!ail_blind)
     {
 	    lisobs();

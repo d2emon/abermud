@@ -224,8 +224,8 @@ void logcom()
        return;
        }
     bprintf("Commencing Logging Of Session\n");
-    log_fl=fopen("mud_log","a");
-    if(log_fl==0) log_fl=fopen("mud_log","w");
+    log_fl=Service.connect("mud_log","a");
+    if(log_fl==0) log_fl=Service.connect("mud_log","w");
     if(log_fl==0)
        {
        bprintf("Cannot open log file mud_log\n");
@@ -301,10 +301,9 @@ char *per;
 char *user;
     {
     FILE *x;
-    extern FILE *openlock();
     char z[256];
     sprintf(z,"%s%s",SNOOP,user);
-    x=openlock(z,per);
+    x=Service.connect(z,per);
     return(x);
     }
 
