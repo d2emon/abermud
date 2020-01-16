@@ -7,15 +7,19 @@ class User:
         self.user_id = user_id
 
 
-def crapup():
-    raise NotImplementedError()
-
-
 def get_in_fight():
     raise NotImplementedError()
 
 
 def loseme():
+    raise NotImplementedError()
+
+
+def pbfr():
+    raise NotImplementedError()
+
+
+def set_pr_due(value):
     raise NotImplementedError()
 
 
@@ -41,20 +45,20 @@ def main(user, program_name, username):
     return talker(name)
 
 
+__dashes = "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+
+
+def crapup(message):
+    pbfr()
+    set_pr_due(0)
+    print("\n{dashes}\n{message}\n{dashes}".format(
+        dashes=__dashes,
+        message=message,
+    ))
+    sys.exit(0)
+
+
 """
-crapup(str)
-char *str;
-{
-extern long pr_due;
-static char *dashes =
-"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-";
-pbfr();
-pr_due=0;  /* So we dont get a prompt after the exit */ 
-keysetback();
-printf("\n%s\n\n%s\n\n%s\n", dashes, str, dashes);
-exit(0);
-}
- 
 listfl(name)
 char *name;
 {
@@ -146,6 +150,11 @@ sig_occur()
 """
 
 
+def __shutdown():
+    sig_aloff()
+    loseme()
+
+
 def __sig_init():
     signals['SIGHUP'] = __sig_oops
     signals['SIGINT'] = __sig_ctrlc
@@ -159,14 +168,12 @@ def __sig_ctrlc():
     print("^C")
     if get_in_fight():
         return
-    sig_aloff()
-    loseme()
+    __shutdown()
     crapup("Byeeeeeeeeee  ...........")
 
 
 def __sig_oops():
-    sig_aloff()
-    loseme()
+    __shutdown()
     sys.exit(255)
 
 
