@@ -42,10 +42,6 @@ def sendmsg(name):
     raise NotImplementedError()
 
 
-def set_cms(value):
-    raise NotImplementedError()
-
-
 def set_i_setup(value):
     raise NotImplementedError()
 
@@ -63,14 +59,14 @@ long i_setup=0;
 long oddcat=0;
 long  talkfl=0;
 
-long cms= -1;
 long curch=0;
 """
 
 
 class Player:
     def __init__(self, name=""):
-        self.__name = ""
+        self.__name = name
+        self.__message_id = -1
 
     @property
     def name(self):
@@ -83,9 +79,18 @@ class Player:
         else:
             self.__name = value
 
+    @property
+    def message_id(self):
+        return self.__message_id
+
+    @message_id.setter
+    def message_id(self, value):
+        self.__message_id = value
+
+    def reset_message_id(self):
+        self.message_id = -1
 
 """
-char globme[40];
 long  curmode=0;
 long  meall=0;
  /*
@@ -237,7 +242,6 @@ if(in_fight) in_fight-=1;
     FILE * unit;
     long number;
     long inpbk[128];
-    extern char globme[];
     extern char *echoback;
     	unit=openworld();
     if (unit<0) {loseme();crapup("\nAberMUD: FILE_ACCESS : Access failed\n");}
@@ -267,7 +271,6 @@ extern long findend();
  rte(name)
  char *name;
     {
-    extern long cms;
     extern long vdes,tdes,rdes;
     extern FILE *fl_com;
     extern long debug_mode;
@@ -276,16 +279,16 @@ extern long findend();
     unit=openworld();
     fl_com=unit;
     if (unit==NULL) crapup("AberMUD: FILE_ACCESS : Access failed\n");
-    if (cms== -1) cms=findend(unit);
+    if (player.message_id== -1) player.message_id=findend(unit);
     too=findend(unit);
-    ct=cms;
+    ct=player.message_id;
     while(ct<too)
        {
        readmsg(unit,block,ct);
        mstoout(block,name);
        ct++;
        }
-    cms=ct;
+    player.message_id=ct;
     update(name);
     eorte();
     rdes=0;tdes=0;vdes=0;
@@ -298,7 +301,6 @@ char *perm;
     FILE *unit;
     long ct;
     extern int errno;
-    extern char globme[];
     ct=0;
    unit=fopen(file,perm);
    if(unit==NULL) return(unit);
@@ -335,7 +337,7 @@ long findend(unit)
 
 def __start(player):
     makebfr()
-    set_cms(-1)
+    player.reset_message_id()
     putmeon(player.name)
 
     try:
@@ -346,7 +348,7 @@ def __start(player):
         crapup("Sorry AberMUD is full at the moment")
     closeworld()
 
-    set_cms(-1)
+    player.reset_message_id()
     special('.g', player.name)
     set_i_setup(True)
 
@@ -554,7 +556,6 @@ extern long iamon;
 extern long mynum;
 extern long zapped;
 char bk[128];
-extern char globme[];
 FILE *unit;  
 sig_aloff(); /* No interruptions while you are busy dying */
 			/* ABOUT 2 MINUTES OR SO */
@@ -563,8 +564,8 @@ i_setup=0;
 unit=openworld();
     dumpitems();
 if(pvis(mynum)<10000) {
-sprintf(bk,"%s has departed from AberMUDII\n",globme);
-sendsys(globme,globme,-10113,0,bk);
+sprintf(bk,"%s has departed from AberMUDII\n", player.name);
+sendsys(player.name,player.name,-10113,0,bk);
 }
     pname(mynum)[0]=0;
     	closeworld();
@@ -577,16 +578,16 @@ long lasup=0;
  update(name)
  char *name;
     {
-    extern long mynum,cms;
+    extern long mynum;
     FILE *unit;
     long xp;
     extern long lasup;
-    xp=cms-lasup;
+    xp=player.message_id-lasup;
     if(xp<0) xp= -xp;
     if(xp<10) goto noup;
     unit=openworld();
-    setppos(mynum,cms);
-    lasup=cms;
+    setppos(mynum,player.message_id);
+    lasup=player.message_id;
     noup:;
     }
  
@@ -614,7 +615,6 @@ long lasup=0;
  lookin(room)
  long room; /* Lords ???? */
     {
-    extern char globme[];
     FILE *un1,un2;
     char str[128];
     long xxx;
@@ -650,7 +650,7 @@ xx1:   xxx=0;
              if(my_lev>9)bprintf("<DEATH ROOM>\n");
              else
                 {
-                loseme(globme);
+                loseme(player.name);
                 crapup("bye bye.....\n");
                 }
              }
@@ -686,9 +686,8 @@ long iamon=0;
 
 userwrap()
 {
-extern char globme[];
 extern long iamon;
-if(fpbns(globme)!= -1) {loseme();syslog("System Wrapup exorcised %s",globme);}
+if(fpbns(player.name)!= -1) {loseme();syslog("System Wrapup exorcised %s",player.name);}
 }
 
 fcloselock(file)
