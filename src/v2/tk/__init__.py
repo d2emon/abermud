@@ -1,3 +1,4 @@
+from ..bprintf import reset_messages
 from ..gamego.error import MudError
 
 
@@ -6,10 +7,6 @@ def closeworld():
 
 
 def get_maxu():
-    raise NotImplementedError()
-
-
-def makebfr():
     raise NotImplementedError()
 
 
@@ -53,6 +50,7 @@ class Player:
         self.__message_id = -1
         self.__player_id = 0
 
+        self.messages = reset_messages()
         self.reader = Reader()
 
         if name == "Phantom":
@@ -76,7 +74,7 @@ class Player:
         self.__message_id = -1
 
     def start(self):
-        makebfr()
+        self.messages = reset_messages()
         self.reset_message_id()
         putmeon(self.name)
 

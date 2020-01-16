@@ -202,8 +202,9 @@ FILE *file;
 """
 
 
-def makebfr():
+def reset_messages():
     __MESSAGES.messages = ""
+    return __MESSAGES
 
 
 """
