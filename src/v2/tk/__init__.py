@@ -1,4 +1,4 @@
-from ..bprintf import reset_messages
+from ..bprintf import reset_messages, set_name
 from ..gamego.error import MudError
 from ..objsys import PlayerData
 from ..opensys import World, WorldError
@@ -88,7 +88,7 @@ class Player:
         pbfr()
 
     def __new_player(self):
-        if PlayerData.by_visibility(self.name) is not None:
+        if PlayerData.by_name(self.name) is not None:
             raise MudError("You are already on the system - you may only be on once at a time")
 
         self.__data = next((p for p in PlayerData.players() if not p.exists), None)
@@ -99,6 +99,17 @@ class Player:
         self.__data.name = self.name
         self.__data.channel_id = self.channel_id
         return self.__data.player_id
+
+    def see_player(self, name):
+        # fpbn
+        player = PlayerData.by_visibility(self, name)
+        if player is None:
+            return True
+        if self.player_id == player.player_id:
+            return True
+        set_name(player)
+        return True
+
 
 
 """
@@ -599,6 +610,6 @@ long iamon=0;
 userwrap()
 {
 extern long iamon;
-if(PlayerData.by_visibility(player.name)!= -1) {loseme();syslog("System Wrapup exorcised %s",player.name);}
+if(PlayerData.by_name(player.name)!= -1) {loseme();syslog("System Wrapup exorcised %s",player.name);}
 }
 """

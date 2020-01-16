@@ -1,3 +1,19 @@
+def set_wd_her(value):
+    raise NotImplementedError()
+
+
+def set_wd_him(value):
+    raise NotImplementedError()
+
+
+def set_wd_it(value):
+    raise NotImplementedError()
+
+
+def set_wd_them(value):
+    raise NotImplementedError()
+
+
 class Messages:
     def __init__(self):
         self.messages = ""
@@ -97,7 +113,7 @@ int pndeaf(str,ct,file)
     long a;
     ct=tocontinue(str,ct,x,23);
     a=PlayerData.by_name(x);
-    if(!seeplayer(a))
+    if(!self.see_player(a))
        {
        ct=tocontinue(str,ct,z,256);
        return(ct);
@@ -113,7 +129,7 @@ int pndeaf(str,ct,file)
     {
     char x[24];
     ct=tocontinue(str,ct,x,24);
-    if(!seeplayer(PlayerData.by_name(x)))
+    if(!self.see_player(PlayerData.by_name(x)))
     fprintf(file,"Someone");
     else
       fprintf(file,"%s",x);
@@ -154,20 +170,10 @@ crapup("Buffer OverRun in IO_TOcontinue");
 }
     return(ct+1);
     }
+"""
 
-int seeplayer(x)
-    {
-    extern long mynum;
-    extern long ail_blind;
-    extern long curch;
-    if(x==-1) return(1);
-    if(mynum==x) {return(1);} /* me */
-    if(plev(mynum)<pvis(x)) return(0);
-    if(ail_blind) return(0); /* Cant see */
-    if((curch==ploc(x))&&(isdark(curch)))return(0);
-    setname(x);
-    return(1);
-    }
+
+"""
 int ppndeaf(str,ct,file)
  char *str;
  FILE *file;
@@ -178,7 +184,7 @@ int ppndeaf(str,ct,file)
     ct=tocontinue(str,ct,x,24);
     if(ail_deaf) return(ct);
     a=PlayerData.by_name(x);
-    if(seeplayer(a)) fprintf(file,"%s",x);
+    if(self.see_player(a)) fprintf(file,"%s",x);
     else
       fprintf(file,"Someone");
     return(ct);
@@ -194,7 +200,7 @@ FILE *file;
     ct=tocontinue(str,ct,x,24);
     if(ail_blind) return(ct);
     a=PlayerData.by_name(x);
-    if(seeplayer(a)) fprintf(file,"%s",x);
+    if(self.see_player(a)) fprintf(file,"%s",x);
     else
        fprintf(file,"Someone");
     return(ct);
@@ -330,7 +336,7 @@ void snoopcom()
        {
        return;
        }
-    x=PlayerData.by_visibility(wordbuf);
+    x=player.by_visibility(wordbuf);
     if(x==-1)
        {
        bprintf("Who is that ?\n");
@@ -375,18 +381,16 @@ void chksnp()
 if(snoopt==-1) return;
 sendsys(sntn,globme,-400,0,"");
 }
- 
-void setname(x)  /* Assign Him her etc according to who it is */
-long x;
-{
-	if((x>15)&&(x!=PlayerData.by_name("riatha"))&&(x!=PlayerData.by_name("shazareth")))
-	{
-		strcpy(wd_it,pname(x));
-		return;
-	}
-	if(psex(x)) strcpy(wd_her,pname(x));
-	else strcpy(wd_him,pname(x));
-	strcpy(wd_them,pname(x));
-}
-
 """
+
+
+def set_name(player):
+    gender = player.gender
+    if gender == player.GENDER_IT:
+        set_wd_it(player.name)
+        return
+    elif gender == player.GENDER_SHE:
+        set_wd_her(player.name)
+    elif gender == player.GENDER_HE:
+        set_wd_him(player.name)
+    set_wd_them(player.name)

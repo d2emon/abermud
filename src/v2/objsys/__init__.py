@@ -1,12 +1,20 @@
+def get_ail_blind():
+    raise NotImplementedError()
+
+
 def get_maxu():
     raise NotImplementedError()
 
 
-def seeplayer(name):
+def isdark(channel_id):
     raise NotImplementedError()
 
 
 class PlayerData:
+    GENDER_HE = 'he'
+    GENDER_SHE = 'she'
+    GENDER_IT = 'it'
+
     def __init__(self, player_id):
         self.player_id = player_id
         self.name = ""
@@ -22,6 +30,16 @@ class PlayerData:
     def exists(self):
         return not self.name
 
+    @property
+    def gender(self):
+        it_players = (self.by_name(name) for name in ["riatha", "shazareth"])
+        if self.player_id > 15 and self.player_id not in it_players:
+            return self.GENDER_IT
+        if self.sex:
+            return self.GENDER_SHE
+        else:
+            return self.GENDER_HE
+
     def __check_name(self, name):
         name2 = self.name.lower()
         return all([
@@ -30,10 +48,10 @@ class PlayerData:
             name2[:4] == "the " and name2[:4] == name,
         ])
 
-    def __check_visible(self, name):
+    def __check_visible(self, player, name):
         return all([
             self.__check_name(name),
-            seeplayer(name),
+            self.visible_for(player),
         ])
 
     @classmethod
@@ -52,9 +70,9 @@ class PlayerData:
         return next((player for player in cls.all() if player.__check_name(name.lower())), None)
 
     @classmethod
-    def by_visibility(cls, name):
+    def by_visibility(cls, viewer, name):
         # fpbn
-        return next((player for player in cls.all() if player.__check_visible(name.lower())), None)
+        return next((player for player in cls.all() if player.__check_visible(viewer, name.lower())), None)
 
     def reset(self):
         self.event_id = -1
@@ -63,6 +81,17 @@ class PlayerData:
         self.strength = -1
         self.weapon_id = -1
         self.sex = 0
+
+    def visible_for(self, player):
+        if self.player_id == player.player_id:
+            return True
+        if any([
+            player.data.level < self.visible,
+            get_ail_blind(),
+            player.channel_id == self.channel_id and isdark(self.channel_id),
+        ]):
+            return False
+        return True
 
 
 """
