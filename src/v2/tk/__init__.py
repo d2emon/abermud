@@ -61,8 +61,12 @@ long curch=0;
 class Player:
     def __init__(self, name=""):
         self.__message_id = -1
-        self.__name = name
         self.__player_id = 0
+
+        if name == "Phantom":
+            self.__name = "The {}".format(name)
+        else:
+            self.__name = name
 
     @property
     def player_id(self):
@@ -71,13 +75,6 @@ class Player:
     @property
     def name(self):
         return self.__name
-
-    @name.setter
-    def name(self, value):
-        if value == "Phantom":
-            self.__name = "The {}".format(value)
-        else:
-            self.__name = value
 
     @property
     def message_id(self):
