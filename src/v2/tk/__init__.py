@@ -1,3 +1,63 @@
+def closeworld():
+    raise NotImplementedError()
+
+
+def crapup(message):
+    raise NotImplementedError()
+
+
+def get_maxu():
+    raise NotImplementedError()
+
+
+def get_mynum():
+    raise NotImplementedError()
+
+
+def get_rd_qd():
+    raise NotImplementedError()
+
+
+def makebfr():
+    raise NotImplementedError()
+
+
+def openworld():
+    raise NotImplementedError()
+
+
+def pbfr():
+    raise NotImplementedError()
+
+
+def putmeon(name):
+    raise NotImplementedError()
+
+
+def rte(name):
+    raise NotImplementedError()
+
+
+def sendmsg(name):
+    raise NotImplementedError()
+
+
+def set_cms(value):
+    raise NotImplementedError()
+
+
+def set_i_setup(value):
+    raise NotImplementedError()
+
+
+def set_rd_qd(value):
+    raise NotImplementedError()
+
+
+def special(code, name):
+    raise NotImplementedError()
+
+
 """
 long i_setup=0;
 long oddcat=0;
@@ -9,23 +69,19 @@ long curch=0;
 
 
 class Player:
-    def __init__(self):
-        self.name = ""
+    def __init__(self, name=""):
+        self.__name = ""
 
+    @property
+    def name(self):
+        return self.__name
 
-__PLAYER = Player()
-
-
-def set_name(name):
-    if name == "Phantom":
-        __PLAYER.name = "The {}".format(name)
-    else:
-        __PLAYER.name = name
-
-
-def get_name():
-    return __PLAYER.name
-
+    @name.setter
+    def name(self, value):
+        if value == "Phantom":
+            self.__name = "The {}".format(value)
+        else:
+            self.__name = value
 
 
 """
@@ -274,39 +330,46 @@ long findend(unit)
     sec_read(unit,bk,0,2);
     return(bk[1]);
     }
- 
- 
- talker(name)
- char *name;
-    {
-    extern long curch,cms;
-    extern long mynum;
-    extern long maxu;
-    extern long rd_qd;
-    FILE *fl;
-    char string[128];
-    extern char globme[];
-    makebfr();
-    	cms= -1;putmeon(name);
-    if(openworld()==NULL) crapup("Sorry AberMUD is currently unavailable");
-    if (mynum>=maxu) {printf("\nSorry AberMUD is full at the moment\n");return(0);}
-    strcpy(globme,name);
-    rte(name);
-    	closeworld();
-    cms= -1;
-    special(".g",name);
-    i_setup=1;
-    while(1)
-       {
-       pbfr();
-       sendmsg(name);
-       if(rd_qd) rte(name);
-       rd_qd=0;
-       closeworld();
-       pbfr();
-       }
-    }
-    
+"""
+
+
+def __start(player):
+    makebfr()
+    set_cms(-1)
+    putmeon(player.name)
+
+    try:
+        openworld()
+    except:
+        crapup("Sorry AberMUD is currently unavailable")
+    if get_mynum() >= get_maxu():
+        crapup("Sorry AberMUD is full at the moment")
+    closeworld()
+
+    set_cms(-1)
+    special('.g', player.name)
+    set_i_setup(True)
+
+
+def __next_turn(player):
+    pbfr()
+    sendmsg(player.name)
+
+    if get_rd_qd():
+        rte(player.name)
+    set_rd_qd(False)
+
+    closeworld()
+    pbfr()
+
+
+def talker(player):
+    __start(player)
+    while True:
+        __next_turn(player)
+
+
+"""
 long rd_qd=0;
  
  cleanup(inpbk)

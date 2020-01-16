@@ -1,6 +1,6 @@
 import logging
 import sys
-from ..tk import get_name, set_name
+from ..tk import Player
 from .error import on_error
 from .user import User
 
@@ -39,11 +39,11 @@ def talker(name):
 
 def main(game_user, program_name, username):
     print("Entering Game ....")
-    set_name(username)
-    print("Hello {}".format(get_name()))
-    logging.info("GAME ENTRY: %s[%s]", get_name(), game_user.user_id)
+    player = Player(username)
+    print("Hello {}".format(player.name))
+    logging.info("GAME ENTRY: %s[%s]", player.name, game_user.user_id)
 
-    return talker(get_name())
+    return talker(player)
 
 
 """
