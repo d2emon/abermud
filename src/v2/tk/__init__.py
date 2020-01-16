@@ -2,7 +2,15 @@ from ..bprintf import reset_messages
 from ..gamego.error import MudError
 
 
+class WorldError(Exception):
+    pass
+
+
 def closeworld():
+    raise NotImplementedError()
+
+
+def fpbn(name):
     raise NotImplementedError()
 
 
@@ -18,10 +26,6 @@ def pbfr():
     raise NotImplementedError()
 
 
-def putmeon(name):
-    raise NotImplementedError()
-
-
 def rte(name):
     raise NotImplementedError()
 
@@ -34,24 +38,58 @@ def special(code, name):
     raise NotImplementedError()
 
 
-"""
-long curch=0;
-"""
+class PlayerData:
+    def __init__(self, player_id):
+        self.player_id = player_id
+        self.name = ""
+        self.channel_id = 0
+        self.event_id = -1
+        self.level = 1
+        self.visible = 0
+        self.strength = -1
+        self.weapon_id = -1
+        self.sex = 0
+
+    @property
+    def exists(self):
+        return not self.name
+
+    @classmethod
+    def all(cls):
+        for player_id in range(get_maxu()):
+            yield cls(player_id)
+
+    def reset(self):
+        self.event_id = -1
+        self.level = 1
+        self.visible = 0
+        self.strength = -1
+        self.weapon_id = -1
+        self.sex = 0
 
 
 class Reader:
     def __init__(self):
         self.to_read = False
+        self.__event_id = -1
+
+    @property
+    def event_id(self):
+        return self.__event_id
+
+    def reset(self):
+        self.__event_id = -1
 
 
 class Player:
     def __init__(self, name=""):
+        self.__channel_id = 0
         self.in_game = False
-        self.__message_id = -1
         self.__player_id = 0
 
         self.messages = reset_messages()
         self.reader = Reader()
+        self.__data = None
 
         if name == "Phantom":
             self.__name = "The {}".format(name)
@@ -63,30 +101,25 @@ class Player:
         return self.__player_id
 
     @property
+    def channel_id(self):
+        return self.__channel_id
+
+    @property
     def name(self):
         return self.__name
 
-    @property
-    def message_id(self):
-        return self.__message_id
-
-    def reset_message_id(self):
-        self.__message_id = -1
-
     def start(self):
         self.messages = reset_messages()
-        self.reset_message_id()
-        putmeon(self.name)
+        self.reader.reset()
 
         try:
             openworld()
-        except:
+            self.__player_id = self.__new_player()
+            closeworld()
+        except WorldError:
             raise MudError("Sorry AberMUD is currently unavailable")
-        if self.player_id >= get_maxu():
-            raise MudError("Sorry AberMUD is full at the moment")
-        closeworld()
 
-        self.reset_message_id()
+        self.reader.reset()
         special('.g', self.name)
         self.in_game = True
 
@@ -100,6 +133,19 @@ class Player:
 
         closeworld()
         pbfr()
+
+    def __new_player(self):
+        if fpbn(self.name) is not None:
+            raise MudError("You are already on the system - you may only be on once at a time")
+
+        self.__data = next((p for p in PlayerData.all() if not p.exists), None)
+        if self.__data is None:
+            raise MudError("Sorry AberMUD is full at the moment")
+
+        self.__data.reset()
+        self.__data.name = self.name
+        self.__data.channel_id = self.channel_id
+        return self.__data.player_id
 
 
 """
@@ -159,7 +205,7 @@ sendmsg(name)
     {
     extern long debug_mode;
     extern char *sysbuf;
-    extern long curch,moni;
+    extern long moni;
     char prmpt[32];
     long a;
 extern long tty;
@@ -238,7 +284,7 @@ if(!strlen(pname(fighting)))
 in_fight=0;
 fighting= -1;
 }
-if(ploc(fighting)!=curch) 
+if(ploc(fighting)!=player.channel_id) 
 {
 in_fight=0;
 fighting= -1;
@@ -291,16 +337,16 @@ extern long findend();
     unit=openworld();
     fl_com=unit;
     if (unit==NULL) raise MudError("AberMUD: FILE_ACCESS : Access failed\n");
-    if (player.message_id== -1) player.message_id=findend(unit);
+    if (player.reader.event_id== -1) player.reader.event_id=findend(unit);
     too=findend(unit);
-    ct=player.message_id;
+    ct=player.reader.event_id;
     while(ct<too)
        {
        readmsg(unit,block,ct);
        mstoout(block,name);
        ct++;
        }
-    player.message_id=ct;
+    player.reader.event_id=ct;
     update(name);
     eorte();
     rdes=0;tdes=0;vdes=0;
@@ -379,7 +425,7 @@ def talker(player):
     {
     extern long curmode;
     char ch,bk[128];
-    extern long curch,moni;
+    extern long moni;
     extern long my_str,my_lev,my_sco,my_sex;
     FILE * ufl;
     char xx[128];
@@ -394,7 +440,7 @@ def talker(player):
        {
        case 'g':
           curmode=1;
-          curch= -5;
+          player.channel_id= -5;
           initme();
           ufl=openworld();
           setpstr(player.player_id,my_str);
@@ -407,11 +453,11 @@ def talker(player):
           cuserid(us);
           sprintf(xy,"\001s%s\001%s  has entered the game\n\001",name,name);
           sprintf(xx,"\001s%s\001[ %s  has entered the game ]\n\001",name,name);
-          sendsys(name,name,-10113,curch,xx);
+          sendsys(name,name,-10113,player.channel_id,xx);
           rte(name);
           if(randperc()>50)trapch(-5);
-else{curch= -183;trapch(-183);}
-sendsys(name,name,-10000,curch,xy);
+else{player.channel_id= -183;trapch(-183);}
+sendsys(name,name,-10000,player.channel_id,xy);
           break;
        default:
           printf("\nUnknown . option\n");
@@ -476,7 +522,6 @@ if(!strcmp(lowercase(nam1+4),lowercase(luser))) return(1);
  trapch(chan)
  long chan;
     {
-extern long curch;
     FILE *unit;
     extern long my_lev;
     if(my_lev>9) goto ndie;
@@ -484,46 +529,10 @@ extern long curch;
     setploc(player.player_id,chan);
     lookin(chan);
     }
- 
- putmeon(name)
- char *name;
-    {
-    extern long curch;
-    extern long maxu;
-    long ct,f;
-    FILE *unit;
-    extern long iamon;
-    iamon=0;
-    unit=openworld();
-    ct=0;
-    f=0;
-    if(fpbn(name)!= -1)
-       {
-       raise MudError("You are already on the system - you may only be on once at a time");
-       }
-    while((f==0)&&(ct<maxu))
-       {
-       if (!strlen(pname(ct))) f=1;
-       else
-          ct++;
-       }
-    if(ct==maxu)
-       {
-       player.player_id=maxu;
-       return;
-       }
-    strcpy(pname(ct),name);
-    setploc(ct,curch);
-    setppos(ct,-1);
-    setplev(ct,1);
-    setpvis(ct,0);
-    setpstr(ct,-1);
-    setpwpn(ct,-1);
-    setpsex(ct,0);
-    player.player_id=ct;
-iamon=1;
-    }
- 
+"""
+
+
+"""
  loseme(name)
  char *name;
     {
@@ -556,12 +565,12 @@ long lasup=0;
     FILE *unit;
     long xp;
     extern long lasup;
-    xp=player.message_id-lasup;
+    xp=player.reader.event_id-lasup;
     if(xp<0) xp= -xp;
     if(xp<10) goto noup;
     unit=openworld();
-    setppos(player.player_id,player.message_id);
-    lasup=player.message_id;
+    setppos(player.player_id,player.reader.event_id);
+    lasup=player.reader.event_id;
     noup:;
     }
  
@@ -651,8 +660,7 @@ else
     }
  loodrv()
     {
-    extern long curch;
-    lookin(curch);
+    lookin(player.channel_id);
     }
  
 
