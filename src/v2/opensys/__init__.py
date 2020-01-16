@@ -1,73 +1,99 @@
 from ..gamego.error import MudError
 
 
-def fcloselock(service):
-    raise NotImplementedError()
-
-
-def get_numobs():
-    raise NotImplementedError()
-
-
-def get_objinfo():
-    raise NotImplementedError()
-
-
-def get_ublock():
-    raise NotImplementedError()
-
-
-def openlock(service, create=False, write=False):
-    raise NotImplementedError()
-
-
-def set_objinfo(value):
-    raise NotImplementedError()
-
-
-def set_ublock(value):
-    raise NotImplementedError()
-
-
 class WorldError(MudError):
     pass
 
 
-class World:
-    active = None
+class Service:
+    def __init__(self, name, read=True, write=False, create=False):
+        if not create:
+            raise WorldError()
 
-    def __init__(self):
+        self.name = name
+        self.__read = read
+        self.__write = write
+        self.__create = create
+        self.__active = True
+
+    def disconnect(self):
+        self.name = None
+        self.__active = False
+
+    @classmethod
+    def lock(cls, name, **kwargs):
         try:
-            self.active = openlock('/usr/tmp/-iy7AM', create=True)
+            return Service(name, **kwargs)
+        except WorldError:
+            # ENOSPC        PANIC exit device full
+            # EHOSTUNREACH  PANIC exit access failure, NFS gone for a snooze
+            raise WorldError()
+
+    def unlock(self):
+        self.disconnect()
+
+    @property
+    def active(self):
+        return self.__active
+
+    @property
+    def data(self):
+        raise NotImplementedError()
+
+    def read(self, record_id, count=None, size=None):
+        if not self.active or not self.__read:
+            raise WorldError()
+
+        return self.data.get(record_id)
+
+    def write(self, record_id, value, count=None, size=None):
+        if not self.active or not self.__write:
+            raise WorldError()
+
+        self.data[record_id] = value
+
+
+class World(Service):
+    __filename = '/usr/tmp/-iy7AM'
+    __world = None
+    __data = {
+        350: [{} for _ in range(48)],
+        400: [{} for _ in range(194)],
+        'players_count': 48,
+        'items_count': 194,
+        'players_size': 16,
+        'items_size': 4,
+    }
+    __items = [None for _ in range(194)]
+    __players = [None for _ in range(48)]
+
+    @property
+    def data(self):
+        return self.__data
+
+    @classmethod
+    def __connect(cls):
+        try:
+            return cls.lock(cls.__filename, create=True)
         except WorldError:
             raise WorldError("Cannot find World file")
 
     @classmethod
-    def __read(cls, offset, count, size):
-        raise NotImplementedError()
-
-    @classmethod
-    def __write(cls, data, offset, count, size):
-        raise NotImplementedError()
-
-    @classmethod
     def load(cls):
-        world = cls.active
-        if world is not None:
-            return world
+        if cls.__world is not None:
+            return cls.__world
 
-        world = cls()
-        set_objinfo(world.__read(400, get_numobs(), 4))
-        set_ublock(world.__read(350, 48, 16))
-        return world
+        cls.__world = cls.__connect()
+        cls.__items = cls.__world.read(400)
+        cls.__players = cls.__world.read(350)
+        return cls.__world
 
     @classmethod
     def save(cls):
-        world = cls.active
-        if world is None:
+        if cls.__world is None:
             return
 
-        world.write(get_objinfo(), 400, get_numobs(), 4)
-        world.write(get_ublock(), 350, 48, 16)
-        fcloselock(world)
-        world.active = None
+        cls.__world.write(cls.__items, 400)
+        cls.__world.write(cls.__players, 350)
+        cls.__world.unlock()
+        cls.__world = None
