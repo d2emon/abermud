@@ -1,14 +1,7 @@
 from ..bprintf import reset_messages
 from ..gamego.error import MudError
+from ..objsys import PlayerData
 from ..opensys import World, WorldError
-
-
-def fpbn(name):
-    raise NotImplementedError()
-
-
-def get_maxu():
-    raise NotImplementedError()
 
 
 def pbfr():
@@ -25,36 +18,6 @@ def sendmsg(name):
 
 def special(code, name):
     raise NotImplementedError()
-
-
-class PlayerData:
-    def __init__(self, player_id):
-        self.player_id = player_id
-        self.name = ""
-        self.channel_id = 0
-        self.event_id = -1
-        self.level = 1
-        self.visible = 0
-        self.strength = -1
-        self.weapon_id = -1
-        self.sex = 0
-
-    @property
-    def exists(self):
-        return not self.name
-
-    @classmethod
-    def all(cls):
-        for player_id in range(get_maxu()):
-            yield cls(player_id)
-
-    def reset(self):
-        self.event_id = -1
-        self.level = 1
-        self.visible = 0
-        self.strength = -1
-        self.weapon_id = -1
-        self.sex = 0
 
 
 class Reader:
@@ -125,10 +88,10 @@ class Player:
         pbfr()
 
     def __new_player(self):
-        if fpbn(self.name) is not None:
+        if PlayerData.by_visibility(self.name) is not None:
             raise MudError("You are already on the system - you may only be on once at a time")
 
-        self.__data = next((p for p in PlayerData.all() if not p.exists), None)
+        self.__data = next((p for p in PlayerData.players() if not p.exists), None)
         if self.__data is None:
             raise MudError("Sorry AberMUD is full at the moment")
 
@@ -636,6 +599,6 @@ long iamon=0;
 userwrap()
 {
 extern long iamon;
-if(fpbns(player.name)!= -1) {loseme();syslog("System Wrapup exorcised %s",player.name);}
+if(PlayerData.by_visibility(player.name)!= -1) {loseme();syslog("System Wrapup exorcised %s",player.name);}
 }
 """

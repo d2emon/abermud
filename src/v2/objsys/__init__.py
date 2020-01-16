@@ -1,3 +1,7 @@
+def get_maxu():
+    raise NotImplementedError()
+
+
 def seeplayer(name):
     raise NotImplementedError()
 
@@ -6,7 +10,17 @@ class PlayerData:
     def __init__(self, player_id):
         self.player_id = player_id
         self.name = ""
-        self.exists = True
+        self.channel_id = 0
+        self.event_id = -1
+        self.level = 1
+        self.visible = 0
+        self.strength = -1
+        self.weapon_id = -1
+        self.sex = 0
+
+    @property
+    def exists(self):
+        return not self.name
 
     def __check_name(self, name):
         name2 = self.name.lower()
@@ -24,7 +38,13 @@ class PlayerData:
 
     @classmethod
     def all(cls):
-        return (cls(player_id) for player_id in range(48))
+        for player_id in range(48):
+            yield cls(player_id)
+
+    @classmethod
+    def players(cls):
+        for player_id in range(get_maxu()):
+            yield cls(player_id)
 
     @classmethod
     def by_name(cls, name):
@@ -35,6 +55,14 @@ class PlayerData:
     def by_visibility(cls, name):
         # fpbn
         return next((player for player in cls.all() if player.__check_visible(name.lower())), None)
+
+    def reset(self):
+        self.event_id = -1
+        self.level = 1
+        self.visible = 0
+        self.strength = -1
+        self.weapon_id = -1
+        self.sex = 0
 
 
 """

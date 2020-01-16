@@ -96,7 +96,7 @@ int pndeaf(str,ct,file)
     char z[257];
     long a;
     ct=tocontinue(str,ct,x,23);
-    a=fpbns(x);
+    a=PlayerData.by_name(x);
     if(!seeplayer(a))
        {
        ct=tocontinue(str,ct,z,256);
@@ -113,7 +113,7 @@ int pndeaf(str,ct,file)
     {
     char x[24];
     ct=tocontinue(str,ct,x,24);
-    if(!seeplayer(fpbns(x)))
+    if(!seeplayer(PlayerData.by_name(x)))
     fprintf(file,"Someone");
     else
       fprintf(file,"%s",x);
@@ -177,7 +177,7 @@ int ppndeaf(str,ct,file)
     long a;
     ct=tocontinue(str,ct,x,24);
     if(ail_deaf) return(ct);
-    a=fpbns(x);
+    a=PlayerData.by_name(x);
     if(seeplayer(a)) fprintf(file,"%s",x);
     else
       fprintf(file,"Someone");
@@ -193,7 +193,7 @@ FILE *file;
     long a;
     ct=tocontinue(str,ct,x,24);
     if(ail_blind) return(ct);
-    a=fpbns(x);
+    a=PlayerData.by_name(x);
     if(seeplayer(a)) fprintf(file,"%s",x);
     else
        fprintf(file,"Someone");
@@ -330,7 +330,7 @@ void snoopcom()
        {
        return;
        }
-    x=fpbn(wordbuf);
+    x=PlayerData.by_visibility(wordbuf);
     if(x==-1)
        {
        bprintf("Who is that ?\n");
@@ -379,7 +379,7 @@ sendsys(sntn,globme,-400,0,"");
 void setname(x)  /* Assign Him her etc according to who it is */
 long x;
 {
-	if((x>15)&&(x!=fpbns("riatha"))&&(x!=fpbns("shazareth")))
+	if((x>15)&&(x!=PlayerData.by_name("riatha"))&&(x!=PlayerData.by_name("shazareth")))
 	{
 		strcpy(wd_it,pname(x));
 		return;
