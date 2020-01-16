@@ -7,7 +7,19 @@ class User:
         self.user_id = user_id
 
 
+def closeworld():
+    raise NotImplementedError()
+
+
 def get_in_fight():
+    raise NotImplementedError()
+
+
+def get_name():
+    raise NotImplementedError()
+
+
+def key_reprint():
     raise NotImplementedError()
 
 
@@ -15,15 +27,31 @@ def loseme():
     raise NotImplementedError()
 
 
+def on_timing():
+    raise NotImplementedError()
+
+
+def openworld():
+    raise NotImplementedError()
+
+
 def pbfr():
     raise NotImplementedError()
 
 
-def set_pr_due(value):
+def rte(name):
     raise NotImplementedError()
 
 
-def sig_aloff():
+def set_interrupt(value):
+    raise NotImplementedError()
+
+
+def set_name(value):
+    raise NotImplementedError()
+
+
+def set_pr_due(value):
     raise NotImplementedError()
 
 
@@ -32,17 +60,17 @@ def talker(name):
 
 
 def main(user, program_name, username):
-    __sig_init()
-
     print("Entering Game ....")
     if username == "Phantom":
         name = "The {}".format(username)
     else:
         name = username
+    set_name(name)
 
-    print("Hello {}".format(name))
-    logging.info("GAME ENTRY: %s[%s]", name, user.user_id)
-    return talker(name)
+    print("Hello {}".format(get_name()))
+    logging.info("GAME ENTRY: %s[%s]", get_name(), user.user_id)
+
+    return talker(get_name())
 
 
 __dashes = "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
@@ -92,23 +120,79 @@ char *getkbd(s,l)   /* Getstr() with length limit and filter ctrl */
 
 # Signals
 
-signals = {}
+class Signals:
+    def __init__(self):
+        self.__active = False
+        self.__alarm = None
+        self.interrupt = False
+        self.__signals = {
+            'SIGHUP': self.__on_error,
+            'SIGINT': self.__on_close,
+            'SIGTERM': self.__on_close,
+            'SIGTSTP': None,
+            'SIGQUIT': None,
+            'SIGCONT': self.__on_error,
+        }
+
+    @property
+    def active(self):
+        return self.__active
+        pass
+
+    @active.setter
+    def active(self, value):
+        self.__active = value
+        if value:
+            self.__signals['SIGALRM'] = self.__on_time
+            self.__alarm = 2
+        else:
+            self.__signals['SIGALRM'] = None
+            self.__alarm = 2147487643
+
+    def signal(self, signal_id):
+        return self.__signals[signal_id]
+
+    def __shutdown(self):
+        self.active = False
+        loseme()
+
+    def __on_close(self):
+        print("^C")
+
+        if get_in_fight():
+            return
+
+        self.__shutdown()
+        crapup("Byeeeeeeeeee  ...........")
+
+    def __on_error(self):
+        self.__shutdown()
+        sys.exit(255)
+
+    def __on_time(self):
+        if not self.active:
+            return
+
+        self.active = False
+
+        openworld()
+
+        set_interrupt(True)
+        rte(get_name())
+        set_interrupt(False)
+
+        on_timing()
+        closeworld()
+
+        key_reprint()
+
+        self.active = True
+
+
+__SIGNALS = Signals()
+
 
 """
-#include <signal.h>
-
-long sig_active=0;
-
-sig_alon()
-{
-	extern int sig_occur();
-	sig_active=1;	
-	signal(SIGALRM,sig_occur);
-	alarm(2);
-}
-
-
-
 unblock_alarm()
 {
 	extern int sig_occur();
@@ -120,61 +204,15 @@ block_alarm()
 {
 	signal(SIGALRM,SIG_IGN);
 }
-
-
-sig_aloff()
-{
-	sig_active=0;	
-	signal(SIGALRM,SIG_IGN);
-	alarm(2147487643);
-}
-
-long interrupt=0;
-
-sig_occur()
-{
-	extern char globme[];
-	if(sig_active==0) return;
-	sig_aloff();
-	openworld();
-	interrupt=1;
-	rte(globme);
-	interrupt=0;
-	on_timing();
-	closeworld();
-	key_reprint();
-	sig_alon();
-}
-
-	
 """
 
 
-def __shutdown():
-    sig_aloff()
-    loseme()
+def sig_alon():
+    __SIGNALS.active = True
 
 
-def __sig_init():
-    signals['SIGHUP'] = __sig_oops
-    signals['SIGINT'] = __sig_ctrlc
-    signals['SIGTERM'] = __sig_ctrlc
-    signals['SIGTSTP'] = None
-    signals['SIGQUIT'] = None
-    signals['SIGCONT'] = __sig_oops
-
-
-def __sig_ctrlc():
-    print("^C")
-    if get_in_fight():
-        return
-    __shutdown()
-    crapup("Byeeeeeeeeee  ...........")
-
-
-def __sig_oops():
-    __shutdown()
-    sys.exit(255)
+def sig_aloff():
+    __SIGNALS.active = False
 
 
 """
@@ -192,5 +230,4 @@ char *text;
 	strcpy(argv_p[n],text);
 	*/
 }
-
 """
