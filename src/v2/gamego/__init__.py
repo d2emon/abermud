@@ -1,12 +1,8 @@
 import logging
 import sys
-from .tk import get_name, set_name
-
-
-class User:
-    def __init__(self, user_id, name=""):
-        self.user_id = user_id
-        self.name = name
+from ..tk import get_name, set_name
+from .error import on_error
+from .user import User
 
 
 def closeworld():
@@ -33,15 +29,7 @@ def openworld():
     raise NotImplementedError()
 
 
-def pbfr():
-    raise NotImplementedError()
-
-
 def rte(name):
-    raise NotImplementedError()
-
-
-def set_pr_due(value):
     raise NotImplementedError()
 
 
@@ -49,7 +37,7 @@ def talker(name):
     raise NotImplementedError()
 
 
-def main(user, program_name, username):
+def main(game_user, program_name, username):
     print("Entering Game ....")
     if username == "Phantom":
         name = "The {}".format(username)
@@ -58,22 +46,9 @@ def main(user, program_name, username):
     set_name(name)
 
     print("Hello {}".format(get_name()))
-    logging.info("GAME ENTRY: %s[%s]", get_name(), user.user_id)
+    logging.info("GAME ENTRY: %s[%s]", get_name(), game_user.user_id)
 
     return talker(get_name())
-
-
-__dashes = "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-
-
-def crapup(message):
-    pbfr()
-    set_pr_due(0)
-    print("\n{dashes}\n{message}\n{dashes}".format(
-        dashes=__dashes,
-        message=message,
-    ))
-    sys.exit(0)
 
 
 """
@@ -86,7 +61,7 @@ a=openlock(name,"r+");
 while(fgets(b,128,a)) printf("%s\n",b);
 fcloselock(a);
 }
- 
+
 char *getkbd(s,l)   /* Getstr() with length limit and filter ctrl */
  char *s;
  int l;
@@ -166,7 +141,7 @@ class Signals:
             return
 
         self.__shutdown()
-        crapup("Byeeeeeeeeee  ...........")
+        on_error("Byeeeeeeeeee  ...........")
 
     def __on_error(self):
         self.__shutdown()
@@ -220,7 +195,7 @@ char *text;
 	int y=strlen(argv_p[n])+strlen(argv_p[1]);  
 	y++;
 	if(strcmp(argv_p[n],text)==0) return;
-	
+
 	while(x<y)
 	   argv_p[n][x++]=0; 
 	strcpy(argv_p[n],text);
