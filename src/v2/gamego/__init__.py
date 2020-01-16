@@ -1,6 +1,6 @@
 import logging
 import sys
-from ..tk import Player
+from ..tk import Player, talker
 from .error import on_error
 from .user import User
 
@@ -30,10 +30,6 @@ def openworld():
 
 
 def rte(name):
-    raise NotImplementedError()
-
-
-def talker(name):
     raise NotImplementedError()
 
 
