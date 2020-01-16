@@ -1,5 +1,6 @@
 import logging
 import sys
+from .tk import get_name, set_name
 
 
 class User:
@@ -13,10 +14,6 @@ def closeworld():
 
 
 def get_in_fight():
-    raise NotImplementedError()
-
-
-def get_name():
     raise NotImplementedError()
 
 
@@ -41,10 +38,6 @@ def pbfr():
 
 
 def rte(name):
-    raise NotImplementedError()
-
-
-def set_name(value):
     raise NotImplementedError()
 
 
