@@ -1,19 +1,15 @@
-from ..bprintf import reset_messages, set_name
+from ..bprintf import reset_messages, set_name, pbfr, MessageError
 from ..gamego.error import MudError
 from ..newuaf import new_person
 from ..objsys import PlayerData
 from ..opensys import World, WorldError
 
 
-def bprintf(message):
-    raise NotImplementedError()
-
-
 def getkbd(max_length):
     raise NotImplementedError()
 
 
-def pbfr():
+def loseme():
     raise NotImplementedError()
 
 
@@ -64,7 +60,7 @@ class Player:
         self.in_game = False
         self.__player_id = 0
 
-        self.messages = reset_messages()
+        self.__messages = reset_messages()
         self.reader = Reader()
         self.actor = Actor()
         self.__data = None
@@ -88,7 +84,7 @@ class Player:
         return self.__name
 
     def start(self):
-        self.messages = reset_messages()
+        self.__messages = reset_messages()
         self.reader.reset()
 
         try:
@@ -148,6 +144,12 @@ class Player:
         set_name(player)
         return True
 
+    def add_message(self, message):
+        try:
+            self.__messages.add_message(message)
+        except MessageError as error:
+            loseme()
+            raise MudError(error)
 
 
 """
@@ -192,10 +194,10 @@ long offd,offs,len;
     x=(char *)block;
     /* Print appropriate stuff from data block */
     strcpy(luser,name);lowercase(luser);
-if(debug_mode)    bprintf("\n<%d>",block[1]);
+if(debug_mode)    player.add_message("\n<%d>",block[1]);
     if (block[1]<-3) sysctrl(block,luser);
     else
-       bprintf("%s", (x+2*sizeof(long)));
+       player.add_message("%s", (x+2*sizeof(long)));
     }
  
 long gurum=0;
@@ -395,22 +397,24 @@ def talker(player):
 """
 
 
-def __new_person():
-    def __get_sex():
-        bprintf("\nSex (M/F) : ")
-        pbfr()
-        sex = getkbd(2).lower()[0]
-        if sex == 'm':
-            return 0
-        elif sex == 'f':
-            return 1
-        bprintf("M or F")
-        __get_sex()
+def __new_person(player):
+    def f():
+        def __get_sex():
+            player.add_message("\nSex (M/F) : ")
+            pbfr()
+            sex = getkbd(2).lower()[0]
+            if sex == 'm':
+                return 0
+            elif sex == 'f':
+                return 1
+            player.add_message("M or F")
+            __get_sex()
 
-    bprintf("Creating character....")
-    return {
-        'sex': __get_sex()
-    }
+        player.add_message("Creating character....")
+        return {
+            'sex': __get_sex()
+        }
+    return f
 
 
 def __start_game(player):
@@ -419,9 +423,9 @@ def __start_game(player):
     World.load()
 
     try:
-        player.from_person(new_person(player.name, on_new=__new_person))
+        player.from_person(new_person(player.name, on_new=__new_person(player)))
     except WorldError as error:
-        bprintf(error)
+        player.add_message(error)
 
     sendsys(
         player.name,
@@ -596,7 +600,7 @@ long lasup=0;
 World.save()
     if(ail_blind)
     {
-    	bprintf("You are blind... you can't see a thing!\n");
+    	player.add_message("You are blind... you can't see a thing!\n");
     }
     if(player.__person.level>9) showname(room);
     un1=openroom(room,"r");
@@ -607,7 +611,7 @@ xx1:   xxx=0;
        	if(isdark())
        	{
        	    un1.disconnect()
-          		bprintf("It is dark\n");
+          		player.add_message("It is dark\n");
                         World.load()
           		onlook();
           		return;
@@ -617,7 +621,7 @@ xx1:   xxx=0;
           if(!strcmp(str,"#DIE"))
              {
              if(ail_blind) {rewind(un1);ail_blind=0;goto xx1;}
-             if(player.__person.level>9)bprintf("<DEATH ROOM>\n");
+             if(player.__person.level>9)player.add_message("<DEATH ROOM>\n");
              else
                 {
                 loseme(player.name);
@@ -628,13 +632,13 @@ xx1:   xxx=0;
 {
 if(!strcmp(str,"#NOBR")) brmode=0;
 else
-             if((!ail_blind)&&(!xxx))bprintf("%s\n",str);
+             if((!ail_blind)&&(!xxx))player.add_message("%s\n",str);
           xxx=brmode;
 }
           }
        }
     else
-       bprintf("\nYou are on channel %d\n",room);
+       player.add_message("\nYou are on channel %d\n",room);
     un1.disconnect()
     World.load()
     if(!ail_blind)
@@ -642,7 +646,7 @@ else
 	    lisobs();
 	    if(player.actor.mode == 1) lispeople();
     }
-    bprintf("\n");
+    player.add_message("\n");
     onlook();
     }
  loodrv()

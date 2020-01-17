@@ -72,7 +72,6 @@ def viewsnoop():
 
 
 class MessageError(MudError):
-    # loseme()
     pass
 
 
