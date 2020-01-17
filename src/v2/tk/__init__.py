@@ -1,12 +1,8 @@
-from ..bprintf import reset_messages, set_name, pbfr, MessageError
+from ..bprintf import reset_messages, set_name, show_messages, MessageError
 from ..gamego.error import MudError
 from ..newuaf import new_person
 from ..objsys import PlayerData
 from ..opensys import World, WorldError
-
-
-def getkbd(max_length):
-    raise NotImplementedError()
 
 
 def loseme():
@@ -100,7 +96,7 @@ class Player:
         self.in_game = True
 
     def next_turn(self):
-        pbfr()
+        self.show_messages()
         sendmsg(self.name)
 
         if self.reader.to_read:
@@ -108,7 +104,7 @@ class Player:
             self.reader.to_read = False
 
         World.save()
-        pbfr()
+        self.show_messages()
 
     def __new_player(self):
         if PlayerData.by_name(self.name) is not None:
@@ -150,6 +146,9 @@ class Player:
         except MessageError as error:
             loseme()
             raise MudError(error)
+
+    def show_messages(self):
+        return show_messages()
 
 
 """
@@ -218,7 +217,7 @@ extern long tty;
     extern long convflg;
 extern long in_fight;
 extern long fighting;
-    l:pbfr();
+    l:player.show_messages()
 if(tty==4) btmscr();
 strcpy(prmpt,"\r");
     if(pvis(player.player_id)) strcat(prmpt,"(");
@@ -239,7 +238,7 @@ strcpy(prmpt,"\r");
           strcat(prmpt,"?");
           }
     if(pvis(player.player_id)) strcat(prmpt,")");
-    pbfr();
+    player.show_messages()
     if(pvis(player.player_id)>9999) set_progname(0,"-csh");
     else
     sprintf(work,"   --}----- ABERMUD -----{--     Playing as %s",name);
@@ -398,22 +397,26 @@ def talker(player):
 
 
 def __new_person(player):
-    def f():
-        def __get_sex():
-            player.add_message("\nSex (M/F) : ")
-            pbfr()
-            sex = getkbd(2).lower()[0]
-            if sex == 'm':
-                return 0
-            elif sex == 'f':
-                return 1
-            player.add_message("M or F")
-            __get_sex()
+    def __get_sex():
+        player.show_messages()
+        sex = input("Sex (M/F) : ")[:2].lower()[0]
+        if sex == 'm':
+            return 0
+        elif sex == 'f':
+            return 1
+        raise ValueError("M or F")
 
+    def f():
         player.add_message("Creating character....")
-        return {
-            'sex': __get_sex()
-        }
+        sex = None
+        while sex is None:
+            try:
+                sex = __get_sex()
+            except ValueError as e:
+                player.add_message(str(e))
+                sex = None
+        return {'sex': sex}
+
     return f
 
 

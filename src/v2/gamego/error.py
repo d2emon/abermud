@@ -8,9 +8,9 @@ class MudError(Exception):
 __dashes = "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 
 
-def on_error(messages, error):
-    messages.pbfr()
-    messages.reset_pr_due()
+def on_error(player, error):
+    player.show_messages()
+    player.reset_pr_due()
 
     print("\n{dashes}\n{message}\n{dashes}".format(
         dashes=__dashes,

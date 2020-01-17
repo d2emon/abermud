@@ -5,7 +5,7 @@ from ..opensys import World, WorldError
 
 
 def dcprnt(messages, output, is_keyboard=True):
-    print(output, is_keyboard)
+    print('>', output, ':', is_keyboard)
     print(messages)
     # raise NotImplementedError()
     """
@@ -277,7 +277,7 @@ void logcom()
 """
 
 
-def pbfr():
+def show_messages():
     block_alarm()
     World.save()
 
@@ -382,7 +382,7 @@ void viewsnoop()
     x=__MESSAGES.snoopt;
     __MESSAGES.snoopt= -1;
     /*
-    pbfr();
+    show_messages();
     */
     __MESSAGES.snoopt=x;
     }
