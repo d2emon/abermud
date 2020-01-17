@@ -1,10 +1,7 @@
 import logging
 from ..gamego.error import MudError
+from ..gamego.signals import block_alarm, unblock_alarm
 from ..opensys import World, WorldError
-
-
-def block_alarm():
-    raise NotImplementedError()
 
 
 def dcprnt(messages, output):
@@ -60,10 +57,6 @@ def set_wd_it(value):
 
 
 def set_wd_them(value):
-    raise NotImplementedError()
-
-
-def unblock_alarm():
     raise NotImplementedError()
 
 
