@@ -1,14 +1,6 @@
 import sys
 
 
-def pbfr():
-    raise NotImplementedError()
-
-
-def set_pr_due(value):
-    raise NotImplementedError()
-
-
 class MudError(Exception):
     pass
 
@@ -16,9 +8,10 @@ class MudError(Exception):
 __dashes = "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 
 
-def on_error(error):
-    pbfr()
-    set_pr_due(0)
+def on_error(messages, error):
+    messages.pbfr()
+    messages.reset_pr_due()
+
     print("\n{dashes}\n{message}\n{dashes}".format(
         dashes=__dashes,
         message=str(error),

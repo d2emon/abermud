@@ -4,103 +4,11 @@ from ..gamego.signals import block_alarm, unblock_alarm
 from ..opensys import World, WorldError
 
 
-def dcprnt(messages, output):
-    raise NotImplementedError()
-
-
-def get_iskb():
-    raise NotImplementedError()
-
-
-def get_log_fl():
-    raise NotImplementedError()
-
-
-def get_pr_qcr():
-    raise NotImplementedError()
-
-
-def get_snoopd():
-    raise NotImplementedError()
-
-
-def get_snoopt():
-    raise NotImplementedError()
-
-
-def opensnoop(name, **kwargs):
-    raise NotImplementedError()
-
-
-def set_iskb(value):
-    raise NotImplementedError()
-
-
-def set_pr_due(value):
-    raise NotImplementedError()
-
-
-def set_pr_qcr(value):
-    raise NotImplementedError()
-
-
-def set_wd_her(value):
-    raise NotImplementedError()
-
-
-def set_wd_him(value):
-    raise NotImplementedError()
-
-
-def set_wd_it(value):
-    raise NotImplementedError()
-
-
-def set_wd_them(value):
-    raise NotImplementedError()
-
-
-def viewsnoop():
-    raise NotImplementedError()
-
-
-class MessageError(MudError):
-    pass
-
-
-class Messages:
-    def __init__(self, user_id):
-        self.user_id = user_id
-        self.messages = ""
-
-    def reset(self):
-        self.messages = ""
-
-    def add_message(self, message):
-        if len(message) > 255:
-            logging.error("Bprintf Short Buffer overflow")
-            raise MudError("Internal Error in BPRINTF")
-        if len(self.messages) + len(message) > 4095:
-            logging.error("Buffer overflow on user {}".format(self.user_id))
-            raise MessageError("PANIC - Buffer overflow")
-        self.messages += message
-
-
-__MESSAGES = Messages(None)
-
-
-"""
-long pr_due=0;
-"""
-
-
-def bprintf(message):
-    return __MESSAGES.add_message(message)
-
-
-"""
- /* The main loop */
-
+def dcprnt(messages, output, is_keyboard=True):
+    print(output, is_keyboard)
+    print(messages)
+    # raise NotImplementedError()
+    """
 void dcprnt(str,file)
  char *str;
  FILE *file;
@@ -135,7 +43,82 @@ void dcprnt(str,file)
              }
        }
     }
+    """
 
+
+def opensnoop(name, **kwargs):
+    raise NotImplementedError()
+
+
+def set_wd_her(value):
+    raise NotImplementedError()
+
+
+def set_wd_him(value):
+    raise NotImplementedError()
+
+
+def set_wd_it(value):
+    raise NotImplementedError()
+
+
+def set_wd_them(value):
+    raise NotImplementedError()
+
+
+def viewsnoop():
+    raise NotImplementedError()
+
+
+class MessageError(MudError):
+    pass
+
+
+class Messages:
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.__messages = ""
+
+        self.__pr_due = False
+        self.__pr_qcr = False
+        self.logger = None
+        self.snoopd = None
+        self.snoopt = None
+
+    def reset(self):
+        self.__messages = ""
+
+    def add_message(self, message):
+        if len(message) > 255:
+            logging.error("Bprintf Short Buffer overflow")
+            raise MudError("Internal Error in BPRINTF")
+        if len(self.__messages) + len(message) > 4095:
+            logging.error("Buffer overflow on user {}".format(self.user_id))
+            raise MessageError("PANIC - Buffer overflow")
+        self.__messages += message
+
+    def reset_pr_due(self):
+        self.__pr_due = False
+
+    def get_messages(self):
+        if len(self.__messages):
+            self.__pr_due = True
+            if self.__pr_qcr:
+                print()
+        self.__pr_qcr = False
+        messages = self.__messages
+        self.reset()
+        return messages
+
+
+__MESSAGES = Messages(None)
+
+
+def bprintf(message):
+    return __MESSAGES.add_message(message)
+
+
+"""
 int pfile(str,ct,file)
  char *str;
  FILE *file;
@@ -269,33 +252,28 @@ def reset_messages():
 
 
 """
-FILE * log_fl= 0; /* 0 = not logging */
-
 void logcom()
     {
-    extern FILE * log_fl;
     extern char globme[];
     if(getuid()!=geteuid()) {__MESSAGES.add_message("\nNot allowed from this ID");return;}
-    if(log_fl!=0)
+    if(__MESSAGES.logger!=0)
        {
-       fprintf(log_fl,"\nEnd of log....\n\n");
-       fclose(log_fl);
-       log_fl=0;
+       fprintf(__MESSAGES.logger,"\nEnd of log....\n\n");
+       fclose(__MESSAGES.logger);
+       __MESSAGES.logger=0;
        __MESSAGES.add_message("End of log");
        return;
        }
     __MESSAGES.add_message("Commencing Logging Of Session");
-    log_fl=Service.connect("mud_log","a");
-    if(log_fl==0) log_fl=Service.connect("mud_log","w");
-    if(log_fl==0)
+    __MESSAGES.logger=Service.connect("mud_log","a");
+    if(__MESSAGES.logger==0) __MESSAGES.logger=Service.connect("mud_log","w");
+    if(__MESSAGES.logger==0)
        {
        __MESSAGES.add_message("Cannot open log file mud_log");
        return;
        }
     __MESSAGES.add_message("The log will be written to the file 'mud_log'");
     }
-
-long pr_qcr; 
 """
 
 
@@ -303,40 +281,25 @@ def pbfr():
     block_alarm()
     World.save()
 
-    if len(__MESSAGES.messages):
-        set_pr_due(True)
-    if len(__MESSAGES.messages) and get_pr_qcr():
-        print()
-    set_pr_qcr(False)
+    messages = __MESSAGES.get_messages()
 
-    log_fl = get_log_fl()
-    if log_fl is None:
-        set_iskb(False)
-        dcprnt(__MESSAGES.messages, log_fl)
+    if __MESSAGES.logger is not None:
+        dcprnt(messages, __MESSAGES.logger, is_keyboard=False)
 
-    snoopd = get_snoopd()
-    if snoopd is not None:
+    if __MESSAGES.snoopd is not None:
         try:
-            fln = opensnoop(snoopd, append=True)
-            set_iskb(False)
-            dcprnt(__MESSAGES.messages, fln)
+            fln = opensnoop(__MESSAGES.snoopd, append=True)
+            dcprnt(messages, fln, is_keyboard=False)
             fln.disconnect()
         except WorldError:
             pass
 
-    set_iskb(True)
-    dcprnt(__MESSAGES.messages, None)
+    dcprnt(messages, None, is_keyboard=True)
 
-    __MESSAGES.reset()
-    if get_snoopt() is not None:
+    if __MESSAGES.snoopt is not None:
         viewsnoop()
 
     unblock_alarm()
-
-
-"""
-long iskb=1;
-"""
 
 
 """
@@ -344,15 +307,12 @@ int pnotkb(str,ct,file)
  char *str;
  FILE *file;
     {
-    extern long iskb;
     char x[128];
     ct=tocontinue(str,ct,x,127);
-    if(iskb) return(ct);
+    if(__MESSAGES.is_keyboard) return(ct);
     fprintf(file,"%s",x);
     return(ct);
     }
-
-long snoopd= -1;
 
 FILE *opensnoop(user,per)
 char *per;
@@ -365,8 +325,6 @@ char *user;
     return(x);
     }
 
-long snoopt= -1;
-
 char sntn[32];
 
 void snoopcom()
@@ -378,10 +336,10 @@ void snoopcom()
        __MESSAGES.add_message("Ho hum, the weather is nice isn't it");
        return;
        }
-    if(snoopt!=-1)
+    if(__MESSAGES.snoopt!=-1)
        {
        __MESSAGES.add_message("Stopped snooping on %s",sntn);
-       snoopt= -1;
+       __MESSAGES.snoopt= -1;
        sendsys(sntn,globme,-400,0,"");
        }
     if(brkword()== -1)
@@ -397,11 +355,11 @@ void snoopcom()
     if(((player.__person.level<10000)&&(plev(x)>=10))||(ptstbit(x,6)))
        {
        __MESSAGES.add_message("Your magical vision is obscured");
-       snoopt= -1;
+       __MESSAGES.snoopt= -1;
        return;
        }
     strcpy(sntn,pname(x));
-    snoopt=x;
+    __MESSAGES.snoopt=x;
     __MESSAGES.add_message("Started to snoop on %s",pname(x));
     sendsys(sntn,globme,-401,0,"");
     fx=opensnoop(globme,"w");
@@ -415,22 +373,22 @@ void viewsnoop()
     char z[128];
     FILE *fx;
     fx=opensnoop(globme,"r+");
-    if(snoopt==-1) return;
+    if(__MESSAGES.snoopt==-1) return;
     if(fx==0)return;
     while((!feof(fx))&&(fgets(z,127,fx)))
            printf("|%s",z);
     ftruncate(fileno(fx),0);
     fcloselock(fx);
-    x=snoopt;
-    snoopt= -1;
+    x=__MESSAGES.snoopt;
+    __MESSAGES.snoopt= -1;
     /*
     pbfr();
     */
-    snoopt=x;
+    __MESSAGES.snoopt=x;
     }
 void chksnp()
 {
-if(snoopt==-1) return;
+if(__MESSAGES.snoopt==-1) return;
 sendsys(sntn,globme,-400,0,"");
 }
 """

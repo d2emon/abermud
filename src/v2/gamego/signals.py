@@ -71,14 +71,14 @@ class Signals:
         self.active = False
         loseme()
 
-    def __on_close(self):
+    def __on_close(self, player):
         print("^C")
 
         if get_in_fight():
             return
 
         self.__shutdown()
-        on_error("Byeeeeeeeeee  ...........")
+        on_error(player.messages, "Byeeeeeeeeee  ...........")
 
     def __on_error(self):
         self.__shutdown()
