@@ -30,6 +30,34 @@ class PersonService(Service):
             self.disconnect()
 
 
+class PersonService(Service):
+    NAME = 'UAF_RAND'
+    __data = {}
+
+    def __init__(self):
+        try:
+            super().__init__(read=True, create=True)
+        except WorldError:
+            raise MudError("Cannot access UAF")
+
+    @property
+    def data(self):
+        return self.__data
+
+    def find(self, person_id):
+        person = self.data.get(person_id)
+        self.disconnect()
+        return person
+
+    def create(self, person):
+        try:
+            self.write(person.person_id, person)
+        except WorldError:
+            bprintf("Save Failed - Device Full?")
+        finally:
+            self.disconnect()
+
+
 class Person:
     size = 32
 
