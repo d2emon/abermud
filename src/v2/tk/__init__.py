@@ -62,6 +62,7 @@ class Reader:
     def __init__(self, player):
         self.to_read = False
         self.__event_id = -1
+        self.__last_update = 0
         self.player = player
 
     @property
@@ -99,6 +100,15 @@ class Reader:
 
         for event in world.read_events(self.event_id, last_event_id):
             self.__process_event(event)
+
+    def update(self):
+        timeout = abs(self.__event_id - self.__last_update)
+        if timeout < 10:
+            return
+
+        World.load()
+        self.player.set_event_id(self.event_id)
+        self.__last_update = self.event_id
 
 
 class Player:
@@ -200,6 +210,9 @@ class Player:
 
     def show_messages(self):
         return show_messages()
+
+    def set_event_id(self, event_id):
+        self.__data.event_id = event_id
 
 
 """
@@ -527,24 +540,10 @@ World.save()
 if(!zapped) saveme();
     	chksnp();
     }
- 
-long lasup=0;
+"""
 
- update(name)
- char *name;
-    {
-    FILE *unit;
-    long xp;
-    extern long lasup;
-    xp=player.reader.event_id-lasup;
-    if(xp<0) xp= -xp;
-    if(xp<10) goto noup;
-    unit=World.load()
-    setppos(player.player_id,player.reader.event_id);
-    lasup=player.reader.event_id;
-    noup:;
-    }
- 
+
+"""
  revise(cutoff)
  long cutoff;
     {
