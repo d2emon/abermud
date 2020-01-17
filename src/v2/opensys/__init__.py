@@ -100,6 +100,11 @@ class World(Service):
         return cls.__world.read(event_id)
 
     @classmethod
+    def read_events(cls, first_event_id, last_event_id):
+        for event_id in range(first_event_id, last_event_id):
+            yield cls.read_event(event_id)
+
+    @classmethod
     def read_players(cls):
         return cls.__world.read(cls.__PLAYERS)
 
@@ -127,11 +132,11 @@ class World(Service):
     def add_event(cls, event):
         meta = cls.read_meta()
         first = meta.get('first', 0)
-        last = meta.get('last', 0)
+        last = meta.get('last', 0) + 1
         event.event_id = last - first
         cls.write_meta({
             'first': first,
-            'last': last + 1,
+            'last': last,
         })
         cls.write_event(event)
 

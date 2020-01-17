@@ -6,6 +6,14 @@ from ..opensys import World, WorldError
 from ..parse.events import Event
 
 
+def eorte():
+    raise NotImplementedError()
+
+
+def get_debug_mode():
+    raise NotImplementedError()
+
+
 def loseme():
     raise NotImplementedError()
 
@@ -14,15 +22,31 @@ def randperc():
     raise NotImplementedError()
 
 
-def rte(name):
-    raise NotImplementedError()
-
-
 def sendmsg(name):
     raise NotImplementedError()
 
 
+def set_rdes(value):
+    raise NotImplementedError()
+
+
+def set_tdes(value):
+    raise NotImplementedError()
+
+
+def set_vdes(value):
+    raise NotImplementedError()
+
+
+def sysctrl(event, name):
+    raise NotImplementedError()
+
+
 def trapch(channel_id):
+    raise NotImplementedError()
+
+
+def update(player):
     raise NotImplementedError()
 
 
@@ -35,16 +59,46 @@ class Actor:
 
 
 class Reader:
-    def __init__(self):
+    def __init__(self, player):
         self.to_read = False
         self.__event_id = -1
+        self.player = player
 
     @property
     def event_id(self):
         return self.__event_id
 
+    @property
+    def has_started(self):
+        return self.__event_id != -1
+
     def reset(self):
         self.__event_id = -1
+
+    def __process_event(self, event):
+        if get_debug_mode():
+            self.player.add_message("\n<{}>".format(event.codeword))
+
+        if event.codeword < -3:
+            sysctrl(event, self.player.name.lower())
+        else:
+            self.player.add_message(event.payload)
+
+        self.__event_id = event.event_id
+
+    def process_events(self):
+        try:
+            world = World.load()
+        except WorldError:
+            raise MudError("AberMUD: FILE_ACCESS : Access failed")
+
+        meta = world.read_meta()
+        last_event_id = meta.get('last', 0)
+        if not self.has_started:
+            self.__event_id = last_event_id
+
+        for event in world.read_events(self.event_id, last_event_id):
+            self.__process_event(event)
 
 
 class Player:
@@ -54,7 +108,7 @@ class Player:
         self.__player_id = 0
 
         self.__messages = reset_messages()
-        self.reader = Reader()
+        self.reader = Reader(self)
         self.actor = Actor()
         self.__data = None
         self.__person = None
@@ -97,7 +151,7 @@ class Player:
         sendmsg(self.name)
 
         if self.reader.to_read:
-            rte(self.name)
+            read_events(self)
             self.reader.to_read = False
 
         World.save()
@@ -180,22 +234,10 @@ long offd,offs,len;
        c++;
        }
     }
- 
- mstoout(block,name)
- long *block;char *name;
-    {
-    extern long debug_mode;
-    char luser[40];
-    char *x;
-    x=(char *)block;
-    /* Print appropriate stuff from data block */
-    strcpy(luser,name);lowercase(luser);
-if(debug_mode)    player.add_message("\n<%d>",block[1]);
-    if (block[1]<-3) sysctrl(block,luser);
-    else
-       player.add_message("%s", (x+2*sizeof(long)));
-    }
- 
+"""
+
+
+"""
 long gurum=0;
 long convflg=0;
  
@@ -249,7 +291,7 @@ strcat(sysbuf,"\001l");
 strcat(sysbuf,work);
 strcat(sysbuf,"\n\001");
 World.load()
-rte(name);
+read_events(player)
 World.save()
     if((convflg)&&(!strcmp(work,"**")))
        {
@@ -289,81 +331,16 @@ fighting= -1;
 if(in_fight) in_fight-=1;
     return((!strcmp(work,".Q"))||(!strcmp(work,".q")));
     }
- 
- send2(block)
- long *block;
-    {
-    FILE * unit;
-    long number;
-    long inpbk[128];
-    extern char *echoback;
-    	unit=World.load()
-    if (unit<0) {loseme();raise MudError("\nAberMUD: FILE_ACCESS : Access failed\n");}
-    sec_read(unit,inpbk,0,64);
-    number=2*inpbk[1]-inpbk[0];inpbk[1]++;
-    sec_write(unit,block,number,128);
-    sec_write(unit,inpbk,0,64);
-    if (number>=199) cleanup(inpbk);
-    if(number>=199) longwthr();
-    }
- 
- readmsg(channel,block,num)
- long channel;
- long *block;
- int num;
-    {
-    long buff[64],actnum;
-    sec_read(channel,buff,0,64);
-    actnum=num*2-buff[0];
-    sec_read(channel,block,actnum,128);
-    }
- 
-FILE *fl_com;
-extern long findstart();
-extern long findend();
- 
- rte(name)
- char *name;
-    {
-    extern long vdes,tdes,rdes;
-    extern FILE *fl_com;
-    extern long debug_mode;
-    FILE *unit;
-    long too,ct,block[128];
-    unit=World.load()
-    fl_com=unit;
-    if (unit==NULL) raise MudError("AberMUD: FILE_ACCESS : Access failed\n");
-    if (player.reader.event_id== -1) player.reader.event_id=findend(unit);
-    too=findend(unit);
-    ct=player.reader.event_id;
-    while(ct<too)
-       {
-       readmsg(unit,block,ct);
-       mstoout(block,name);
-       ct++;
-       }
-    player.reader.event_id=ct;
-    update(name);
-    eorte();
-    rdes=0;tdes=0;vdes=0;
-    }
-    
-long findstart(unit)
- FILE *unit;
-    {
-    long bk[2];
-    sec_read(unit,bk,0,1);
-    return(bk[0]);
-    }
- 
-long findend(unit)
- FILE *unit;
-    {
-    long bk[3];
-    sec_read(unit,bk,0,2);
-    return(bk[1]);
-    }
 """
+
+
+def read_events(player):
+    player.reader.process_events()
+    update(player)
+    eorte()
+    set_rdes(0)
+    set_tdes(0)
+    set_vdes(0)
 
 
 def talker(player):
@@ -434,7 +411,7 @@ def __start_game(player):
         player.channel_id,
         "[s name=\"{name}\"][ {name}  has entered the game ][/s]".format(name=player.name),
     )
-    rte(player.name)
+    read_events(player)
     if randperc() > 50:
         trapch(-5)
     else:
@@ -475,7 +452,8 @@ long block[128];
 block[1]= -1;
 strcpy(bk2,mesg);
 vcpy(block,2,(long *)bk2,0,126);
-send2(block);
+event = Event(*block)
+event.send()
 }
 
 tbroad(message)
