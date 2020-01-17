@@ -1,3 +1,52 @@
+import logging
+from ..gamego.error import MudError
+from ..opensys import World, WorldError
+
+
+def block_alarm():
+    raise NotImplementedError()
+
+
+def dcprnt(messages, output):
+    raise NotImplementedError()
+
+
+def get_iskb():
+    raise NotImplementedError()
+
+
+def get_log_fl():
+    raise NotImplementedError()
+
+
+def get_pr_qcr():
+    raise NotImplementedError()
+
+
+def get_snoopd():
+    raise NotImplementedError()
+
+
+def get_snoopt():
+    raise NotImplementedError()
+
+
+def opensnoop(name, **kwargs):
+    raise NotImplementedError()
+
+
+def set_iskb(value):
+    raise NotImplementedError()
+
+
+def set_pr_due(value):
+    raise NotImplementedError()
+
+
+def set_pr_qcr(value):
+    raise NotImplementedError()
+
+
 def set_wd_her(value):
     raise NotImplementedError()
 
@@ -14,36 +63,50 @@ def set_wd_them(value):
     raise NotImplementedError()
 
 
+def unblock_alarm():
+    raise NotImplementedError()
+
+
+def viewsnoop():
+    raise NotImplementedError()
+
+
+class MessageError(MudError):
+    # loseme()
+    pass
+
+
 class Messages:
-    def __init__(self):
+    def __init__(self, user_id):
+        self.user_id = user_id
         self.messages = ""
 
+    def reset(self):
+        self.messages = ""
 
-__MESSAGES = Messages()
+    def add_message(self, message):
+        if len(message) > 255:
+            logging.error("Bprintf Short Buffer overflow")
+            raise MudError("Internal Error in BPRINTF")
+        if len(self.messages) + len(message) > 4095:
+            logging.error("Buffer overflow on user {}".format(self.user_id))
+            raise MessageError("PANIC - Buffer overflow")
+        self.messages += message
+
+
+__MESSAGES = Messages(None)
 
 
 """
-#include "files.h"
-#include <stdio.h>
-#include "System.h"
-
 long pr_due=0;
+"""
 
-void bprintf(args,arg1,arg2,arg3,arg4,arg5,arg6,arg7)
-char *args,*arg1,*arg2,*arg3,*arg4,*arg5,*arg6,*arg7;
-    {
-    char x[256],a[40];  /* Max 240 chars/msg */
-    long ct;
-    sprintf(x,args,arg1,arg2,arg3,arg4,arg5,arg6);
-if(strlen(x)>235)
-{
-syslog("Bprintf Short Buffer overflow");
-crapup("Internal Error in BPRINTF");
-}
-    /* Now we have a string of chars expanded */
-    quprnt(x);
-    }
 
+def bprintf(message):
+    return __MESSAGES.add_message(message)
+
+
+"""
  /* The main loop */
 
 void dcprnt(str,file)
@@ -209,7 +272,7 @@ FILE *file;
 
 
 def reset_messages():
-    __MESSAGES.messages = ""
+    __MESSAGES.reset()
     return __MESSAGES
 
 
@@ -220,74 +283,71 @@ void logcom()
     {
     extern FILE * log_fl;
     extern char globme[];
-    if(getuid()!=geteuid()) {bprintf("\nNot allowed from this ID\n");return;}
+    if(getuid()!=geteuid()) {__MESSAGES.add_message("\nNot allowed from this ID");return;}
     if(log_fl!=0)
        {
        fprintf(log_fl,"\nEnd of log....\n\n");
        fclose(log_fl);
        log_fl=0;
-       bprintf("End of log\n");
+       __MESSAGES.add_message("End of log");
        return;
        }
-    bprintf("Commencing Logging Of Session\n");
+    __MESSAGES.add_message("Commencing Logging Of Session");
     log_fl=Service.connect("mud_log","a");
     if(log_fl==0) log_fl=Service.connect("mud_log","w");
     if(log_fl==0)
        {
-       bprintf("Cannot open log file mud_log\n");
+       __MESSAGES.add_message("Cannot open log file mud_log");
        return;
        }
-    bprintf("The log will be written to the file 'mud_log'\n");
+    __MESSAGES.add_message("The log will be written to the file 'mud_log'");
     }
 
 long pr_qcr; 
+"""
 
-void pbfr()
-    {
-    FILE *fln;
-    long mu;
-    block_alarm();
-    closeworld();
-    if(strlen(sysbuf)) pr_due=1;
-    if((strlen(sysbuf))&&(pr_qcr)) putchar('\n');
-    pr_qcr=0;
-    if(log_fl!=NULL)
-       {
-       iskb=0;
-       dcprnt(sysbuf,log_fl);
-       }
-    if(snoopd!=-1)
-       {
-       fln=opensnoop(pname(snoopd),"a");
-       if(fln>0)
-          {
-iskb=0;
-          dcprnt(sysbuf,fln);
-          fcloselock(fln);
-          }
-       }
-    iskb=1;
-    dcprnt(sysbuf,stdout);
-    sysbuf[0]=0; /* clear buffer */
-    if(snoopt!=-1) viewsnoop();
-    unblock_alarm();
-    }
 
+def pbfr():
+    block_alarm()
+    World.save()
+
+    if len(__MESSAGES.messages):
+        set_pr_due(True)
+    if len(__MESSAGES.messages) and get_pr_qcr():
+        print()
+    set_pr_qcr(False)
+
+    log_fl = get_log_fl()
+    if log_fl is None:
+        set_iskb(False)
+        dcprnt(__MESSAGES.messages, log_fl)
+
+    snoopd = get_snoopd()
+    if snoopd is not None:
+        try:
+            fln = opensnoop(snoopd, append=True)
+            set_iskb(False)
+            dcprnt(__MESSAGES.messages, fln)
+            fln.disconnect()
+        except WorldError:
+            pass
+
+    set_iskb(True)
+    dcprnt(__MESSAGES.messages, None)
+
+    __MESSAGES.reset()
+    if get_snoopt() is not None:
+        viewsnoop()
+
+    unblock_alarm()
+
+
+"""
 long iskb=1;
+"""
 
-void quprnt(x)
- char *x;
-    {
-    if((strlen(x)+strlen(sysbuf))>4095)
-       {
-       strcpy(sysbuf,"");
-       loseme();
-       syslog("Buffer overflow on user %s",globme);
-       crapup("PANIC - Buffer overflow");
-       }
-    strcat(sysbuf,x);
-    }
 
+"""
 int pnotkb(str,ct,file)
  char *str;
  FILE *file;
@@ -323,12 +383,12 @@ void snoopcom()
     long x;
     if(my_lev<10)
        {
-       bprintf("Ho hum, the weather is nice isn't it\n");
+       __MESSAGES.add_message("Ho hum, the weather is nice isn't it");
        return;
        }
     if(snoopt!=-1)
        {
-       bprintf("Stopped snooping on %s\n",sntn);
+       __MESSAGES.add_message("Stopped snooping on %s",sntn);
        snoopt= -1;
        sendsys(sntn,globme,-400,0,"");
        }
@@ -339,18 +399,18 @@ void snoopcom()
     x=player.by_visibility(wordbuf);
     if(x==-1)
        {
-       bprintf("Who is that ?\n");
+       __MESSAGES.add_message("Who is that ?");
        return;
        }
     if(((my_lev<10000)&&(plev(x)>=10))||(ptstbit(x,6)))
        {
-       bprintf("Your magical vision is obscured\n");
+       __MESSAGES.add_message("Your magical vision is obscured");
        snoopt= -1;
        return;
        }
     strcpy(sntn,pname(x));
     snoopt=x;
-    bprintf("Started to snoop on %s\n",pname(x));
+    __MESSAGES.add_message("Started to snoop on %s",pname(x));
     sendsys(sntn,globme,-401,0,"");
     fx=opensnoop(globme,"w");
     fprintf(fx," ");
