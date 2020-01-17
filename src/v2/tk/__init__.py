@@ -1,22 +1,15 @@
 from ..bprintf import reset_messages, set_name
 from ..gamego.error import MudError
+from ..newuaf import new_person
 from ..objsys import PlayerData
 from ..opensys import World, WorldError
 
 
-def get_my_lev():
+def bprintf(message):
     raise NotImplementedError()
 
 
-def get_my_sex():
-    raise NotImplementedError()
-
-
-def get_my_str():
-    raise NotImplementedError()
-
-
-def initme():
+def getkbd(max_length):
     raise NotImplementedError()
 
 
@@ -75,6 +68,7 @@ class Player:
         self.reader = Reader()
         self.actor = Actor()
         self.__data = None
+        self.__person = None
 
         if name == "Phantom":
             self.__name = "The {}".format(name)
@@ -133,17 +127,15 @@ class Player:
         self.__data.channel_id = self.channel_id
         return self.__data.player_id
 
-    def from_person(self):
+    def from_person(self, person):
         self.__channel_id = -5
 
-        self.__data.strength = get_my_str()
-        self.__data.level = get_my_lev()
-        if get_my_lev() < 10000:
-            self.__data.visible = 0
-        else:
-            self.__data.visible = 10000
+        self.__person = person
+        self.__data.strength = person.strength
+        self.__data.level = person.level
+        self.__data.visible = 0 if person.level < 10000 else 10000
         self.__data.weapon_id = -1
-        self.__data.flags = get_my_sex()
+        self.__data.flags = person.sex
         self.__data.helping = -1
 
     def see_player(self, name):
@@ -222,8 +214,6 @@ extern long tty;
     long w2[35];
     extern char key_buff[];
     extern long convflg;
-    extern long my_lev;
-extern long my_str;
 extern long in_fight;
 extern long fighting;
     l:pbfr();
@@ -231,7 +221,7 @@ if(tty==4) btmscr();
 strcpy(prmpt,"\r");
     if(pvis(player.player_id)) strcat(prmpt,"(");
     if(debug_mode) strcat(prmpt,"#");
-    if(my_lev>9)strcat(prmpt,"----");
+    if(player.__person.level>9)strcat(prmpt,"----");
     switch(convflg)
        {
        case 0:
@@ -405,12 +395,33 @@ def talker(player):
 """
 
 
+def __new_person():
+    def __get_sex():
+        bprintf("\nSex (M/F) : ")
+        pbfr()
+        sex = getkbd(2).lower()[0]
+        if sex == 'm':
+            return 0
+        elif sex == 'f':
+            return 1
+        bprintf("M or F")
+        __get_sex()
+
+    bprintf("Creating character....")
+    return {
+        'sex': __get_sex()
+    }
+
+
 def __start_game(player):
     player.actor.mode = Actor.MODE_GAME
 
-    initme()
     World.load()
-    player.from_person()
+
+    try:
+        player.from_person(new_person(player.name, on_new=__new_person))
+    except WorldError as error:
+        bprintf(error)
 
     sendsys(
         player.name,
@@ -502,8 +513,7 @@ if(!strcmp(lowercase(nam1+4),lowercase(luser))) return(1);
  long chan;
     {
     FILE *unit;
-    extern long my_lev;
-    if(my_lev>9) goto ndie;
+    if(player.__person.level>9) goto ndie;
     ndie:unit=World.load()
     setploc(player.player_id,chan);
     lookin(chan);
@@ -583,13 +593,12 @@ long lasup=0;
     extern long brmode;
     extern long ail_blind;
     long ct;
-    extern long my_lev;
 World.save()
     if(ail_blind)
     {
     	bprintf("You are blind... you can't see a thing!\n");
     }
-    if(my_lev>9) showname(room);
+    if(player.__person.level>9) showname(room);
     un1=openroom(room,"r");
     if (un1!=NULL)
     {
@@ -608,7 +617,7 @@ xx1:   xxx=0;
           if(!strcmp(str,"#DIE"))
              {
              if(ail_blind) {rewind(un1);ail_blind=0;goto xx1;}
-             if(my_lev>9)bprintf("<DEATH ROOM>\n");
+             if(player.__person.level>9)bprintf("<DEATH ROOM>\n");
              else
                 {
                 loseme(player.name);

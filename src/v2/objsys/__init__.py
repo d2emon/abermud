@@ -186,11 +186,10 @@ bprintf(" ");
 
 iscontin(o1,o2)
 {
-extern long my_lev;
 if(ocarrf(o1)!=3) return(0)
 ;
 if(oloc(o1)!=o2) return(0);
-if((my_lev<10)&&(isdest(o1)))return(0);
+if((player.__person.level<10)&&(isdest(o1)))return(0);
 return(1);
 }
 
@@ -365,8 +364,7 @@ if(curch==-1081)
     {
     extern long curch;
     long a;
-extern long my_lev;
-    if((my_lev<10)&&(isdest(item)))return(0);
+    if((player.__person.level<10)&&(isdest(item)))return(0);
     if(ocarrf(item)==1) return(0);
     if(oloc(item)!=curch) return(0);
     return(1);
@@ -375,8 +373,7 @@ extern long my_lev;
  iscarrby(item,user)
     {
     extern long curch;
-extern long my_lev;
-    if((my_lev<10)&&(isdest(item)))return(0);
+    if((player.__person.level<10)&&(isdest(item)))return(0);
     if((ocarrf(item)!=1)&&(ocarrf(item)!=2)) return(0);
     if(oloc(item)!=user) return(0);
     return(1);
@@ -386,9 +383,7 @@ extern long my_lev;
     {
     extern long mynum,curch;
     extern char wordbuf[],globme[];
-    extern long my_sco;
     long a,b,bf[32];
-    extern long my_lev;
     if(brkword()==-1)
        {
       bprintf("Drop what ?\n");
@@ -401,7 +396,7 @@ extern long my_lev;
        return;
        }
 
-if((my_lev<10)&&(a==32))
+if((player.__person.level<10)&&(a==32))
 {
 bprintf("You can't let go of it!\n");
 return;
@@ -414,7 +409,7 @@ return;
    sprintf(bf,"The %s disappears into the bottomless pit.\n",wordbuf);
    bprintf("It disappears down into the bottomless pit.....\n");
     sendsys(globme,globme,-10000,curch,bf);
-    my_sco+=(tscale()*obaseval(a))/5;
+    player.__person.score+=(tscale()*obaseval(a))/5;
     calibme();
 setoloc(a,-6,0);
     }
@@ -474,11 +469,10 @@ long ublock[16*49];
  whocom()
     {
     long a;
-    extern long my_lev;
     long bas;
     a=0;
     bas=16;
-    if(my_lev>9)
+    if(player.__person.level>9)
        {
       bprintf("Players\n");
        bas=48;
@@ -495,9 +489,8 @@ long ublock[16*49];
 
  dispuser(ubase)
     {
-extern long my_lev;
     if(pstr(ubase)<0) return; /* On  Non game mode */
-    if(pvis(ubase)>my_lev) return;
+    if(pvis(ubase)>player.__person.level) return;
 if(pvis(ubase)) bprintf("(");
    bprintf("%s ",pname(ubase));
     disl4(plev(ubase),psex(ubase));
@@ -650,12 +643,11 @@ case -31:bprintf("the Acolyte");break;
  
 usercom()
 {
-extern long my_lev;
 long a;
-a=my_lev;
-my_lev=0;
+a=player.__person.level;
+player.__person.level=0;
 whocom();
-my_lev=a;
+player.__person.level=a;
 }
  
 oplong(x)

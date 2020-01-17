@@ -2,25 +2,13 @@ from ..gamego.error import MudError
 from ..opensys import Service, WorldError
 
 
-def bprintf(message):
-    raise NotImplementedError()
-
-
-def getkbd(max_length):
-    raise NotImplementedError()
-
-
-def pbfr():
-    raise NotImplementedError()
-
-
 class PersonService(Service):
     NAME = 'UAF_RAND'
     __data = {}
 
     def __init__(self):
         try:
-            super().__init__(read=True, create=True)
+            super().__init__(read=True, write=True, create=True)
         except WorldError:
             raise MudError("Cannot access UAF")
 
@@ -37,7 +25,7 @@ class PersonService(Service):
         try:
             self.write(person.person_id, person)
         except WorldError:
-            bprintf("Save Failed - Device Full?")
+            raise WorldError("Save Failed - Device Full?")
         finally:
             self.disconnect()
 
@@ -54,7 +42,7 @@ class Person:
 
     @classmethod
     def find(cls, person_id):
-        return PersonService().find(person_id) is not None
+        return PersonService().find(person_id)
 
     @classmethod
     def create(cls, person_id, score=0, strength=40, sex=0, level=1):
@@ -85,28 +73,13 @@ def delpers(person_id):
     return delpers(person_id)
 
 
-def new_person(person_id):
-    def get_sex():
-        bprintf("\nSex (M/F) : ")
-        pbfr()
-        s = getkbd(2).lower()[0]
-        if s == 'm':
-            return 0
-        elif s == 'f':
-            return 1
-        else:
-            bprintf("M or F")
-            get_sex()
-
+def new_person(person_id, on_new=lambda: {}):
     try:
         person = Person.find(person_id)
     except FileNotFoundError:
         raise MudError("Panic: Timeout event on user file")
 
-    if person is None:
-        bprintf("Creating character....")
-        return Person.create(person_id, sex=get_sex())
-    return person
+    return person or Person.create(person_id, **on_new())
 
 
 def saveme(player):

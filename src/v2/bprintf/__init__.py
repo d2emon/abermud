@@ -321,7 +321,7 @@ void snoopcom()
     {
     FILE *fx;
     long x;
-    if(my_lev<10)
+    if(player.__person.level<10)
        {
        bprintf("Ho hum, the weather is nice isn't it\n");
        return;
@@ -342,7 +342,7 @@ void snoopcom()
        bprintf("Who is that ?\n");
        return;
        }
-    if(((my_lev<10000)&&(plev(x)>=10))||(ptstbit(x,6)))
+    if(((player.__person.level<10000)&&(plev(x)>=10))||(ptstbit(x,6)))
        {
        bprintf("Your magical vision is obscured\n");
        snoopt= -1;
