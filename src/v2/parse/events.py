@@ -24,22 +24,14 @@ class Event:
 
     def save(self):
         try:
-            unit = World.load()
+            world = World.load()
         except WorldError:
             loseme()
             raise MudError("AberMUD: FILE_ACCESS : Access failed")
 
-        meta = unit.read(0, 64)
-        first = meta.get('first', 0)
-        last = meta.get('last', 0)
-        self.event_id = last - first
-        meta = {
-            'first': first,
-            'last': last,
-        }
-        unit.write(0, meta)
-        unit.write(self.event_id, self)
+        world.add_event(self)
         if self.event_id >= 199:
+            meta = world.read_meta()
             cleanup(meta)
             longwthr()
 

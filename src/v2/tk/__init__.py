@@ -3,6 +3,7 @@ from ..gamego.error import MudError
 from ..newuaf import new_person
 from ..objsys import PlayerData
 from ..opensys import World, WorldError
+from ..parse.events import Event
 
 
 def loseme():
@@ -18,10 +19,6 @@ def rte(name):
 
 
 def sendmsg(name):
-    raise NotImplementedError()
-
-
-def sendsys(player_to, player_from, code, channel_id, message):
     raise NotImplementedError()
 
 
@@ -430,9 +427,9 @@ def __start_game(player):
     except WorldError as error:
         player.add_message(error)
 
-    sendsys(
-        player.name,
-        player.name,
+    Event.emit(
+        player,
+        player,
         -10113,
         player.channel_id,
         "[s name=\"{name}\"][ {name}  has entered the game ][/s]".format(name=player.name),
@@ -443,9 +440,9 @@ def __start_game(player):
     else:
         player.channel_id = -183
         trapch(-183)
-    sendsys(
-        player.name,
-        player.name,
+    Event.emit(
+        player,
+        player,
         -10000,
         player.channel_id,
         "[s name=\"{name}\"]{name}  has entered the game[/s]".format(name=player.name),
@@ -545,7 +542,7 @@ unit=World.load()
     dumpitems();
 if(pvis(player.player_id)<10000) {
 sprintf(bk,"%s has departed from AberMUDII\n", player.name);
-sendsys(player.name,player.name,-10113,0,bk);
+Event.emit(player, player, -10113, 0, bk);
 }
     pname(player.player_id)[0]=0;
 World.save()

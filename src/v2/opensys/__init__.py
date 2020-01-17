@@ -58,6 +58,7 @@ class Service:
 
 class World(Service):
     NAME = '/usr/tmp/-iy7AM'
+    __META = 0
     __ITEMS = 400
     __PLAYERS = 350
     __ITEMS_COUNT = 194
@@ -65,6 +66,10 @@ class World(Service):
 
     __world = None
     __data = {
+        __META: {
+            'first': 0,
+            'last': 0,
+        },
         __PLAYERS: [{} for _ in range(__PLAYERS_COUNT)],
         __ITEMS: [{} for _ in range(__ITEMS_COUNT)],
         'players_count': __PLAYERS_COUNT,
@@ -88,7 +93,7 @@ class World(Service):
 
     @classmethod
     def read_meta(cls):
-        return cls.__world.read(0)
+        return cls.__world.read(cls.__META)
 
     @classmethod
     def read_event(cls, event_id):
@@ -96,27 +101,39 @@ class World(Service):
 
     @classmethod
     def read_players(cls):
-        return cls.__world.read(350)
+        return cls.__world.read(cls.__PLAYERS)
 
     @classmethod
     def read_items(cls):
-        return cls.__world.read(400)
+        return cls.__world.read(cls.__ITEMS)
 
     @classmethod
     def write_meta(cls, meta):
-        cls.__world.write(meta, 0)
+        cls.__world.write(cls.__META, meta)
 
     @classmethod
-    def write_event(cls, event_id, event):
-        cls.__world.write(event, event_id)
+    def write_event(cls, event):
+        cls.__world.write(event.event_id, event)
 
     @classmethod
     def write_players(cls, players):
-        cls.__world.write(cls.__players, 350)
+        cls.__world.write(cls.__PLAYERS, players)
 
     @classmethod
     def write_items(cls, items):
-        cls.__world.write(cls.__items, 400)
+        cls.__world.write(cls.__ITEMS, items)
+
+    @classmethod
+    def add_event(cls, event):
+        meta = cls.read_meta()
+        first = meta.get('first', 0)
+        last = meta.get('last', 0)
+        event.event_id = last - first
+        cls.write_meta({
+            'first': first,
+            'last': last + 1,
+        })
+        cls.write_event(event)
 
     @classmethod
     def load(cls):
@@ -124,8 +141,8 @@ class World(Service):
             return cls.__world
 
         cls.__world = cls.__connect()
-        cls.__items = cls.__world.read(cls.__ITEMS)
-        cls.__players = cls.__world.read(cls.__PLAYERS)
+        cls.__items = cls.read_items()
+        cls.__players = cls.read_players()
         return cls.__world
 
     @classmethod
@@ -133,7 +150,7 @@ class World(Service):
         if cls.__world is None:
             return
 
-        cls.__world.write(cls.__ITEMS, cls.__items)
-        cls.__world.write(cls.__PLAYERS, cls.__players)
+        cls.write_items(cls.__items)
+        cls.write_players(cls.__players)
         cls.__world.unlock()
         cls.__world = None
