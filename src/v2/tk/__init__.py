@@ -40,12 +40,16 @@ def sendsys(player_to, player_from, code, channel_id, message):
     raise NotImplementedError()
 
 
-def set_curmode(value):
-    raise NotImplementedError()
-
-
 def trapch(channel_id):
     raise NotImplementedError()
+
+
+class Actor:
+    MODE_SPECIAL = 0
+    MODE_GAME = 1
+
+    def __init__(self):
+        self.mode = self.MODE_SPECIAL
 
 
 class Reader:
@@ -69,6 +73,7 @@ class Player:
 
         self.messages = reset_messages()
         self.reader = Reader()
+        self.actor = Actor()
         self.__data = None
 
         if name == "Phantom":
@@ -129,6 +134,8 @@ class Player:
         return self.__data.player_id
 
     def from_person(self):
+        self.__channel_id = -5
+
         self.__data.strength = get_my_str()
         self.__data.level = get_my_lev()
         if get_my_lev() < 10000:
@@ -152,7 +159,6 @@ class Player:
 
 
 """
-long  curmode=0;
 long  meall=0;
  /*
  
@@ -220,7 +226,6 @@ extern long tty;
 extern long my_str;
 extern long in_fight;
 extern long fighting;
-    extern long curmode;
     l:pbfr();
 if(tty==4) btmscr();
 strcpy(prmpt,"\r");
@@ -272,7 +277,7 @@ if((strcmp(work,"*"))&&(work[0]=='*')){(work[0]=32);goto nadj;}
        else
           sprintf(work,"tss %s",w2);
        }
-    nadj:if(curmode==1) gamecom(work);
+    nadj:if(player.actor.mode == 1) gamecom(work);
     else
        {
        if(((strcmp(work,".Q"))&&(strcmp(work,".q")))&& (!!strlen(work)))
@@ -401,8 +406,8 @@ def talker(player):
 
 
 def __start_game(player):
-    set_curmode(1)
-    player.channel_id = -5
+    player.actor.mode = Actor.MODE_GAME
+
     initme()
     World.load()
     player.from_person()
@@ -576,7 +581,6 @@ long lasup=0;
     char str[128];
     long xxx;
     extern long brmode;
-    extern long curmode;
     extern long ail_blind;
     long ct;
     extern long my_lev;
@@ -627,7 +631,7 @@ else
     if(!ail_blind)
     {
 	    lisobs();
-	    if(curmode==1) lispeople();
+	    if(player.actor.mode == 1) lispeople();
     }
     bprintf("\n");
     onlook();
