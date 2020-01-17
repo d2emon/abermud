@@ -6,14 +6,17 @@ class WorldError(MudError):
 
 
 class Service:
-    def __init__(self, name, read=True, write=False, create=False):
+    NAME = None
+
+    def __init__(self, read=True, write=False, create=False, append=False):
         if not create:
             raise WorldError()
 
-        self.name = name
+        self.name = self.NAME
         self.__read = read
         self.__write = write
         self.__create = create
+        self.__append = append
         self.__active = True
 
     def disconnect(self):
@@ -21,9 +24,9 @@ class Service:
         self.__active = False
 
     @classmethod
-    def lock(cls, name, **kwargs):
+    def lock(cls, **kwargs):
         try:
-            return Service(name, **kwargs)
+            return Service(**kwargs)
         except WorldError:
             # ENOSPC        PANIC exit device full
             # EHOSTUNREACH  PANIC exit access failure, NFS gone for a snooze
@@ -54,7 +57,7 @@ class Service:
 
 
 class World(Service):
-    __filename = '/usr/tmp/-iy7AM'
+    NAME = '/usr/tmp/-iy7AM'
     __world = None
     __data = {
         350: [{} for _ in range(48)],
@@ -74,7 +77,7 @@ class World(Service):
     @classmethod
     def __connect(cls):
         try:
-            return cls.lock(cls.__filename, create=True)
+            return cls.lock(create=True)
         except WorldError:
             raise WorldError("Cannot find World file")
 
