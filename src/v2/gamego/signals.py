@@ -1,10 +1,6 @@
 import sys
 from .error import on_error
-from ..tk import get_name
-
-
-def closeworld():
-    raise NotImplementedError()
+from ..opensys import World
 
 
 def get_in_fight():
@@ -20,10 +16,6 @@ def key_reprint():
 
 
 def on_timing():
-    raise NotImplementedError()
-
-
-def openworld():
     raise NotImplementedError()
 
 
@@ -48,7 +40,6 @@ class Signals:
     @property
     def active(self):
         return self.__active
-        pass
 
     @active.setter
     def active(self, value):
@@ -93,20 +84,20 @@ class Signals:
         self.__shutdown()
         sys.exit(255)
 
-    def __on_time(self):
+    def __on_time(self, player):
         if not self.active:
             return
 
         self.active = False
 
-        openworld()
+        World.load()
 
         self.interrupt = True
-        rte(get_name())
+        rte(player.name)
         self.interrupt = False
 
         on_timing()
-        closeworld()
+        World.save()
 
         key_reprint()
 
