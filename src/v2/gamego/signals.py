@@ -1,15 +1,13 @@
-import logging
-from ..opensys import World
-from ..tk import Player, talker
+import sys
 from .error import on_error
-from .user import User
+from ..tk import get_name
 
 
-def get_in_fight():
+def closeworld():
     raise NotImplementedError()
 
 
-def key_reprint():
+def get_in_fight():
     raise NotImplementedError()
 
 
@@ -17,56 +15,21 @@ def loseme():
     raise NotImplementedError()
 
 
+def key_reprint():
+    raise NotImplementedError()
+
+
 def on_timing():
+    raise NotImplementedError()
+
+
+def openworld():
     raise NotImplementedError()
 
 
 def rte(name):
     raise NotImplementedError()
 
-
-def main(game_user, program_name, username):
-    print("Entering Game ....")
-    player = Player(username)
-    print("Hello {}".format(player.name))
-    logging.info("GAME ENTRY: %s[%s]", player.name, game_user.user_id)
-
-    return talker(player)
-
-
-"""
-listfl(name)
-char *name;
-{
-FILE *a;
-char b[128];
-a=Service.lock(name,"r+");
-while(fgets(b,128,a)) printf("%s\n",b);
-a.unlock()
-}
-
-char *getkbd(s,l)   /* Getstr() with length limit and filter ctrl */
- char *s;
- int l;
-    {
-    char c,f,n;
-    f=0;c=0;
-    while(c<l)
-       {
-       regec:n=getchar();
-       if ((n<' ')&&(n!='\n')) goto regec;
-       if (n=='\n') {s[c]=0;f=1;c=l-1;}
-       else
-          s[c]=n;
-       c++;
-       }
-    if (f==0) {s[c]=0;while(getchar()!='\n');}
-    return(s);
-    }
-"""
-
-
-# Signals
 
 class Signals:
     def __init__(self):
@@ -130,20 +93,20 @@ class Signals:
         self.__shutdown()
         sys.exit(255)
 
-    def __on_time(self, player):
+    def __on_time(self):
         if not self.active:
             return
 
         self.active = False
 
-        World.load()
+        openworld()
 
         self.interrupt = True
-        rte(player.name)
+        rte(get_name())
         self.interrupt = False
 
         on_timing()
-        World.save()
+        closeworld()
 
         key_reprint()
 
@@ -167,21 +130,3 @@ def sig_alon():
 
 def sig_aloff():
     __SIGNALS.active = False
-
-
-"""
-set_progname(n,text)
-char *text;
-{
-	/*
-	int x=0;
-	int y=strlen(argv_p[n])+strlen(argv_p[1]);  
-	y++;
-	if(strcmp(argv_p[n],text)==0) return;
-
-	while(x<y)
-	   argv_p[n][x++]=0; 
-	strcpy(argv_p[n],text);
-	*/
-}
-"""
