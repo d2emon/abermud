@@ -1,5 +1,3 @@
-PLAYERS_COUNT = 16
-
 """
 delu2()
 {

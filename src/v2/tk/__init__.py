@@ -4,7 +4,27 @@ from ..objsys import PlayerData
 from ..opensys import World, WorldError
 
 
+def get_my_lev():
+    raise NotImplementedError()
+
+
+def get_my_sex():
+    raise NotImplementedError()
+
+
+def get_my_str():
+    raise NotImplementedError()
+
+
+def initme():
+    raise NotImplementedError()
+
+
 def pbfr():
+    raise NotImplementedError()
+
+
+def randperc():
     raise NotImplementedError()
 
 
@@ -16,7 +36,15 @@ def sendmsg(name):
     raise NotImplementedError()
 
 
-def special(code, name):
+def sendsys(player_to, player_from, code, channel_id, message):
+    raise NotImplementedError()
+
+
+def set_curmode(value):
+    raise NotImplementedError()
+
+
+def trapch(channel_id):
     raise NotImplementedError()
 
 
@@ -73,7 +101,7 @@ class Player:
             World.save()
 
         self.reader.reset()
-        special('.g', self.name)
+        special('.g', self)
         self.in_game = True
 
     def next_turn(self):
@@ -99,6 +127,17 @@ class Player:
         self.__data.name = self.name
         self.__data.channel_id = self.channel_id
         return self.__data.player_id
+
+    def from_person(self):
+        self.__data.strength = get_my_str()
+        self.__data.level = get_my_lev()
+        if get_my_lev() < 10000:
+            self.__data.visible = 0
+        else:
+            self.__data.visible = 10000
+        self.__data.weapon_id = -1
+        self.__data.flags = get_my_sex()
+        self.__data.helping = -1
 
     def see_player(self, name):
         # fpbn
@@ -238,7 +277,7 @@ if((strcmp(work,"*"))&&(work[0]=='*')){(work[0]=32);goto nadj;}
        {
        if(((strcmp(work,".Q"))&&(strcmp(work,".q")))&& (!!strlen(work)))
           {
-          a=special(work,name);
+          a=special(work, player);
           }
        }
 if(fighting>-1)
@@ -358,56 +397,50 @@ def talker(player):
     sec_write(unit,inpbk,0,64);
     revise(inpbk[0]);
     }
- 
- 
- 
- special(string,name)
- char *string,*name;
-    {
-    extern long curmode;
-    char ch,bk[128];
-    extern long moni;
-    extern long my_str,my_lev,my_sco,my_sex;
-    FILE * ufl;
-    char xx[128];
-    char xy[128];
-    char us[32];
-    strcpy(bk,string);
-    lowercase(bk);
-    ch= *bk;
-    if (ch!='.') return(0);
-    ch=bk[1];
-    switch(ch)
-       {
-       case 'g':
-          curmode=1;
-          player.channel_id= -5;
-          initme();
-          ufl=World.load()
-          setpstr(player.player_id,my_str);
-          setplev(player.player_id,my_lev);
- if(my_lev<10000) setpvis(player.player_id,0);
-    else setpvis(player.player_id,10000);
-          setpwpn(player.player_id,-1);
-          setpsexall(player.player_id,my_sex);
-          setphelping(player.player_id,-1);
-          cuserid(us);
-          sprintf(xy,"\001s%s\001%s  has entered the game\n\001",name,name);
-          sprintf(xx,"\001s%s\001[ %s  has entered the game ]\n\001",name,name);
-          sendsys(name,name,-10113,player.channel_id,xx);
-          rte(name);
-          if(randperc()>50)trapch(-5);
-else{player.channel_id= -183;trapch(-183);}
-sendsys(name,name,-10000,player.channel_id,xy);
-          break;
-       default:
-          printf("\nUnknown . option\n");
-          }
-    return(1);
-    }
- 
- 
- 
+"""
+
+
+def __start_game(player):
+    set_curmode(1)
+    player.channel_id = -5
+    initme()
+    World.load()
+    player.from_person()
+
+    sendsys(
+        player.name,
+        player.name,
+        -10113,
+        player.channel_id,
+        "[s name=\"{name}\"][ {name}  has entered the game ][/s]".format(name=player.name),
+    )
+    rte(player.name)
+    if randperc() > 50:
+        trapch(-5)
+    else:
+        player.channel_id = -183
+        trapch(-183)
+    sendsys(
+        player.name,
+        player.name,
+        -10000,
+        player.channel_id,
+        "[s name=\"{name}\"]{name}  has entered the game[/s]".format(name=player.name),
+    )
+
+
+def special(code, player):
+    if len(code) < 2 or code[0] != '.':
+        return False
+    code = code.lower()
+    if code[1] == 'g':
+        __start_game(player)
+    else:
+        print("Unknown . option")
+    return True
+
+
+"""
 long dsdb=0;
  
  

@@ -2,15 +2,13 @@ def get_ail_blind():
     raise NotImplementedError()
 
 
-def get_maxu():
-    raise NotImplementedError()
-
-
 def isdark(channel_id):
     raise NotImplementedError()
 
 
 class PlayerData:
+    PLAYERS_COUNT = 16
+
     GENDER_HE = 'he'
     GENDER_SHE = 'she'
     GENDER_IT = 'it'
@@ -28,7 +26,7 @@ class PlayerData:
 
     @property
     def exists(self):
-        return not self.name
+        return self.name != ''
 
     @property
     def gender(self):
@@ -61,7 +59,7 @@ class PlayerData:
 
     @classmethod
     def players(cls):
-        for player_id in range(get_maxu()):
+        for player_id in range(cls.PLAYERS_COUNT):
             yield cls(player_id)
 
     @classmethod
