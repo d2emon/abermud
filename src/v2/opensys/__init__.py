@@ -79,6 +79,38 @@ class World(Service):
             raise WorldError("Cannot find World file")
 
     @classmethod
+    def read_meta(cls):
+        return cls.__world.read(0)
+
+    @classmethod
+    def read_event(cls, event_id):
+        return cls.__world.read(event_id)
+
+    @classmethod
+    def read_players(cls):
+        return cls.__world.read(350)
+
+    @classmethod
+    def read_items(cls):
+        return cls.__world.read(400)
+
+    @classmethod
+    def write_meta(cls, meta):
+        cls.__world.write(meta, 0)
+
+    @classmethod
+    def write_event(cls, event_id, event):
+        cls.__world.write(event, event_id)
+
+    @classmethod
+    def write_players(cls, players):
+        cls.__world.write(cls.__players, 350)
+
+    @classmethod
+    def write_items(cls, items):
+        cls.__world.write(cls.__items, 400)
+
+    @classmethod
     def load(cls):
         if cls.__world is not None:
             return cls.__world
